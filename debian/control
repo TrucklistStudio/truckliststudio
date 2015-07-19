@@ -1,0 +1,72 @@
+Source: truckliststudio
+Section: video
+Priority: optional
+Maintainer: Karl Ellis <soylent.tv@gmail.com>
+Build-Depends: debhelper (>= 7.2.7~),
+  cdbs (>= 0.4.69~),
+  dkms (>= 2.1.1.1),
+  devscripts,
+  bzip2,
+  subversion,
+  linux-headers-generic,
+  ant,
+  default-jdk,
+  openjdk-7-jdk,
+  libappframework-java,
+  libcommons-cli-java,
+  libcommons-codec-java,
+  libcommons-httpclient-java,
+  libcommons-lang3-java,
+  libjsr305-java,
+  liblog4j1.2-java,
+  libnetty-java,
+  libslf4j-java,
+  libswingworker-java,
+  junit
+Standards-Version: 3.9.3
+Homepage: http://sourceforge.net/projects/truckliststudio
+Vcs-Svn: http://svn.code.sf.net/p/truckliststudio/svn/trunk
+Vcs-Browser: http://sourceforge.net/p/truckliststudio/svn/HEAD/tree/
+
+Package: truckliststudio
+Architecture: amd64 i386
+Depends: openjdk-7-jre,
+  java-wrappers,
+  libappframework-java,
+  libcommons-cli-java,
+  libcommons-codec-java,
+  libcommons-httpclient-java,
+  libcommons-lang3-java,
+  libjsr305-java,
+  liblog4j1.2-java,
+  libnetty-java,
+  libslf4j-java,
+  libswingworker-java,
+  libav-tools | ffmpeg,
+  libavformat-extra-53 | libavformat-extra-54 | libavformat56,
+  gstreamer-tools,
+  gstreamer0.10-plugins-good,
+  gstreamer0.10-plugins-bad,
+  gstreamer0.10-plugins-bad-multiverse,
+  gstreamer0.10-plugins-ugly,
+  gstreamer0.10-pulseaudio,
+  gstreamer0.10-gnonlin,
+  gstreamer0.10-fluendo-mp3,
+  gstreamer1.0-tools,
+  gstreamer1.0-gnonlin,
+  gstreamer1.0-alsa,
+  gstreamer1.0-fluendo-mp3,
+  pavucontrol,
+  pulseaudio-utils,
+  zenity,
+  wmctrl,
+  ${shlibs:Depends},
+  ${misc:Depends}
+Recommends: ,
+  ${shlibs:Recommends}
+Suggests: ffmpeg | ffmpeg-real,
+  ${shlibs:Suggests}
+Description: TrucklistStudio is a fork from WebcamStudio software.
+  It is only capable to handle Videos, Music, Picture and Text/Animated-Gifs Overlays. It can 
+  Broadcast to almost every kind of services through FMEs XML configuration files.
+  The Main goal is to have a light and stable media playlist broadcasting software.

@@ -1,0 +1,59 @@
+truckliststudio (0.7)    04 Jun 2015
+
+  * Changes: More GUI Modifications.
+  * Changes: List Items Foreground colors. The "Now Playing Item" is directly painted in Yellow, inside the Track List.
+  * Adds: DesktopTabs like WebcamStudio 0.73.
+  * Adds: "Iconize All Tabs Streams" Button.
+  * Removes: "Now Playing" Label.
+  * Fixes: Playlist is broken if adding a media folder that contains files other than Video/Music.
+  * Fixes: jpg pictures are not displayed.
+  * New upstream version
+
+truckliststudio (0.6)    02 Jun 2015
+
+  * Changes: More GUI Modifications.
+  * Changes: Some code cleanup.
+  * Changes: Streams reading source switched from TCP to Console (Thanks P.Balleux).
+  * Adds: "Add FME" OutputPanel Button, to add FME manually.
+  * Removes: SourceCustom removed.
+  * Fixes: Auto "Make a Track" have to work only for music and videos.
+  * New upstream version
+
+truckliststudio (0.5)    25 Apr 2015
+
+  * Changes: More deep GUI Modifications.
+  * Changes: Some code cleanup.
+  * New upstream version
+
+truckliststudio (0.4)    22 Apr 2015
+
+  * Changes: More GUI Modifications.
+  * Adds: AutoTrack feature. If enabled all Movies and Music loaded streams will be added to the playlist automatically.
+  * Removes: AutoPlaylist Button.
+  * New upstream version
+
+truckliststudio (0.3)    17 Apr 2015
+
+  * Fixes: Rename and Remove tracks operations.
+  * Changes: More GUI Modifications.
+  * Changes: More refactoring to match TrucklistStudio Project.
+  * Removes: WebcamStudio Studio Files support. TrucklistStudio will not be able to load WebcamStudio Studio Files.
+  * New upstream version
+
+truckliststudio (0.2)    16 Apr 2015
+
+  * Fixes: Removing first track, next channel will not match in playlist.
+  * Fixes: Duration in tracks operation don't match the current stream time.
+  * Fixes: Adding a new track and playing it will not stop current Media playing.
+  * Changes: Refactored almost all classes to match TruclistStudio project.
+  * Changes: Debian Packaging Operations.
+  * Changes: Deep GUI re-design using Split Panes.
+  * Adds: Add tracks to PlayList without stopping timer.
+  * Adds: "Make a Track" button in Tracks Options.
+  * Adds: Initial Windows compatibility Layer (Static ffmpeg build needed to be copied in project/installation root folder).
+  * Removes: Vloopback and Webcam related classes and operatios.
+  * New upstream version
+
+truckliststudio (0.1)    15 Apr 2015
+
+  * Initial release

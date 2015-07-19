@@ -1,0 +1,16 @@
+debian/truckliststudio.desktop usr/share/applications
+debian/truckliststudio.png usr/share/pixmaps
+debian/wrappers/truckliststudio usr/bin
+
+dist/* usr/lib/truckliststudio
+
+libraries/commons-io-*.jar usr/lib/truckliststudio/lib
+libraries/AbsoluteLayout-7.0.jar usr/lib/truckliststudio/lib
+libraries/jna-*.jar usr/lib/truckliststudio/lib
+libraries/jtwitter*.jar usr/lib/truckliststudio/lib
+libraries/mail.jar usr/lib/truckliststudio/lib
+libraries/zxing*.jar usr/lib/truckliststudio/lib
+libraries/imgscalr-lib-*.jar usr/lib/truckliststudio/lib
+libraries/Catalano.*.jar usr/lib/truckliststudio/lib
+
+src/truckliststudio/resources/start.gif usr/lib/truckliststudio

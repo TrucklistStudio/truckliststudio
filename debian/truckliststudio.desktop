@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Encoding=UTF-8
+Name=TrucklistStudio
+Type=Application
+Categories=AudioVideo;
+Terminal=false
+Icon=/usr/share/pixmaps/truckliststudio.png
+Exec=/usr/bin/truckliststudio
+Comment=TrucklistStudio for GNU/Linux
