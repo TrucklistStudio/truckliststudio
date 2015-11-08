@@ -132,7 +132,7 @@
                                           <Component id="spinHeight" pref="90" max="32767" attributes="0"/>
                                           <Component id="spinWidth" max="32767" attributes="0"/>
                                       </Group>
-                                      <EmptySpace pref="18" max="32767" attributes="0"/>
+                                      <EmptySpace pref="40" max="32767" attributes="0"/>
                                       <Component id="tglLockRatio" max="32767" attributes="0"/>
                                   </Group>
                               </Group>
@@ -140,12 +140,12 @@
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="btnFullScreen" max="32767" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="tglSound" max="32767" attributes="0"/>
+                              <Component id="tglSound" min="-2" pref="129" max="-2" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="btnApply" min="-2" pref="98" max="-2" attributes="0"/>
                               <EmptySpace min="-2" pref="0" max="-2" attributes="0"/>
-                              <Component id="btnApplyToStreams" max="32767" attributes="0"/>
+                              <Component id="btnApplyToStreams" pref="129" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jLabel3" max="-2" attributes="0"/>

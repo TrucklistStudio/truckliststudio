@@ -49,10 +49,10 @@ public class TSImage extends BufferedImage {
     }
    
     public void readFully(DataInputStream din) throws IOException {
-        if (din.available() > 0) {
+//        if (din.available() > 0) {
             din.readFully(byteData);
             convertByte(byteData);
-        }
+//        }
     }
 
     public byte[] getBytes() {

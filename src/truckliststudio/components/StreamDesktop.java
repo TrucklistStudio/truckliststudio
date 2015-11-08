@@ -25,10 +25,9 @@ import truckliststudio.mixers.MasterFrameBuilder;
 import truckliststudio.mixers.MasterMixer;
 import truckliststudio.mixers.PreviewFrameBuilder;
 import truckliststudio.streams.SourceAudioSource;
-//import truckliststudio.streams.SourceCustom;
 import truckliststudio.streams.SourceImage;
 import truckliststudio.streams.SourceImageGif;
-import truckliststudio.streams.SourceImageU;
+//import truckliststudio.streams.SourceImageU;
 import truckliststudio.streams.SourceMovie;
 import truckliststudio.streams.SourceMusic;
 import truckliststudio.streams.SourceText;
@@ -146,7 +145,7 @@ public class StreamDesktop extends javax.swing.JInternalFrame {
                         jCBGStreamer.setSelected(false);
                         break;
                     default:
-                        if (stream instanceof SourceAudioSource ||stream instanceof SourceImageU) {
+                        if (stream instanceof SourceAudioSource) { // ||stream instanceof SourceImageU
                             jCBGStreamer.setSelected(true);
                             stream.setComm("GS");
                             jCBAVConv.setSelected(false);
@@ -160,16 +159,16 @@ public class StreamDesktop extends javax.swing.JInternalFrame {
                         break;
                 }
             } else {
-                if (stream instanceof SourceAudioSource ||stream instanceof SourceImageU) {
-                    if (distro.equals("windows")) {
-                        stream.setComm("FF");
-                        jCBFFmpeg.setSelected(true);    
-                    } else {
+                if (stream instanceof SourceAudioSource) { // ||stream instanceof SourceImageU
+//                    if (distro.equals("windows")) {
+//                        stream.setComm("FF");
+//                        jCBFFmpeg.setSelected(true);    
+//                    } else {
                         jCBGStreamer.setSelected(true);
                         stream.setComm("GS");
                         jCBAVConv.setSelected(false);
                         jCBFFmpeg.setSelected(false);
-                    }
+//                    }
                 } else {
                     if (distro.toLowerCase().equals("ubuntu")){
                         jCBAVConv.setSelected(true);

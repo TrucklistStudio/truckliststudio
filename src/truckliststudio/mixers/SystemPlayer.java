@@ -5,7 +5,6 @@
 package truckliststudio.mixers;
 
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.LineUnavailableException;
@@ -32,10 +31,8 @@ public class SystemPlayer implements Runnable {
     public boolean stopMePub = stopMe;
     private SourceDataLine source;
     private ExecutorService executor = null;
-    private final ArrayList<byte[]> buffer = new ArrayList<byte[]>();
     private FrameBuffer frames = null;
     private Viewer viewer = null;
-    private final int aFreq = audioFreq;
 
     private SystemPlayer(Viewer viewer) {
         this.viewer = viewer;

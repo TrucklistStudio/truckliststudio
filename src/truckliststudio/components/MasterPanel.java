@@ -10,14 +10,14 @@
  */
 package truckliststudio.components;
 
+import static com.jhlabs.image.ImageUtils.cloneImage;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.WritableRaster;
 import java.beans.PropertyVetoException;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -62,13 +62,15 @@ public class MasterPanel extends javax.swing.JPanel implements MasterMixer.SinkL
     boolean lockRatio = false;
     private BufferedImage liveImg = null;
     int opacity = 75;
+    int rate = mixer.getRate();
+    int i = rate;
     public static float masterVolume = 0f;
+    boolean transition = false;
     
     
     /** Creates new form MasterPanel */
     public MasterPanel() {
         initComponents();
-//        tglSound.setVisible(false);
         jslOpacity.setValue(75);
         lblCurtain.setVisible(false);
         spinFPS.setModel(new SpinnerNumberModel(5, 5, 30, 5));
@@ -275,16 +277,16 @@ public class MasterPanel extends javax.swing.JPanel implements MasterMixer.SinkL
                                 .addGroup(panMixerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(spinHeight, javax.swing.GroupLayout.DEFAULT_SIZE, 90, Short.MAX_VALUE)
                                     .addComponent(spinWidth))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 40, Short.MAX_VALUE)
                                 .addComponent(tglLockRatio, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                     .addGroup(panMixerLayout.createSequentialGroup()
                         .addComponent(btnFullScreen, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(tglSound, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(tglSound, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(panMixerLayout.createSequentialGroup()
                         .addComponent(btnApply, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, 0)
-                        .addComponent(btnApplyToStreams, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(btnApplyToStreams, javax.swing.GroupLayout.DEFAULT_SIZE, 129, Short.MAX_VALUE))
                     .addGroup(panMixerLayout.createSequentialGroup()
                         .addComponent(jLabel3)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -442,6 +444,7 @@ public class MasterPanel extends javax.swing.JPanel implements MasterMixer.SinkL
         for (Stream s : streamM){
             String streamName =s.getClass().getName();
 //            System.out.println("StreamName: "+streamName);
+            s.setRate(mixer.getRate());
             if (streamName.contains("SinkFile") || streamName.contains("SinkUDP")){
 //                System.out.println("Sink New Size: "+w+"x"+h);
                 s.setWidth(w);
@@ -458,6 +461,7 @@ public class MasterPanel extends javax.swing.JPanel implements MasterMixer.SinkL
         ArrayList<Stream> allStreams = MasterTracks.getInstance().getStreams();
         int wi = mixer.getWidth();
         int he = mixer.getHeight();
+        int rate = mixer.getRate();
         int oldCW;
         int oldCH;
         for (Stream oneStream : allStreams) {
@@ -500,6 +504,7 @@ public class MasterPanel extends javax.swing.JPanel implements MasterMixer.SinkL
                     oneStream.setY(newY);
                     oneStream.setCaptureWidth(newW);
                     oneStream.setCaptureHeight(newH);
+                    oneStream.setRate(rate);
                     sTx.setTextCW(wi);
                     sTx.setTextCH(he);
 //                    System.out.println(oneStream.getName()+" UpdateStatus !!!");
@@ -520,6 +525,7 @@ public class MasterPanel extends javax.swing.JPanel implements MasterMixer.SinkL
                     oneStream.setY(newY);
                     oneStream.setCaptureWidth(newW);
                     oneStream.setCaptureHeight(newH);
+                    oneStream.setRate(rate);
                     sImg.setImgCW(wi);
                     sImg.setImgCH(he);
 //                    System.out.println(oneStream.getName()+" UpdateStatus !!!");
@@ -539,6 +545,7 @@ public class MasterPanel extends javax.swing.JPanel implements MasterMixer.SinkL
                     oneStream.setY(newY);
                     oneStream.setCaptureWidth(wi);
                     oneStream.setCaptureHeight(he);
+                    oneStream.setRate(rate);
 //                    System.out.println(oneStream.getName()+" UpdateStatus !!!");
                     oneStream.updateStatus();
                     for (SourceTrack ssc : oneStream.getTracks()) {
@@ -745,26 +752,54 @@ public class MasterPanel extends javax.swing.JPanel implements MasterMixer.SinkL
 
     @Override
     public void newFrame(Frame frame) {
+        if (transition) {
+            if (i == 0) {
+                i = rate;
+                transition= false;
+            }  
+            BufferedImage img = cloneImage(frame.getImage());
+            BufferedImage temp = cloneImage(img);
+            Graphics2D buffer = img.createGraphics();
+            buffer.setRenderingHint(RenderingHints.KEY_RENDERING,
+                               RenderingHints.VALUE_RENDER_SPEED);
+            buffer.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                               RenderingHints.VALUE_ANTIALIAS_OFF);
+            buffer.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+                               RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+            buffer.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS,
+                               RenderingHints.VALUE_FRACTIONALMETRICS_OFF);
+            buffer.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING,
+                               RenderingHints.VALUE_COLOR_RENDER_SPEED);
+            buffer.setRenderingHint(RenderingHints.KEY_DITHERING,
+                               RenderingHints.VALUE_DITHER_DISABLE);
+            buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, i*100/rate / 100F));
+            buffer.setBackground(new Color(0,0,0,0));
+            buffer.clearRect(0,0,img.getWidth(),img.getHeight());
+            buffer.drawImage(temp, 0, 0,null);
+            buffer.dispose();
+            frame.setImage(img);
+            i--;
+        }
         player.addFrame(frame);
         liveImg = frame.getImage();
     }
     
-    BufferedImage deepCopy(BufferedImage bi) {
-        if (bi != null) {
-            ColorModel cm = bi.getColorModel();
-            boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
-            WritableRaster raster = bi.copyData(null);
-            BufferedImage temp = new BufferedImage(cm, raster, isAlphaPremultiplied, null);
-            return temp;
-        } else {
-            return null;
-        }
-    }
+//    BufferedImage deepCopy(BufferedImage bi) {
+//        if (bi != null) {
+//            ColorModel cm = bi.getColorModel();
+//            boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
+//            WritableRaster raster = bi.copyData(null);
+//            BufferedImage temp = new BufferedImage(cm, raster, isAlphaPremultiplied, null);
+//            return temp;
+//        } else {
+//            return null;
+//        }
+//    }
     
     @Override
     public void newPreFrame(Frame frame) {
-        BufferedImage img = deepCopy(frame.getImage());
-        BufferedImage lImg = deepCopy(liveImg);
+        BufferedImage img = cloneImage(frame.getImage());
+        BufferedImage lImg = cloneImage(liveImg);
         if (lImg != null) {
             Graphics2D buffer = lImg.createGraphics();
             buffer.setRenderingHint(RenderingHints.KEY_INTERPOLATION, 

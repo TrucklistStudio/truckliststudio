@@ -45,9 +45,6 @@ import truckliststudio.streams.Stream;
 import truckliststudio.studio.Studio;
 import truckliststudio.util.Tools;
 
-
-
-
 /**
  *
  * @author patrick (modified by karl)
@@ -235,7 +232,7 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
             lblPlayingTrack.setForeground(Color.YELLOW);
         }
         btnAdd.setVisible(false);
-//        btnAutoPlayList.setVisible(false);
+        listTracks.revalidate();
         
         loadPrefs();
         ((JSpinner.DefaultEditor)trkDuration.getEditor()).getTextField().addKeyListener(new KeyListener(){
@@ -345,6 +342,7 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
         spinJumpPos = new javax.swing.JSpinner();
         btnJump = new javax.swing.JButton();
         jSeparator3 = new javax.swing.JSeparator();
+        btnDuplicateTrk = new javax.swing.JButton();
 
         setFont(new java.awt.Font("Noto Sans", 1, 18)); // NOI18N
 
@@ -586,6 +584,15 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
         jSeparator3.setName("jSeparator3"); // NOI18N
         jSeparator3.setPreferredSize(new java.awt.Dimension(0, 3));
 
+        btnDuplicateTrk.setIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/duplicatebutton.png"))); // NOI18N
+        btnDuplicateTrk.setToolTipText("Duplicate Selected Track");
+        btnDuplicateTrk.setName("btnDuplicateTrk"); // NOI18N
+        btnDuplicateTrk.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDuplicateTrkActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -609,6 +616,8 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
                                 .addComponent(spinJumpPos, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btnAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnDuplicateTrk, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btnRemove, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -651,13 +660,15 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
                         .addComponent(btnUp, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(btnUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(btnRemove, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(btnClearAllTrk, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(tglRemote, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(btnDown, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                 .addComponent(spinJumpPos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(btnJump, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                .addComponent(btnJump, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btnDuplicateTrk, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnClearAllTrk, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addComponent(lblPlayingTrack, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -672,7 +683,7 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(trkProgressTime, javax.swing.GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE)
+                        .addComponent(trkProgressTime, javax.swing.GroupLayout.DEFAULT_SIZE, 92, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, 3, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -882,7 +893,7 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
         @Override
         public void run(){
             updateTrackOn();
-            System.out.println("IndexPlaying="+trkOn+" PlaylistSize="+arrayListTracks.size());
+//            System.out.println("IndexPlaying="+trkOn+" PlaylistSize="+arrayListTracks.size());
             if (trkOn == arrayListTracks.size() - 1) {
                 trkNxName = arrayListTracks.get(0);
             } else {
@@ -899,7 +910,7 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
             listTracks.setSelectedValue(trkNxName, true);
             master.selectTrack(trkNxName);
             String name = listTracks.getSelectedValue().toString();
-            System.out.println("Apply Select: "+name);
+            System.out.println("Playing: "+name);
             lblPlayingTrack.setText(name);boolean noDuplicateCh = true;
 //        for (String chName : arrayListTracks){
 //            if (name.equals(chName)){
@@ -1382,7 +1393,7 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
                     String name = listTracks.getSelectedValue().toString();
                     master.selectTrack(name);
                     savePrefs();
-                    System.out.println("Playing Select: "+name);
+                    System.out.println("Playing: "+name);
                     lblPlayingTrack.setText(name);
                     btnRemove.setEnabled(false);
 //                    btnRename.setEnabled(false);
@@ -1411,7 +1422,7 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
                         String name = listTracks.getSelectedValue().toString();
                         master.selectTrack(name);
                         savePrefs();
-                        System.out.println("Playing Select: "+name);
+                        System.out.println("Playing: "+name);
                         lblPlayingTrack.setText(name);
                         btnRemove.setEnabled(false);
 //                        btnRename.setEnabled(false);
@@ -1490,7 +1501,7 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
         updateTrackOn();
         master.selectTrack(name);
         savePrefs();
-        System.out.println("Playing Select: "+name);
+        System.out.println("Playing: "+name);
         lblPlayingTrack.setText(name);
         btnRemove.setEnabled(false);
 //        btnRename.setEnabled(false);
@@ -1526,7 +1537,7 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
                     String name = listTracks.getSelectedValue().toString();
                     master.selectTrack(name);
                     savePrefs();
-                    System.out.println("Playing Select: "+name);
+                    System.out.println("Playing: "+name);
                     lblPlayingTrack.setText(name);
                     btnRemove.setEnabled(false);
 //                    btnRename.setEnabled(false);
@@ -1560,7 +1571,7 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
             master.stopTextCDown();
             Tools.sleep(100);
             updateTrackOn();
-            System.out.println("IndexPlaying="+trkOn+" PlaylistSize="+arrayListTracks.size());
+//            System.out.println("IndexPlaying="+trkOn+" PlaylistSize="+arrayListTracks.size());
             if (trkOn == arrayListTracks.size() - 1) {
                 trkNxName = arrayListTracks.get(0);
             } else {
@@ -1577,7 +1588,7 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
             listTracks.setSelectedValue(trkNxName, true);
             master.selectTrack(trkNxName);
             String name = listTracks.getSelectedValue().toString();
-            System.out.println("Apply Select: "+name);
+            System.out.println("Playing: "+name);
             lblPlayingTrack.setText(name);
             listTracks.repaint();
             if (trkNextTime != 0) {
@@ -1822,12 +1833,47 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
             }
         }
     }//GEN-LAST:event_spinJumpPosStateChanged
+    @SuppressWarnings("unchecked")
+    private void btnDuplicateTrkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDuplicateTrkActionPerformed
+        if (listTracks.getSelectedIndex() != -1) {
+            int selectedTrkIndex = listTracks.getSelectedIndex();
+            String selectedTrkName = arrayListTracks.get(selectedTrkIndex);
+            int count = 0;
+            for (String trkName : arrayListTracks){
+                if (trkName.contains(selectedTrkName)){
+                    count++;
+//                    System.out.println("Counting...");
+                }
+            }
+            String duplicatedTrkName = selectedTrkName + "("+count+")";
+            int selectedTrkTimer = CHTimers.get(selectedTrkIndex);
+            
+            ArrayList<Stream> allStreams = MasterTracks.getInstance().getStreams();
+            for (Stream s : allStreams) {
+                if (!s.getClass().toString().contains("Sink")){
+//                    System.out.println("StreamName="+s.getName());
+                    SourceTrack streamTrk = master.getTrack(selectedTrkName, s);
+                    SourceTrack dupTrk = SourceTrack.duplicateTrack(streamTrk);
+                    dupTrk.setName(duplicatedTrkName);
+                    s.addTrack(dupTrk);
+                }
+            }
+            
+            master.addTrack2List(duplicatedTrkName);
+            model.addElement(duplicatedTrkName);
+            CHTimers.add(selectedTrkTimer);
+            arrayListTracks.add(duplicatedTrkName);
+            listTracks.revalidate();
+//            System.out.println("Tracks="+arrayListTracks);
+        }
+    }//GEN-LAST:event_btnDuplicateTrkActionPerformed
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JPanel PanelResource;
     private javax.swing.JButton btnAdd;
     private javax.swing.JButton btnClearAllTrk;
     private javax.swing.JButton btnDown;
+    private javax.swing.JButton btnDuplicateTrk;
     private javax.swing.JButton btnJump;
     private javax.swing.JButton btnRemove;
     private javax.swing.JButton btnSkipTrack;

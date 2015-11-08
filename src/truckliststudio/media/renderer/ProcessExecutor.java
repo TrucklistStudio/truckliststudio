@@ -34,9 +34,9 @@ public class ProcessExecutor {
 
     public static int getPID(Process process) throws Exception //Author Martijn Courteaux Code
     {
-//        System.out.println("Process_GetUnixPid: "+process.getClass().getName());
+//    System.out.println("Process_GetUnixPid: "+process.getClass().getName());
     String pName = process.getClass().getName();
-    System.out.println("ProcessType="+pName);
+//    System.out.println("ProcessType="+pName);
     if (pName.equals("java.lang.UNIXProcess")) {
         Class cl = process.getClass();
         Field field = cl.getDeclaredField("pid");
@@ -44,7 +44,7 @@ public class ProcessExecutor {
         Object pidObject = field.get(process);
         return (Integer) pidObject;
     } else if (os.equals(os.WINDOWS)){
-        System.out.println("Windows Process ...");
+//        System.out.println("Windows Process ...");
         int ret = 0;
         try {
             Field f = process.getClass().getDeclaredField("handle");
@@ -55,7 +55,7 @@ public class ProcessExecutor {
             WinNT.HANDLE handle = new WinNT.HANDLE();
             handle.setPointer(Pointer.createConstant(handl));
             ret = kernel.GetProcessId(handle);
-            System.out.println("Detected Win32 pid: "+ ret);
+//            System.out.println("Detected Win32 pid: "+ ret);
             
         } catch (Throwable e) {
             e.printStackTrace();
@@ -69,7 +69,7 @@ public class ProcessExecutor {
     public static void killUnixProcess(Process process) throws Exception //Modified from Martijn Courteaux Code
     {
     int pid = getPID(process);
-    System.out.println("Process_Pid: "+pid);
+//    System.out.println("Process_Pid: "+pid);
     String commandPids = "ps -ef | awk '{if ($3 == "+pid+") print $2;}'";
     File fileP=new File(userHomeDir+"/.webcamstudio/"+"WSBust.sh");
     FileOutputStream fosV;
@@ -113,7 +113,7 @@ public class ProcessExecutor {
     public static void killWin32Process(Process process) throws Exception //Modified from Martijn Courteaux Code
     {
         int pid = getPID(process);
-        System.out.println("Process_Pid: "+pid);
+//        System.out.println("Process_Pid: "+pid);
         String batchPidCommand = "taskkill /F /pid " + pid;
         rt.exec(batchPidCommand);
         Tools.sleep(10);

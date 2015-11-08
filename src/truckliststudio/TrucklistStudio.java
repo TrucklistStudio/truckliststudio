@@ -74,7 +74,6 @@ import truckliststudio.components.ResourceMonitor;
 import truckliststudio.components.ResourceMonitorLabel;
 import truckliststudio.components.SourceControls;
 import truckliststudio.components.StreamDesktop;
-//import static truckliststudio.components.TrackPanel.listTracks;
 import truckliststudio.externals.ProcessRenderer;
 import truckliststudio.mixers.MasterMixer;
 import truckliststudio.mixers.PrePlayer;
@@ -84,7 +83,6 @@ import truckliststudio.streams.SourceAudioSource;
 import truckliststudio.streams.SourceTrack;
 import truckliststudio.streams.SourceImage;
 import truckliststudio.streams.SourceImageGif;
-import truckliststudio.streams.SourceImageU;
 import truckliststudio.streams.SourceMovie;
 import truckliststudio.streams.SourceMusic;
 import truckliststudio.streams.SourceText;
@@ -136,13 +134,14 @@ public final class TrucklistStudio extends JFrame implements StreamDesktop.Liste
     private Color busyTab = Color.red;
     private Color resetTab = Color.black;
     ArrayList<JDesktopPane> tabs = new ArrayList<>();
+    public static boolean x64 = false;
+    public static boolean winGS = false;
     
     @Override
     public void closeSource(String name) {
-//        String name = lblSourceSelected.getText();
         lblSourceSelected.setText("");
         int tabIndex = tabSources.getSelectedIndex();
-        System.out.println("TabIndex="+tabIndex);
+//        System.out.println("TabIndex="+tabIndex);
         String tabTitle = tabSources.getTitleAt(tabIndex);
         if (tabTitle.contains("Videos")) {
             numVideos -= 1;
@@ -262,7 +261,7 @@ public final class TrucklistStudio extends JFrame implements StreamDesktop.Liste
                     } else {
                         for (DataFlavor d : evt.getTransferable().getTransferDataFlavors()) {
                             if (evt.getTransferable().isDataFlavorSupported(d)) {
-                                System.out.println("Supported: " + d.getDefaultRepresentationClassAsString());
+//                                System.out.println("Supported: " + d.getDefaultRepresentationClassAsString());
                                 dataFlavor = d;
                                 break;
                             }
@@ -328,7 +327,7 @@ public final class TrucklistStudio extends JFrame implements StreamDesktop.Liste
                                             Font font = new Font("Ubuntu", Font.BOLD, 11);
                                             lblMusic.setFont(font);
                                             lblMusic.setText("Musics("+numMusics+")");
-                                        } else if (stream instanceof SourceImage || stream instanceof SourceImageU  || stream instanceof SourceImageGif) {
+                                        } else if (stream instanceof SourceImage || stream instanceof SourceImageGif) { //|| stream instanceof SourceImageU  
                                             numPictures += 1;
                                             pictureDesktop.add(frame, javax.swing.JLayeredPane.DEFAULT_LAYER);
                                             lblPicture.setForeground(busyTab);
@@ -422,6 +421,14 @@ public final class TrucklistStudio extends JFrame implements StreamDesktop.Liste
         
         mainVerticalSplit.setBottomComponent(bottomPanel);
         masterPanelSplit.setEnabled(false);
+        
+        if (os == OS.WINDOWS) {
+            checkWinBits();
+            checkWinGS();
+            tabSources.remove(4);
+            tglAVconv.setVisible(false);
+            lblAVconv.setVisible(false);
+        }
         initAnimations();
         initAudioMainSW();
         initThemeMainSW();
@@ -450,6 +457,38 @@ public final class TrucklistStudio extends JFrame implements StreamDesktop.Liste
         return new StreamDesktop(s, this);
     }
 
+    private boolean checkWinBits() {
+        File prgSystemDir = new File("C:\\");
+        File[] listFile = prgSystemDir.listFiles();
+        for (File f : listFile){
+            System.out.println("File Name: "+f.getName());
+            if (f.getName().equals("Program Files (x86)")){
+                x64 = true;
+                break;
+            } else {
+                x64 = false;
+            }
+        }
+        System.out.println("bit64: "+x64);
+        return x64;
+    }
+    
+    private boolean checkWinGS() {
+        File prgSystemDir = new File("C:\\");
+        File[] listFile = prgSystemDir.listFiles();
+        for (File f : listFile){
+            System.out.println("File Name: "+f.getName());
+            if (f.getName().equals("gstreamer")){
+                winGS = true;
+                break;
+            } else {
+                winGS = false;
+            }
+        }
+        System.out.println("winGS: "+winGS);
+        return winGS;
+    }
+    
     @SuppressWarnings("unchecked")  
     private void initAnimations() {
         try {
@@ -494,10 +533,23 @@ public final class TrucklistStudio extends JFrame implements StreamDesktop.Liste
         // FF = 0 ; AV = 1 ; GS = 2
         if (wsDistroWatch().toLowerCase().equals("windows")) {
             btnAddAudioSrc.setVisible(false);
-            outFMEbe = 0;
-            tglFFmpeg.setSelected(true);
-            tglAVconv.setEnabled(false);
-            tglGst.setEnabled(false);
+            if (winGS){ 
+                tglGst.setEnabled(true);
+            } else {
+                tglGst.setEnabled(false);
+            }
+            if (outFMEbe == 0) {
+                outFMEbe = 0;
+                tglFFmpeg.setSelected(true);
+            } else if (outFMEbe == 2) {
+                if (tglGst.isEnabled()) {
+                    tglFFmpeg.setSelected(false);
+                    tglGst.setSelected(true);    
+                } else {
+                    outFMEbe = 0;
+                    tglFFmpeg.setSelected(true);
+                }
+            }
         } else {
             if (ffmpeg && !avconv){
                 if (outFMEbe == 0 || outFMEbe == 1) {
@@ -675,7 +727,7 @@ public final class TrucklistStudio extends JFrame implements StreamDesktop.Liste
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("TrackStudio");
-        setMinimumSize(new java.awt.Dimension(916, 740));
+        setMinimumSize(new java.awt.Dimension(916, 600));
         setPreferredSize(new java.awt.Dimension(930, 750));
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
@@ -1116,7 +1168,7 @@ public final class TrucklistStudio extends JFrame implements StreamDesktop.Liste
         toolbar.add(jSeparator2);
 
         btnMinimizeTab.setIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/go-down.png"))); // NOI18N
-        btnMinimizeTab.setToolTipText(bundle.getString("ICON_ALL")); // NOI18N
+        btnMinimizeTab.setToolTipText(bundle.getString("ICON_TAB_ALL")); // NOI18N
         btnMinimizeTab.setFocusable(false);
         btnMinimizeTab.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnMinimizeTab.setMaximumSize(new java.awt.Dimension(29, 28));
@@ -1337,8 +1389,8 @@ public final class TrucklistStudio extends JFrame implements StreamDesktop.Liste
             File file = chooser.getSelectedFile();
             if (file != null) {
                 lastFolder = file.getParentFile();
-                String FileName = file.getName();
-                System.out.println("Name: " + FileName);
+//                String FileName = file.getName();
+//                System.out.println("Name: " + FileName);
             }
             if (file != null) {
                 Stream s = Stream.getInstance(file);
@@ -1346,8 +1398,8 @@ public final class TrucklistStudio extends JFrame implements StreamDesktop.Liste
                 boolean noDouble = true;
                 if (s != null) {
                     getStreamParams(s, file, null);
-                    System.out.println("IsOnlyAudio="+s.isOnlyAudio());
-                    System.out.println("IsOnlyVideo="+s.isOnlyVideo());
+//                    System.out.println("IsOnlyAudio="+s.isOnlyAudio());
+//                    System.out.println("IsOnlyVideo="+s.isOnlyVideo());
                     if (s.getStreamTime().equals("N/A") && (s instanceof SourceMovie || s instanceof SourceMusic )) {
                         noError = false;
                         s.destroy();
@@ -1382,7 +1434,7 @@ public final class TrucklistStudio extends JFrame implements StreamDesktop.Liste
                             Font font = new Font("Ubuntu", Font.BOLD, 11);
                             lblMusic.setFont(font);
                             lblMusic.setText("Musics("+numMusics+")");
-                        } else if (s instanceof SourceImage || s instanceof SourceImageU  || s instanceof SourceImageGif) {
+                        } else if (s instanceof SourceImage || s instanceof SourceImageGif) { //|| s instanceof SourceImageU  
                             numPictures += 1;
                             pictureDesktop.add(frame, javax.swing.JLayeredPane.DEFAULT_LAYER);
                             lblPicture.setForeground(busyTab);
@@ -1604,7 +1656,7 @@ public final class TrucklistStudio extends JFrame implements StreamDesktop.Liste
             fileType = "mov";
         } else if (stream instanceof SourceMusic) {
             fileType = "mus";
-        } else if (stream instanceof SourceImageU ||stream instanceof SourceImage || stream instanceof SourceImageGif) {
+        } else if (stream instanceof SourceImage || stream instanceof SourceImageGif) { //stream instanceof SourceImageU ||
             fileType = "pic";
         }
         if (image != null) {
@@ -1760,7 +1812,7 @@ public final class TrucklistStudio extends JFrame implements StreamDesktop.Liste
                         }
                     }
                 }
-                System.out.println(audiofind);
+//                System.out.println(audiofind);
                 stream.setOnlyVideo(!audiofind);
                 stream.setAudio(audiofind);
             } catch (IOException | InterruptedException | NumberFormatException e) {
@@ -1917,7 +1969,7 @@ public final class TrucklistStudio extends JFrame implements StreamDesktop.Liste
                                     Font font = new Font("Ubuntu", Font.BOLD, 11);
                                     lblMusic.setFont(font);
                                     lblMusic.setText("Musics("+numMusics+")");
-                                } else if (s instanceof SourceImage || s instanceof SourceImageU || s instanceof SourceImageGif) {
+                                } else if (s instanceof SourceImage || s instanceof SourceImageGif) { //|| s instanceof SourceImageU 
                                     numPictures += 1;
                                     pictureDesktop.add(frame, javax.swing.JLayeredPane.DEFAULT_LAYER);
                                     lblPicture.setForeground(busyTab);
@@ -1934,7 +1986,7 @@ public final class TrucklistStudio extends JFrame implements StreamDesktop.Liste
                                 }
                                 s.setLoaded(false);
                             }
-                            System.out.println("Adding Source: "+s.getName());
+//                            System.out.println("Adding Source: "+s.getName());
                         }
                         Studio.extstream.clear();
                         Studio.extstream = null;
@@ -1952,7 +2004,7 @@ public final class TrucklistStudio extends JFrame implements StreamDesktop.Liste
                                 lblText.setText("Texts("+numTexts+")");
                                 text.setLoaded(false);
                             }
-                            System.out.println("Adding Source: "+text.getName());
+//                            System.out.println("Adding Source: "+text.getName());
                         }
                         Studio.LText.clear();
                         Studio.LText = null;
@@ -2223,7 +2275,7 @@ public final class TrucklistStudio extends JFrame implements StreamDesktop.Liste
                                         Font font = new Font("Ubuntu", Font.BOLD, 11);
                                         lblMusic.setFont(font);
                                         lblMusic.setText("Musics("+numMusics+")");
-                                    } else if (s instanceof SourceImage || s instanceof SourceImageU || s instanceof SourceImageGif) {
+                                    } else if (s instanceof SourceImage || s instanceof SourceImageGif) { //|| s instanceof SourceImageU 
                                         numPictures += 1;
                                         pictureDesktop.add(frame, javax.swing.JLayeredPane.DEFAULT_LAYER);
                                         lblPicture.setForeground(busyTab);
@@ -2710,7 +2762,7 @@ public final class TrucklistStudio extends JFrame implements StreamDesktop.Liste
         if (args != null){
             int c = 0;
             for (String arg : args){
-                System.out.println("Argument: "+arg);
+//                System.out.println("Argument: "+arg);
                 if (arg.endsWith("studio")){
                     cmdFile = new File(arg);
                 }
@@ -2901,7 +2953,7 @@ public final class TrucklistStudio extends JFrame implements StreamDesktop.Liste
                                 Font font = new Font("Ubuntu", Font.BOLD, 11);
                                 lblMusic.setFont(font);
                                 lblMusic.setText("Musics("+numMusics+")");
-                            } else if (s instanceof SourceImage || s instanceof SourceImageU || s instanceof SourceImageGif) {
+                            } else if (s instanceof SourceImage || s instanceof SourceImageGif) { //|| s instanceof SourceImageU 
                                 numPictures += 1;
                                 pictureDesktop.add(frame, javax.swing.JLayeredPane.DEFAULT_LAYER);
                                 lblPicture.setForeground(busyTab);
@@ -2918,7 +2970,7 @@ public final class TrucklistStudio extends JFrame implements StreamDesktop.Liste
                             }
                             s.setLoaded(false);
                         }
-                        System.out.println("Adding Source: "+s.getName());
+//                        System.out.println("Adding Source: "+s.getName());
                     }
                     Studio.extstream.clear();
                     Studio.extstream = null;
@@ -2936,7 +2988,7 @@ public final class TrucklistStudio extends JFrame implements StreamDesktop.Liste
                             lblText.setText("Texts("+numTexts+")");
                             text.setLoaded(false);
                         }
-                        System.out.println("Adding Source: "+text.getName());
+//                        System.out.println("Adding Source: "+text.getName());
                     }
                     Studio.LText.clear();
                     Studio.LText = null;

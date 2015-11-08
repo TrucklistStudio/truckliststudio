@@ -36,11 +36,10 @@ public abstract class Stream implements Callable<Frame>{
                 || ext.endsWith(".mkv")
                 || ext.endsWith(".vob")) {
             stream = new SourceMovie(file);
-        } else if (ext.endsWith(".jpg")
+        } else if (ext.endsWith(".png")
+                || ext.endsWith(".jpg")
                 || ext.endsWith(".bmp")
                 || ext.endsWith(".jpeg")) {
-            stream = new SourceImageU(file);
-        } else if (ext.endsWith(".png")) {
             stream = new SourceImage(file);
         } else if (ext.endsWith(".gif")) {
             stream = new SourceImageGif(file);

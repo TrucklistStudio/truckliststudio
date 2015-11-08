@@ -118,7 +118,7 @@ public class SourceMovie extends Stream {
     public void readNext() {
         Frame f = null;
         if (capture != null) {
-            f = capture.getFrameC();
+            f = capture.getFrame();
             if (f != null) {
                 BufferedImage img = f.getImage(); 
                 applyEffects(img);

@@ -23,6 +23,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import truckliststudio.streams.Stream;
 import truckliststudio.util.Tools;
+import java.util.concurrent.CancellationException;
+
 
 /**
  *
@@ -108,9 +110,7 @@ public class PreviewFrameBuilder implements Runnable {
                 g.drawImage(imageF, imageX, imageY, imageW, imageH, null);
             }
             g.dispose();
-
         }
-        
         orderedFrames.clear();
     }
 
@@ -151,50 +151,85 @@ public class PreviewFrameBuilder implements Runnable {
     public void run() throws NullPointerException{
         stopMe = false;
         ArrayList<Frame> frames = new ArrayList<>();
-        ArrayList<Future<Frame>> resultsT = new ArrayList<>();
         mark = System.currentTimeMillis();
         int r = PreviewMixer.getInstance().getRate();
         long frameDelay = 1000 / r;
         long timeCode = System.currentTimeMillis();
-        ExecutorService pool = java.util.concurrent.Executors.newCachedThreadPool();
+//        long frameNum = 0;
         while (!stopMe) {
             timeCode += frameDelay;
             Frame targetFrame = frameBuffer.getFrameToUpdate();
             frames.clear();
+//            long captureTime = 0;
+//            long captureStartTime = System.nanoTime();
+            // threaded capture mode runs frame capture for each source in a different thread
+            // In principle it should be better but the overhead of threading appears to be more trouble than it's worth.
+            boolean threadedCaptureMode = true;
+            ExecutorService pool = java.util.concurrent.Executors.newCachedThreadPool();
+            if (threadedCaptureMode) {
+                ArrayList<Future<Frame>> resultsT = new ArrayList<>();
+
             try {
-                resultsT = ((ArrayList) pool.invokeAll(preStreams, 5, TimeUnit.SECONDS)); //modify to 10 give more time to pause
+                    resultsT = ((ArrayList)pool.invokeAll(preStreams, 5, TimeUnit.SECONDS));
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(MasterFrameBuilder.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 ArrayList<Future<Frame>> results = resultsT;
-                int i=0;
+//                int i=0;
                 Frame f;
                 for (Future stream : results) {
-                    if ((Frame)stream.get() != null) {
-                        if (!preStreams.isEmpty()) {
+                    try {
                             f = (Frame)stream.get();
+
+                        if (f != null) {
+                            frames.add(f);
+                        }
+                    } catch (CancellationException | InterruptedException | ExecutionException ex) {
+                        Logger.getLogger(MasterFrameBuilder.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            } else {
+                for (int i = 0; i < preStreams.size(); i++) {
+                    Frame f;
+
+                    try {
+                        Stream s = preStreams.get(i);
+                        f = s.call();
+                        // Due to race conditions when sources start up, a source may not really be ready to operate by the time it's active in MasterFrameBuilder. (Ultimately that should probably be fixed)
+                        // For that reason, we guard against (f == null) here, so streams
+                        if (f != null) {
                             frames.add(f);
                         }
                     }
-                    i++;
+                    catch (Exception e)
+                    {}
                 }
+            }
+            long now = System.currentTimeMillis();
+//            captureTime = (now - captureStartTime);
+
+            long sleepTime = (timeCode - now);
+            // Drop frames if we're running behind - but no more than half of them
+//            if ((sleepTime > 0) || ((frameNum % 2) != 0)) {
+                fps++;
                 mixAudio(frames, targetFrame);
                 mixImages(frames, targetFrame);
                 targetFrame = null;
                 frameBuffer.doneUpdate();
                 PreviewMixer.getInstance().setCurrentFrame(frameBuffer.pop());
-                fps++;
-                float delta = System.currentTimeMillis() - mark;
+//            }
+            float delta = (now - mark);
                 if (delta >= 1000) {
-                    mark = System.currentTimeMillis();
-                    PreviewMixer.getInstance().setFPS(fps / (delta / 1000F));
+                mark = now;
+                PreviewMixer.getInstance().setFPS(fps / (delta / 1000F));
                     fps = 0;
                 }
-                long sleepTime = timeCode - System.currentTimeMillis();
+            //System.out.println("Capture time: " + (captureTime / 1000000.0) + "ms");
+            //System.out.println("Timecode: " + timeCode + ", now: " + now + ", diff: " + sleepTime);
                 if (sleepTime > 0) {
-                    Tools.sleep(sleepTime + 10);
+                Tools.sleep(sleepTime);
                 }
-            } catch (InterruptedException | ExecutionException ex) {
-                Logger.getLogger(MasterFrameBuilder.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
+//            frameNum++;
         }
     }
 }

@@ -5,9 +5,12 @@
 package truckliststudio.streams;
 
 import java.awt.image.BufferedImage;
+import static truckliststudio.TrucklistStudio.os;
 import static truckliststudio.TrucklistStudio.outFMEbe;
+import static truckliststudio.TrucklistStudio.x64;
 import truckliststudio.externals.ProcessRenderer;
 import truckliststudio.mixers.Frame;
+import truckliststudio.util.Tools;
 
 /**
  *
@@ -33,7 +36,13 @@ public class SinkAudio extends Stream {
 
     @Override
     public void read() {
-        capture = new ProcessRenderer(this, ProcessRenderer.ACTION.OUTPUT, "spkAudioOut", comm); //"spkAudioOut"
+        String plugin = "spkAudioOut";
+        if (os == Tools.OS.WINDOWS){
+            if  (!x64){
+                plugin = "spkAudioOut86";
+            }
+        }
+        capture = new ProcessRenderer(this, ProcessRenderer.ACTION.OUTPUT, plugin, comm); //"spkAudioOut"
         capture.writeCom();
     }
 

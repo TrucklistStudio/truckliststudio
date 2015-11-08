@@ -5,10 +5,13 @@
 package truckliststudio.streams;
 
 import java.awt.image.BufferedImage;
+import static truckliststudio.TrucklistStudio.os;
 import static truckliststudio.TrucklistStudio.outFMEbe;
+import static truckliststudio.TrucklistStudio.x64;
 import truckliststudio.externals.FME;
 import truckliststudio.externals.ProcessRenderer;
 import truckliststudio.mixers.MasterMixer;
+import truckliststudio.util.Tools;
 
 /**
  *
@@ -43,16 +46,32 @@ public class SinkBroadcast extends Stream {
         captureWidth = MasterMixer.getInstance().getWidth();
         captureHeight = MasterMixer.getInstance().getHeight();
         if (!"".equals(this.fme.getMount())) {
+            String plugin = "iceCast";
+            String pluginHD = "iceCastHQ";
+            if (os == Tools.OS.WINDOWS){
+                if  (!x64){
+                    plugin = "iceCast86";
+                    pluginHD = "iceCastHQ86";
+                }
+            }
             if (standard.equals("STD")) {
-                capture = new ProcessRenderer(this,fme,"iceCast");
+                capture = new ProcessRenderer(this, fme, plugin);
             } else {
-                capture = new ProcessRenderer(this,fme,"iceCastHQ");
+                capture = new ProcessRenderer(this, fme, pluginHD);
             }
         } else {
+            String plugin = "broadcast";
+            String pluginHD = "broadcastHQ";
+            if (os == Tools.OS.WINDOWS){
+                if  (!x64){
+                    plugin = "broadcast86";
+                    pluginHD = "broadcastHQ86";
+                }
+            }
             if (standard.equals("STD")) {
-                capture = new ProcessRenderer(this,fme,"broadcast");
+                capture = new ProcessRenderer(this, fme, plugin);
             } else {
-                capture = new ProcessRenderer(this,fme,"broadcastHQ");
+                capture = new ProcessRenderer(this, fme, pluginHD);
             }
         }
         capture.writeCom();

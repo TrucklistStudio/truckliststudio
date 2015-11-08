@@ -1,6 +1,6 @@
-*********************************
-* TrucklistStudio for GNU/Linux *
-*********************************
+*******************
+* TrucklistStudio *
+*******************
 
 To compile from the command line simply run:
 
@@ -27,21 +27,54 @@ https://plus.google.com/communities/118134381932259626262
 
 http://sourceforge.net/p/truckliststudio/tickets/
 
-TrucklistStudio 0.7
-*******************
+*************************************
+* TrucklistStudio 0.7 for GNU/Linux *
+*************************************
 
 Hello and welcome to TrucklistStudio by Karl Ellis.
 This software is a fork from WebcamStudio by Patrick Balleux.
 This release is a buggy and unstable one, so be gentle.
 
+For Ubuntu users you can add Truckliststudio Daily Builds PPA:
+
+https://code.launchpad.net/~soylent-tv/+archive/ubuntu/truckliststudio
 
 What you need:
 --------------
-- Java >= 1.7
-- AVCONV - FFMPEG - Windows users should download the proper ffmpeg static binary and put it in their PATH.
-  The URL is: http://ffmpeg.zeranoe.com/builds
-- Some patience ;)
+- The dependences are similar to WebcamStudio, so have a look at its README also ...
 
+  openjdk-7-jre,
+  java-wrappers,
+  libappframework-java,
+  libcommons-cli-java,
+  libcommons-codec-java,
+  libcommons-httpclient-java,
+  libcommons-lang3-java,
+  libjsr305-java,
+  liblog4j1.2-java,
+  libnetty-java,
+  libslf4j-java,
+  libswingworker-java,
+  libav-tools or ffmpeg,
+  libavformat-extra-53 or libavformat-extra-54 or libavformat56 or libavformat-ffmpeg56,
+  gstreamer-tools,
+  gstreamer0.10-plugins-good,
+  gstreamer0.10-plugins-bad,
+  gstreamer0.10-plugins-bad-multiverse,
+  gstreamer0.10-plugins-ugly,
+  gstreamer0.10-pulseaudio,
+  gstreamer0.10-gnonlin,
+  gstreamer0.10-fluendo-mp3,
+  gstreamer1.0-tools,
+  gstreamer1.0-gnonlin,
+  gstreamer1.0-alsa,
+  gstreamer1.0-fluendo-mp3,
+  pavucontrol,
+  pulseaudio-utils,
+  zenity,
+  wmctrl.
+
+- Some patience ;)
 
 How to use:
 -----------
@@ -73,3 +106,54 @@ Some testing to do:
 -------------------
 
 - Add an FME file to broadcast to Justin.tv, Bambuser, Ustream or VaughnTv (IceCast and Red5 are also supported)
+
+*******************************************
+* TrucklistStudio v0.7 (Beta) for Windows *
+*******************************************
+
+You can find binaries for Windows here:
+
+http://sourceforge.net/projects/truckliststudio/files/Binaries/Beta/Windows/
+
+Windows users should download the proper ffmpeg static binary (Already included in the Windows Archive) and put it in the TrucklistStudio Jar path:
+
+The URL is: http://ffmpeg.zeranoe.com/builds
+
+For Windows GStreamer FME Output backend support. 
+1) You have to install GStreamer binary for Windows before starting TS, you can find it here:
+   http://gstreamer.freedesktop.org/data/pkg/windows
+
+2) Choose your architecture msi:
+   - gstreamer-1.0-x86-1.6.x.msi
+   - gstreamer-1.0-x86_64-1.6.x.msi
+
+3) Choose "Complete" Installation and do not change the default installation dir.
+   TS will automatically detect the executables.
+
+First make sure you have Java installed and
+simply double-click TrucklistStudio.jar icon.
+
+Notes & Troubleshooting:
+========================
+- It is better to use latest Java 8 jre to avoid permission issues.
+
+- Seems that running the jar from a command line TS got some errors so it is better to run doubleclicking on it.
+
+- In case of permissions issues, try to change properties of the "javaw.exe" file
+(Usually located under "C:\Program Files\Java\jre1.x.x\bin") by right clicking on
+it and setting "Run as administrator" under "Compatibility" tab. Unfortunatly in
+this way you loose the Drag'n'Drop feature ...
+
+Know Bugs under Windows:
+========================
+- Drag'n'Drop may not work.
+- AudioSources doesn't work yet.
+
+For anything feel free to post in TrucklistStudio Community:
+https://plus.google.com/communities/118134381932259626262
+
+TrucklistStudio sf page:
+http://sourceforge.net/projects/truckliststudio/
+
+Have a good day.
+karl

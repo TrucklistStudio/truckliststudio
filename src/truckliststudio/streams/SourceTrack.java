@@ -133,6 +133,39 @@ public class SourceTrack  {
         return s;
     }
     
+    public static SourceTrack duplicateTrack(SourceTrack original) {
+        SourceTrack clone = new SourceTrack();
+        clone.x = original.x;
+        clone.y = original.y;
+        clone.width = original.width;
+        clone.height = original.height;
+        clone.opacity = original.opacity;
+        clone.effects.addAll(original.effects);
+        clone.startTransitions.addAll(original.startTransitions);
+        clone.endTransitions.addAll(original.endTransitions);
+        clone.volume = original.volume;
+        clone.zorder = original.zorder;
+        clone.name = original.getName();
+        clone.isPlaying = original.isPlaying;
+        clone.isPaused = original.isPaused;
+        clone.capHeight = original.capHeight;
+        clone.capWidth = original.capWidth;
+//        if (stream instanceof SourceText) {
+//            SourceText st = (SourceText) stream;
+            clone.capHeight = original.capHeight;
+            clone.capWidth = original.capWidth;
+            clone.isATimer = original.isATimer;
+            clone.isQRCode = original.isQRCode;
+            clone.isACdown = original.isACdown;
+            clone.isPlayList = original.isPlayList;
+            clone.duration = original.duration;
+            clone.text = original.text;
+            clone.font = original.font;
+            clone.color = original.color;
+//        }
+        return clone;
+    }
+    
     private int x = 0;
     private int y = 0;
     private int capWidth = 0;

@@ -31,7 +31,7 @@ import truckliststudio.mixers.MasterMixer;
 import truckliststudio.streams.SourceAudioSource;
 import truckliststudio.streams.SourceImage;
 import truckliststudio.streams.SourceImageGif;
-import truckliststudio.streams.SourceImageU;
+//import truckliststudio.streams.SourceImageU;
 import truckliststudio.streams.SourceMovie;
 import truckliststudio.streams.SourceMusic;
 import truckliststudio.streams.Stream;
@@ -187,7 +187,7 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
             tglAudio.setVisible(true);
             tglVideo.setVisible(false);
             }
-        } else if (stream instanceof SourceImage || stream instanceof SourceImageU || stream instanceof SourceImageGif){
+        } else if (stream instanceof SourceImage || stream instanceof SourceImageGif){ //|| stream instanceof SourceImageU 
             jlbDuration.setText(" ");
             jlbDuration.setVisible(!jSlSpinV.isVisible());
             tglAudio.setVisible(false);
@@ -922,7 +922,7 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
                 stream.read();
             }
         } else {
-            if (stream.getisATrack() && stream.getName().equals(lblPlayingTrack.getText())) {
+            if (stream.getisATrack() && lblPlayingTrack.getText().contains(stream.getName())) {
                 listTracks.repaint();
                 lblPlayingTrack.setText("");
             }

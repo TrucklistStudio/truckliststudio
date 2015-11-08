@@ -911,12 +911,23 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
             tglAudioOut.setSelected(stream.isPlaying());
         } else if (stream instanceof SinkBroadcast) {
             String name = stream.getName();
+//            int count = 0;
             for (Component c : this.getComponents()) {
                 if (c instanceof JToggleButton) {
                     JToggleButton b = (JToggleButton) c;
                     if (b.getText().equals(name)) {
                         b.setSelected(stream.isPlaying());
                     }
+                }
+            }
+            if (!stream.isPlaying()){
+                fmeCount --;
+            }
+            if (fmeCount == 0 && !udpOutState) {
+                if (theme.equals("Dark")) {
+                    lblOnAir.setForeground(Color.WHITE);
+                } else {
+                    lblOnAir.setForeground(Color.BLACK);
                 }
             }
         } 

@@ -6,10 +6,13 @@ package truckliststudio.streams;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import static truckliststudio.TrucklistStudio.os;
 import static truckliststudio.TrucklistStudio.outFMEbe;
+import static truckliststudio.TrucklistStudio.x64;
 import truckliststudio.externals.ProcessRenderer;
 import truckliststudio.mixers.Frame;
 import truckliststudio.mixers.MasterMixer;
+import truckliststudio.util.Tools;
 
 /**
  *
@@ -39,7 +42,13 @@ public class SinkFile extends Stream {
         rate = MasterMixer.getInstance().getRate();
         captureWidth = MasterMixer.getInstance().getWidth();
         captureHeight = MasterMixer.getInstance().getHeight();
-        capture = new ProcessRenderer(this, ProcessRenderer.ACTION.OUTPUT, "file", comm);
+        String plugin = "file";
+        if (os == Tools.OS.WINDOWS){
+            if  (!x64){
+                plugin = "file86";
+            }
+        }
+        capture = new ProcessRenderer(this, ProcessRenderer.ACTION.OUTPUT, plugin, comm);
         capture.writeCom();
     }
 

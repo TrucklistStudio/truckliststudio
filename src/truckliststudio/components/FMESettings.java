@@ -31,16 +31,16 @@ public class FMESettings extends javax.swing.JFrame implements Stream.Listener {
         thisFME = fme;
         String shortName = "";
         String sourceName = thisFME.getName();
-        System.out.println("sourceName: "+sourceName);
+//        System.out.println("sourceName: "+sourceName);
         if (sourceName.length() > 9) {
             shortName = sourceName.substring(0, 9)+" ...";
-            System.out.println("shortName: "+shortName);
+//            System.out.println("shortName: "+shortName);
         } else {
             shortName = sourceName;
         }
         lblName.setText(shortName);
         textURL.setText(thisFME.getUrl());
-        if (thisFME.getStream().equals("")) {
+        if (thisFME.getStream().isEmpty()) {
             textStream.setText("");
             textStream.setEnabled(false);
         } else {

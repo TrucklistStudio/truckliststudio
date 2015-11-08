@@ -42,6 +42,8 @@
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="btnAdd" min="-2" pref="28" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
+                              <Component id="btnDuplicateTrk" min="-2" pref="28" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
                               <Component id="btnRemove" min="-2" pref="28" max="-2" attributes="0"/>
                               <EmptySpace min="-2" max="-2" attributes="0"/>
                               <Component id="btnClearAllTrk" min="-2" pref="28" max="-2" attributes="0"/>
@@ -93,7 +95,6 @@
                       <Component id="btnUp" min="-2" pref="28" max="-2" attributes="0"/>
                       <Component id="btnUpdate" min="-2" pref="28" max="-2" attributes="0"/>
                       <Component id="btnRemove" min="-2" pref="28" max="-2" attributes="0"/>
-                      <Component id="btnClearAllTrk" min="-2" pref="28" max="-2" attributes="0"/>
                       <Component id="tglRemote" min="-2" max="-2" attributes="0"/>
                       <Group type="103" alignment="1" groupAlignment="0" attributes="0">
                           <Component id="btnDown" min="-2" pref="28" max="-2" attributes="0"/>
@@ -101,6 +102,10 @@
                               <Component id="spinJumpPos" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="btnJump" alignment="3" min="-2" pref="28" max="-2" attributes="0"/>
                           </Group>
+                      </Group>
+                      <Group type="103" alignment="1" groupAlignment="0" attributes="0">
+                          <Component id="btnDuplicateTrk" min="-2" pref="28" max="-2" attributes="0"/>
+                          <Component id="btnClearAllTrk" min="-2" pref="28" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                   <Component id="lblPlayingTrack" min="-2" pref="27" max="-2" attributes="0"/>
@@ -119,7 +124,7 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" max="-2" attributes="0"/>
-                      <Component id="trkProgressTime" pref="94" max="32767" attributes="0"/>
+                      <Component id="trkProgressTime" pref="92" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="jSeparator3" min="-2" pref="3" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
@@ -554,6 +559,18 @@
           <Dimension value="[0, 3]"/>
         </Property>
       </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="btnDuplicateTrk">
+      <Properties>
+        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+          <Image iconType="3" name="/truckliststudio/resources/tango/duplicatebutton.png"/>
+        </Property>
+        <Property name="toolTipText" type="java.lang.String" value="Duplicate Selected Track"/>
+        <Property name="name" type="java.lang.String" value="btnDuplicateTrk" noResource="true"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnDuplicateTrkActionPerformed"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>

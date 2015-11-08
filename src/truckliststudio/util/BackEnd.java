@@ -16,8 +16,6 @@
 */
 package truckliststudio.util;
 
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
 import java.io.IOException;
 
 /**
@@ -26,79 +24,10 @@ import java.io.IOException;
  */
 public class BackEnd {
 
-//    public static String[] getSources() {
-//        java.util.ArrayList<String> list = new java.util.ArrayList<>();
-//        System.out.println("Screen List:");
-//        GraphicsEnvironment g = GraphicsEnvironment.getLocalGraphicsEnvironment();
-//        GraphicsDevice[] devices = g.getScreenDevices();
-//
-//        for (GraphicsDevice d : devices){
-//            System.out.println(d.getIDstring() + " " + d.getDefaultConfiguration().getBounds().toString().replaceAll("java.awt.Rectangle", ""));
-//            list.add(d.getIDstring());
-//        }
-//        return list.toArray(new String[list.size()]);
-//
-//    }
-    
-//    public static int getWidth(String id){
-//        System.out.println("Screen: "+id);
-//        GraphicsEnvironment g = GraphicsEnvironment.getLocalGraphicsEnvironment();
-//        GraphicsDevice[] devices = g.getScreenDevices();
-//
-//        int retValue = 0;
-//        for (GraphicsDevice d : devices){
-//           if (d.getIDstring().equals(id)){
-//               retValue = d.getDisplayMode().getWidth();
-//               break;
-//           } 
-//        }
-//        return retValue;
-//    }
-//    public static int getHeight(String id){
-//        GraphicsEnvironment g = GraphicsEnvironment.getLocalGraphicsEnvironment();
-//        GraphicsDevice[] devices = g.getScreenDevices();
-//        int retValue = 0;
-//        for (GraphicsDevice d : devices){
-//           if (d.getIDstring().equals(id)){
-//               retValue = d.getDisplayMode().getHeight();
-//               break;
-//           } 
-//        }
-//        return retValue;
-//    }
-    
-//    public static int getX(String id){
-//        GraphicsEnvironment g = GraphicsEnvironment.getLocalGraphicsEnvironment();
-//        GraphicsDevice[] devices = g.getScreenDevices();
-//
-//        int retValue = 0;
-//        for (GraphicsDevice d : devices){
-//           if (d.getIDstring().equals(id)){
-//               retValue = d.getDefaultConfiguration().getBounds().x;
-//               break;
-//           } 
-//        }
-//        return retValue;
-//    }
-    
-//    public static int getY(String id){
-//        GraphicsEnvironment g = GraphicsEnvironment.getLocalGraphicsEnvironment();
-//        GraphicsDevice[] devices = g.getScreenDevices();
-//        int retValue = 0;
-//        for (GraphicsDevice d : devices){
-//           if (d.getIDstring().equals(id)){
-//               retValue = d.getDefaultConfiguration().getBounds().y;
-//               break;
-//           } 
-//        }
-//        return retValue;
-//    }
-    
     public static boolean avconvDetected(){
         boolean retValue = false;
         Process p = null;
         try {
-            
             p = Runtime.getRuntime().exec("avconv");
             p.waitFor();
 //            System.out.println(p.exitValue());
@@ -118,7 +47,6 @@ public class BackEnd {
         boolean retValue = false;
         Process p = null;
         try {
-            
             p = Runtime.getRuntime().exec("ffmpeg");
             p.waitFor();
 //            System.out.println(p.exitValue());
@@ -133,5 +61,5 @@ public class BackEnd {
         }
         return retValue;
     }
-    
+
 }

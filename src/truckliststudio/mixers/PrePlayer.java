@@ -35,7 +35,7 @@ public class PrePlayer implements Runnable {
     private final ArrayList<byte[]> buffer = new ArrayList<>();
     private FrameBuffer frames = null;
     private PreViewer preViewer = null;
-    private final int aFreq = audioFreq;
+//    private final int aFreq = audioFreq;
     
     private PrePlayer(PreViewer viewer) {
         this.preViewer = viewer;

@@ -16,7 +16,6 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
-import truckliststudio.media.renderer.Capturer;
 import truckliststudio.mixers.MasterMixer;
 
 /**
@@ -44,8 +43,8 @@ public class FME {
     public FME(File xml) {
         try{
             parse(xml);
-        }catch (ParserConfigurationException | SAXException | IOException | XPathExpressionException e ){
-            Logger.getLogger(Capturer.class.getName()).log(Level.SEVERE, null, e);
+        } catch (ParserConfigurationException | SAXException | IOException | XPathExpressionException ex) {
+            Logger.getLogger(FME.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     

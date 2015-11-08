@@ -33,7 +33,7 @@ public class PaCTL {
     
     public static AudioSource[] getSources() throws IOException {
         java.util.ArrayList<AudioSource> list = new java.util.ArrayList<>();
-        System.out.println("Source Audio List:");
+//        System.out.println("Source Audio List:");
         Process p = Runtime.getRuntime().exec("pactl list sources");
         InputStream in = p.getInputStream();
         InputStreamReader isr = new InputStreamReader(in);
@@ -46,7 +46,7 @@ public class PaCTL {
                 line = reader.readLine();
                 String l = line.trim().split(":")[1];
                 l = l.replaceAll(" ", "");
-                System.out.println(l);
+//                System.out.println(l);
                 s.device = l;
                 line = reader.readLine();
                 l = line.trim().split(":")[1];

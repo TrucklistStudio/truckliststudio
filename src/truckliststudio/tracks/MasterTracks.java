@@ -33,13 +33,13 @@ public class MasterTracks {
         String streamName =s.getClass().getName();
         streamName = streamName.replace("truckliststudio.streams.", "");
         if (!s.getClass().toString().contains("Sink")){
-            System.out.println(streamName + " registered.");
+//            System.out.println(streamName + " registered.");
         }
         streams.add(s);
     }
     public void unregister(Stream s){
         if (!s.getClass().toString().contains("Sink")){
-            System.out.println(s.getName() + " unregistered.");
+//            System.out.println(s.getName() + " unregistered.");
         }
         streams.remove(s);
     }
@@ -51,10 +51,14 @@ public class MasterTracks {
         }
     }
     
+    public void addTrack2List(String name){
+        trackNames.add(name);
+    }
+    
     public void addPlayTrack(String name, String playTrk){
         trackNames.add(name);
         for (Stream s : streams){
-            if (s.getTrkName().equals(playTrk)) {
+            if (playTrk.contains(s.getTrkName())) {
                 s.setIsPlaying(false);
                 s.addTrack(SourceTrack.getTrack(name, s));
                 s.setIsPlaying(true);
@@ -62,6 +66,16 @@ public class MasterTracks {
                 s.addTrack(SourceTrack.getTrack(name, s));
             }
         }
+    }
+    
+    public static SourceTrack getTrack(String trackName, Stream s) {
+        SourceTrack track = null;
+        for (SourceTrack tr : s.getTracks()) {
+            if (tr.getName().equals(trackName)) {
+                track = tr;
+            }
+        }
+        return track;
     }
     
     public void addTrkTransitions(String name){
