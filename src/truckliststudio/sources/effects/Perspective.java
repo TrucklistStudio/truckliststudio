@@ -6,7 +6,6 @@ package truckliststudio.sources.effects;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import javax.swing.JPanel;
 import truckliststudio.sources.effects.controls.PerspectiveControl;
@@ -31,20 +30,8 @@ public class Perspective extends Effect {
     public void applyEffect(BufferedImage img) {
         int w = img.getWidth();
         int h = img.getHeight();
-        filter.setCorners(x1, y1, w+x2, y2, w+x3, h+y3, x4, h+y4);
+        filter.setCorners(x1, y1, w + x2, y2, w + x3, h + y3, x4, h + y4);
         Graphics2D buffer = img.createGraphics();
-        buffer.setRenderingHint(RenderingHints.KEY_RENDERING,
-                           RenderingHints.VALUE_RENDER_SPEED);
-        buffer.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                           RenderingHints.VALUE_ANTIALIAS_OFF);
-        buffer.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-                           RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
-        buffer.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS,
-                           RenderingHints.VALUE_FRACTIONALMETRICS_OFF);
-        buffer.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING,
-                           RenderingHints.VALUE_COLOR_RENDER_SPEED);
-        buffer.setRenderingHint(RenderingHints.KEY_DITHERING,
-                           RenderingHints.VALUE_DITHER_DISABLE);
         BufferedImage temp = filter.filter(img, null);
         buffer.setBackground(new Color(0, 0, 0, 0));
         buffer.clearRect(0, 0, w, h);
@@ -58,8 +45,8 @@ public class Perspective extends Effect {
     }
 
     @Override
-    public boolean needApply(){
-        return needApply= true;
+    public boolean needApply() {
+        return needApply = true;
     }
 
     /**

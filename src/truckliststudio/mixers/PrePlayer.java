@@ -19,6 +19,7 @@ import truckliststudio.util.Tools;
  * @author patrick (modified by karl)
  */
 public class PrePlayer implements Runnable {
+
     private static PrePlayer preInstance = null;
 
     public static PrePlayer getPreInstance(PreViewer viewer) {
@@ -36,7 +37,7 @@ public class PrePlayer implements Runnable {
     private FrameBuffer frames = null;
     private PreViewer preViewer = null;
 //    private final int aFreq = audioFreq;
-    
+
     private PrePlayer(PreViewer viewer) {
         this.preViewer = viewer;
     }
@@ -47,7 +48,16 @@ public class PrePlayer implements Runnable {
         int lAL = PreviewMixer.getInstance().getAudioLevelLeft();
         int lAR = PreviewMixer.getInstance().getAudioLevelRight();
         preViewer.setAudioLevel(lAL, lAR);
+        int liveAL = MasterMixer.getInstance().getAudioLevelLeft();
+        int liveAR = MasterMixer.getInstance().getAudioLevelRight();
+        preViewer.setLiveAudioLevelFX(liveAL, liveAR);
         preViewer.repaint();
+//        if (source != null) {
+//            frames.push(frame);
+//        }
+    }
+
+    public void addLiveFrame(Frame frame) {
         if (source != null) {
             frames.push(frame);
         }
@@ -57,7 +67,9 @@ public class PrePlayer implements Runnable {
         frames = new FrameBuffer(MasterMixer.getInstance().getWidth(), MasterMixer.getInstance().getHeight(), MasterMixer.getInstance().getRate());
         AudioFormat format = new AudioFormat(audioFreq, 16, 2, true, true);
         source = javax.sound.sampled.AudioSystem.getSourceDataLine(format);
+        Tools.sleep(50);
         source.open();
+        Tools.sleep(50);
         source.start();
         executor = java.util.concurrent.Executors.newCachedThreadPool();
         executor.submit(this);

@@ -52,7 +52,7 @@ public class TSPreviewPanel extends javax.swing.JPanel implements PreviewMixer.S
         setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.RAISED));
         setMaximumSize(new java.awt.Dimension(290, 428));
         setMinimumSize(new java.awt.Dimension(290, 428));
-        setPreferredSize(new java.awt.Dimension(290, 280));
+        setPreferredSize(new java.awt.Dimension(320, 180));
         setLayout(new java.awt.BorderLayout());
 
         panPreview.setBackground(new java.awt.Color(113, 113, 113));

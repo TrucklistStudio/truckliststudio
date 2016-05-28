@@ -6,6 +6,7 @@ package truckliststudio.streams;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import static truckliststudio.TrucklistStudio.gsNLE;
 import truckliststudio.externals.ProcessRenderer;
 import truckliststudio.mixers.Frame;
 import truckliststudio.mixers.MasterFrameBuilder;
@@ -34,13 +35,17 @@ public class SourceMusic extends Stream {
     @Override
     public void read() {
         isPlaying = true;
-        if (getPreView()){
+        if (getPreView()) {
             PreviewFrameBuilder.register(this);
         } else {
             MasterFrameBuilder.register(this);
         }
-        lastPreview = new BufferedImage(captureWidth,captureHeight,BufferedImage.TYPE_INT_ARGB);
-        capture = new ProcessRenderer(this, ProcessRenderer.ACTION.CAPTURE, "music", comm);
+        lastPreview = new BufferedImage(captureWidth, captureHeight, BufferedImage.TYPE_INT_ARGB);
+        if (gsNLE) {
+            capture = new ProcessRenderer(this, ProcessRenderer.ACTION.CAPTURE, "nlemusic", comm);
+        } else {
+            capture = new ProcessRenderer(this, ProcessRenderer.ACTION.CAPTURE, "music", comm);
+        }
         capture.read();
     }
 
@@ -49,29 +54,29 @@ public class SourceMusic extends Stream {
         isPaused = true;
         capture.pause();
     }
-    
+
     @Override
     public void stop() {
-        if (loop){
+        if (loop) {
             if (capture != null) {
                 capture.stop();
                 capture = null;
             }
-            if (this.getBackFF()){
+            if (this.getBackFF()) {
                 this.setComm("FF");
             }
             this.read();
         } else {
             for (int fx = 0; fx < this.getEffects().size(); fx++) {
-            Effect fxT = this.getEffects().get(fx);
-            if (fxT.getName().endsWith("Stretch") || fxT.getName().endsWith("Crop")) {
-                // do nothing.
-            } else {
-                fxT.resetFX();
+                Effect fxT = this.getEffects().get(fx);
+                if (fxT.getName().endsWith("Stretch") || fxT.getName().endsWith("Crop")) {
+                    // do nothing.
+                } else {
+                    fxT.resetFX();
+                }
             }
-        }
             isPlaying = false;
-            if (getPreView()){
+            if (getPreView()) {
                 PreviewFrameBuilder.unregister(this);
             } else {
                 MasterFrameBuilder.unregister(this);
@@ -80,25 +85,28 @@ public class SourceMusic extends Stream {
                 capture.stop();
                 capture = null;
             }
-            if (this.getBackFF()){
+            if (this.getBackFF()) {
                 this.setComm("FF");
             }
         }
 
     }
+
     @Override
     public boolean needSeek() {
-            return needSeekCTRL=true;
+        return needSeekCTRL = true;
     }
 
     @Override
     public boolean isPlaying() {
         return isPlaying;
     }
+
     @Override
     public void setIsPlaying(boolean setIsPlaying) {
         isPlaying = setIsPlaying;
     }
+
     @Override
     public BufferedImage getPreview() {
         return lastPreview;
@@ -106,17 +114,20 @@ public class SourceMusic extends Stream {
 
     @Override
     public Frame getFrame() {
-       
+
         return nextFrame;
     }
+
     @Override
-    public boolean hasFakeVideo(){
+    public boolean hasFakeVideo() {
         return true;
     }
+
     @Override
-    public boolean hasFakeAudio(){
+    public boolean hasFakeAudio() {
         return true;
     }
+
     @Override
     public boolean hasAudio() {
         return true;
@@ -126,13 +137,14 @@ public class SourceMusic extends Stream {
     public boolean hasVideo() {
         return true;
     }
+
     @Override
     public void readNext() {
         Frame f = null;
         if (capture != null) {
             f = capture.getFrame();
             if (f != null) {
-                BufferedImage img = f.getImage(); 
+                BufferedImage img = f.getImage();
                 applyEffects(img);
             }
             if (f != null) {
@@ -140,7 +152,7 @@ public class SourceMusic extends Stream {
                 lastPreview.getGraphics().drawImage(f.getImage(), 0, 0, null);
             }
         }
-        nextFrame=f;
+        nextFrame = f;
     }
 
     @Override

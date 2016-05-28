@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-/*
+ /*
  * StreamPanel.java
  *
  * Created on 4-Apr-2012, 4:07:51 PM
@@ -11,8 +11,8 @@
 package truckliststudio.components;
 
 import java.awt.BasicStroke;
-import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
@@ -22,61 +22,91 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JTabbedPane;
 import javax.swing.Painter;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.UIDefaults;
+import static truckliststudio.TrucklistStudio.theme;
+import static truckliststudio.TrucklistStudio.wsDistroWatch;
 import static truckliststudio.components.TrackPanel.lblPlayingTrack;
 import static truckliststudio.components.TrackPanel.listTracks;
 import truckliststudio.mixers.MasterMixer;
-import truckliststudio.streams.SourceAudioSource;
 import truckliststudio.streams.SourceImage;
 import truckliststudio.streams.SourceImageGif;
-//import truckliststudio.streams.SourceImageU;
 import truckliststudio.streams.SourceMovie;
 import truckliststudio.streams.SourceMusic;
 import truckliststudio.streams.Stream;
-
-
+import truckliststudio.util.BackEnd;
 
 /**
  *
  * @author patrick (modified by karl)
  */
-public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, StreamDesktop.Listener {
+public class StreamPanel extends javax.swing.JPanel implements Stream.Listener { //, StreamDesktop.Listener 
 
     Stream stream = null;
-    Viewer viewer = new Viewer();
-    PreViewer preViewer = new PreViewer();
     private float volume = 0;
     private float vol = 0;
     BufferedImage icon = null;
     boolean lockRatio = false;
     boolean muted = false;
-    int oldW ;
-    int oldH ;
-    
+    int oldW;
+    int oldH;
+    String distro = wsDistroWatch();
+    boolean ffmpeg = BackEnd.ffmpegDetected();
+    boolean avconv = BackEnd.avconvDetected();
+    JLabel titleLabel = new JLabel();
+    JTabbedPane JTp;
+    Color sActiveLblCol = Color.GREEN;
+    Color sStopLblCol = Color.WHITE;
+    int tabIndex = 0;
+
     public interface Listener {
+
         public void startItsTrack(String name);
+
         public void stopItsTrack();
+
+        public void selectedSource(Stream source);
+
+        public void closeSource(String name);
     }
-    
+
     static Listener listenerTP = null;
-    
+
     public static void setListenerTP(Listener l) {
         listenerTP = l;
     }
-    
-    /** Creates new form StreamPanel
-     * @param stream */
+
+    static Listener listenerTS = null;
+
+    public static void setListenerTS(Listener l) {
+        listenerTS = l;
+    }
+
+    /**
+     * Creates new form StreamPanel
+     *
+     * @param stream
+     */
     public StreamPanel(Stream stream) {
 
         initComponents();
-        
+
         oldW = stream.getWidth();
         oldH = stream.getHeight();
         volume = stream.getVolume();
         vol = stream.getVolume();
-//        System.out.println("Volume: " + volume);
+
+        if (theme.equals("Dark")) {
+            sStopLblCol = Color.WHITE;
+            sActiveLblCol = Color.GREEN;
+        } else {
+            sStopLblCol = Color.BLACK;
+            sActiveLblCol = Color.GREEN.darker();
+        }
+
         try {
             icon = ImageIO.read(getClass().getResource("/truckliststudio/resources/tango/speaker4.png"));
         } catch (IOException ex) {
@@ -86,7 +116,7 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
         sliderDefaults.put("Slider.paintValue", true);
         sliderDefaults.put("Slider.thumbHeight", 13);
         sliderDefaults.put("Slider.thumbWidth", 13);
-        
+
         sliderDefaults.put("Slider:SliderThumb.backgroundPainter", new Painter() {
 
             @Override
@@ -94,32 +124,29 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
                 g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g.drawImage(icon, 0, -5, null);
             }
-            
+
         });
-        
+
         sliderDefaults.put("Slider:SliderTrack.backgroundPainter", new Painter() {
-            
+
             @Override
-                public void paint(Graphics2D g, Object object, int w, int h) {
+            public void paint(Graphics2D g, Object object, int w, int h) {
                 g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g.setStroke(new BasicStroke(2f));
                 g.setColor(Color.WHITE);
-                g.drawRoundRect(0, 2, w-1, 1, 1, 1);
+                g.drawRoundRect(0, 2, w - 1, 1, 1, 1);
             }
 
         });
-        
+
         jSlSpinV.putClientProperty("JComponent.sizeVariant", "small");
-        jSlSpinV.putClientProperty("Nimbus.Overrides",sliderDefaults);
+        jSlSpinV.putClientProperty("Nimbus.Overrides", sliderDefaults);
         jSlSpinV.putClientProperty("Nimbus.Overrides.InheritDefaults", false);
         jSlSpinV.setOpaque(true);
-        
+
         spinVolume.setVisible(false);
         jSlSpinV.setVisible(stream.hasAudio());
-        viewer.setOpaque(true);
-        viewer.setVisible(true);
-        viewer.setBackground(Color.black);
-        panPreview.add(viewer, BorderLayout.CENTER);
+        labelVol.setVisible(stream.hasAudio());
         this.stream = stream;
         spinX.setValue(stream.getX());
         spinY.setValue(stream.getY());
@@ -131,8 +158,6 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
         spinVolume.setValue(stream.getVolume() * 100);
         jSlSpinV.setEnabled(stream.hasAudio());
         spinZOrder.setValue(stream.getZOrder());
-        spinH1.setValue(stream.getCaptureHeight());
-        spinW1.setValue(stream.getCaptureWidth());
         spinVDelay.setValue(stream.getVDelay());
         spinADelay.setValue(stream.getADelay());
         spinVDelay.setEnabled(stream.hasVideo());
@@ -142,17 +167,11 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
         spinSeek.setValue(stream.getSeek());
         spinSeek.setVisible(stream.needSeekCTRL());
         jSlSpinSeek.setVisible(stream.needSeekCTRL());
-        if (!stream.needSeekCTRL()) {
-            jSeparator2.setVisible(false);
-            jSeparator2 = new javax.swing.JSeparator();
-            jSeparator2.setOrientation(javax.swing.SwingConstants.VERTICAL);
-            jSeparator2.setName("jSeparator2"); // NOI18N
-            add(jSeparator2, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 290, 10, 80));
-        }
-        jlbDuration.setText("Play Time "+stream.getStreamTime());
-        
+        labelSeek.setVisible(stream.needSeekCTRL());
+        jlbDuration.setText("Play Time " + stream.getStreamTime());
+
         stream.setListener(this);
-        if (!stream.hasVideo()){
+        if (!stream.hasVideo()) {
             spinX.setEnabled(false);
             jSlSpinX.setEnabled(false);
             spinY.setEnabled(false);
@@ -161,69 +180,207 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
             jSlSpinW.setEnabled(false);
             spinH.setEnabled(false);
             jSlSpinH.setEnabled(false);
-            spinH1.setEnabled(false);
-            jSlSpinCH.setEnabled(false);
-            spinW1.setEnabled(false);
-            jSlSpinCW.setEnabled(false);
             spinOpacity.setEnabled(false);
             jSlSpinO.setEnabled(false);
         }
-        if (stream instanceof SourceAudioSource) {
-            jlbDuration.setVisible(false);
-            tglAudio.setVisible(true);
-            tglPause.setVisible(false);
-            this.add(tglAudio, new org.netbeans.lib.awtextra.AbsoluteConstraints(87, 120, 30, 20));
-            this.add(tglVideo, new org.netbeans.lib.awtextra.AbsoluteConstraints(57, 120, 30, 20));
-        } else if (stream instanceof SourceMusic) {
+        if (stream instanceof SourceMusic) {
             tglAudio.setVisible(false);
             tglPause.setVisible(true);
             this.add(tglVideo, new org.netbeans.lib.awtextra.AbsoluteConstraints(57, 120, 30, 20));
         } else if (stream instanceof SourceMovie) {
-            if (stream.isOnlyVideo()){
+            if (stream.isOnlyVideo()) {
                 tglAudio.setVisible(false);
                 tglVideo.setVisible(false);
                 this.add(tglActiveStream, new org.netbeans.lib.awtextra.AbsoluteConstraints(7, 120, 80, 20));
             } else {
-            tglAudio.setVisible(true);
-            tglVideo.setVisible(false);
+                tglAudio.setVisible(true);
+                tglVideo.setVisible(false);
             }
-        } else if (stream instanceof SourceImage || stream instanceof SourceImageGif){ //|| stream instanceof SourceImageU 
+        } else {
             jlbDuration.setText(" ");
-            jlbDuration.setVisible(!jSlSpinV.isVisible());
+            jlbDuration.setVisible(jSlSpinV.isVisible());
             tglAudio.setVisible(false);
             tglPause.setVisible(false);
             tglVideo.setVisible(false);
-            this.add(tglActiveStream, new org.netbeans.lib.awtextra.AbsoluteConstraints(7, 120, 110, 20));
-        } else {
-            jlbDuration.setText(" ");
-            jlbDuration.setVisible(!jSlSpinV.isVisible());
-            tglAudio.setVisible(false);
-            tglVideo.setVisible(false);
-            this.add(tglActiveStream, new org.netbeans.lib.awtextra.AbsoluteConstraints(7, 120, 78, 20));
+            this.add(tglActiveStream, new org.netbeans.lib.awtextra.AbsoluteConstraints(7, 28, 110, 20));
         }
         tglVideo.setSelected(stream.isOnlyAudio());
         tglAudio.setSelected(!stream.hasAudio());
         if (tglAudio.isSelected()) {
-                tglAudio.setEnabled(true);
-                tglVideo.setEnabled(false);
-            } else if (tglVideo.isSelected()) {
-                tglVideo.setEnabled(true);
-                tglAudio.setEnabled(false);
-            } else {
-                tglAudio.setEnabled(true);
-                tglVideo.setEnabled(true);
+            tglAudio.setEnabled(true);
+            tglVideo.setEnabled(false);
+        } else if (tglVideo.isSelected()) {
+            tglVideo.setEnabled(true);
+            tglAudio.setEnabled(false);
+        } else {
+            tglAudio.setEnabled(true);
+            tglVideo.setEnabled(true);
+        }
+        if (stream.getLoaded()) {
+            if (ffmpeg && !avconv) {
+                switch (stream.getComm()) {
+                    case "AV":
+                        tglFFmpeg.setSelected(true);
+                        stream.setComm("FF");
+                        stream.setBackFF(true);
+                        tglAVconv.setEnabled(false);
+                        tglGst.setSelected(false);
+                        break;
+                    case "GS":
+                        tglGst.setSelected(true);
+                        stream.setComm("GS");
+                        tglAVconv.setEnabled(false);
+                        break;
+                    case "FF":
+                        tglFFmpeg.setSelected(true);
+                        stream.setComm("FF");
+                        stream.setBackFF(true);
+                        tglAVconv.setEnabled(false);
+                        tglGst.setSelected(false);
+                        break;
+                    default:
+                        tglFFmpeg.setSelected(true);
+                        stream.setComm("FF");
+                        stream.setBackFF(true);
+                        tglAVconv.setEnabled(false);
+                        tglGst.setSelected(false);
+                        break;
+                }
+
+            } else if (ffmpeg && avconv) {
+                switch (stream.getComm()) {
+                    case "AV":
+                        tglAVconv.setSelected(true);
+                        stream.setComm("AV");
+                        tglGst.setSelected(false);
+                        break;
+                    case "GS":
+                        tglGst.setSelected(true);
+                        stream.setComm("GS");
+                        tglAVconv.setSelected(false);
+                        break;
+                    case "FF":
+                        tglFFmpeg.setSelected(true);
+                        stream.setComm("FF");
+                        stream.setBackFF(true);
+                        tglAVconv.setSelected(false);
+                        tglGst.setSelected(false);
+                        break;
+                    default:
+                        tglAVconv.setSelected(true);
+                        stream.setComm("AV");
+                        tglGst.setSelected(false);
+                        tglFFmpeg.setSelected(false);
+                        break;
+                }
+            } else if (!ffmpeg && avconv) {
+                switch (stream.getComm()) {
+                    case "AV":
+                        tglAVconv.setSelected(true);
+                        stream.setComm("AV");
+                        tglGst.setSelected(false);
+                        tglFFmpeg.setEnabled(false);
+                        break;
+                    case "GS":
+                        tglGst.setSelected(true);
+                        stream.setComm("GS");
+                        tglAVconv.setSelected(false);
+                        tglFFmpeg.setEnabled(false);
+                        break;
+                    case "FF":
+                        tglAVconv.setSelected(true);
+                        stream.setComm("AV");
+                        tglGst.setSelected(false);
+                        tglFFmpeg.setEnabled(false);
+                        break;
+                    default:
+                        tglAVconv.setSelected(true);
+                        stream.setComm("AV");
+                        tglGst.setSelected(false);
+                        tglFFmpeg.setEnabled(false);
+                        break;
+                }
             }
+            this.revalidate();
+        } else if (distro.toLowerCase().equals("ubuntu")) {
+            if (ffmpeg && !avconv) {
+                tglFFmpeg.setSelected(true);
+                stream.setComm("FF");
+                stream.setBackFF(true);
+                tglAVconv.setEnabled(false);
+                tglGst.setSelected(false);
+            } else if (ffmpeg && avconv) {
+                tglAVconv.setSelected(true);
+                stream.setComm("AV");
+                tglGst.setSelected(false);
+                tglFFmpeg.setSelected(false);
+            } else if (!ffmpeg && avconv) {
+                tglAVconv.setSelected(true);
+                stream.setComm("AV");
+                tglGst.setSelected(false);
+                tglFFmpeg.setEnabled(false);
+            }
+        } else if (distro.toLowerCase().equals("windows")) {
+            stream.setComm("FF");
+            stream.setBackFF(true);
+            tglFFmpeg.setSelected(true);
+            tglAVconv.setVisible(false);
+            tglGst.setVisible(false);
+        } else {
+            tglAVconv.setEnabled(false);
+            stream.setComm("FF");
+            stream.setBackFF(true);
+            tglGst.setSelected(false);
+            tglFFmpeg.setSelected(true);
+        } //                tglLoop.setVisible(false);
+        if (stream instanceof SourceImageGif || stream instanceof SourceImage) {
+            tglAVconv.setVisible(false);
+            tglFFmpeg.setVisible(false);
+            tglGst.setVisible(false);
+            tglLoop.setVisible(false);
+            labelVD.setVisible(false);
+            spinVDelay.setVisible(false);
+            jSlSpinVD.setVisible(false);
+            labelAD.setVisible(false);
+            spinADelay.setVisible(false);
+            jSlSpinAD.setVisible(false);
+            lblBE.setVisible(false);
+        }
+        if (stream instanceof SourceMovie || stream instanceof SourceMusic) {
+            tglLoop.setSelected(stream.getLoop());
+        }
+
     }
-    
-    public ImageIcon getIcon(){
+
+    public void setParent() {
+        JTp = (JTabbedPane) this.getParent();
+        int totalTabs = JTp.getTabCount();
+        String sName = stream.getName();
+        for (int i = 0; i < totalTabs; i++) {
+            String titleAt = JTp.getTitleAt(i).replace("<html><body><table width='20'>", "").replace("</table></body></html>", "").replace("<span></span>", "");
+            if (sName.equals(titleAt)) {
+                tabIndex = i;
+                break;
+            }
+        }
+
+        String t = JTp.getTitleAt(tabIndex);
+        titleLabel.setText(t);
+        int fontSize = titleLabel.getFont().getSize();
+        Font font = new Font(titleLabel.getFont().getName(), Font.BOLD, fontSize);
+        titleLabel.setFont(font);
+        JTp.setTabComponentAt(tabIndex, titleLabel);
+    }
+
+    public ImageIcon getIcon() {
         ImageIcon icon = null;
-        if (stream.getPreview()!=null){
+        if (stream.getPreview() != null) {
             icon = new ImageIcon(stream.getPreview().getScaledInstance(32, 32, BufferedImage.SCALE_FAST));
         }
-        
+
         return icon;
     }
-    
+
     public void remove() {
         stream.stop();
         stream = null;
@@ -231,62 +388,53 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
     }
 
     @Override
-    public void sourceUpdated(Stream stream){
+    public void sourceUpdated(Stream stream) {
+
         int mixerW = MasterMixer.getInstance().getWidth();
         int mixerH = MasterMixer.getInstance().getHeight();
-        
+
         if (jSlSpinX.getValue() > mixerW) {
             spinX.setValue(stream.getX());
         }
         jSlSpinX.setMaximum(mixerW);
-        
-        if (jSlSpinX.getValue() < - mixerW) {
+
+        if (jSlSpinX.getValue() < -mixerW) {
             spinX.setValue(stream.getX());
         }
-        jSlSpinX.setMinimum(- mixerW);
-        
+        jSlSpinX.setMinimum(-mixerW);
+
         if (jSlSpinY.getValue() > mixerH) {
             spinY.setValue(stream.getY());
         }
         jSlSpinY.setMaximum(mixerH);
-        
-        if (jSlSpinY.getValue() < - mixerH) {
+
+        if (jSlSpinY.getValue() < -mixerH) {
             spinY.setValue(stream.getY());
         }
-        jSlSpinY.setMinimum(- mixerH);
-        
+        jSlSpinY.setMinimum(-mixerH);
+
         if (jSlSpinW.getValue() > mixerW) {
             spinW.setValue(stream.getWidth());
         }
         jSlSpinW.setMaximum(mixerW);
-        
+
         if (jSlSpinH.getValue() > mixerH) {
             spinH.setValue(stream.getHeight());
         }
         jSlSpinH.setMaximum(mixerH);
-        
+
         spinX.setValue(stream.getX());
         spinY.setValue(stream.getY());
         spinH.setValue(stream.getHeight());
         spinW.setValue(stream.getWidth());
-        spinW1.setValue(stream.getCaptureWidth());
-        spinH1.setValue(stream.getCaptureHeight());
         spinOpacity.setValue(stream.getOpacity());
         spinVolume.setValue(stream.getVolume() * 100);
         spinZOrder.setValue(stream.getZOrder());
         tglActiveStream.setSelected(stream.isPlaying());
         if (stream.isPlaying()) {
+
             tglPause.setSelected(stream.getisPaused());
-        } else {
-            tglPause.setSelected(false);
-            stream.setisPaused(false);
-        }
-        if (stream.isPlaying()){
-            this.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.green));
-            spinW1.setEnabled(false);
-            jSlSpinCW.setEnabled(false);
-            spinH1.setEnabled(false);
-            jSlSpinCH.setEnabled(false);
+
             spinVDelay.setEnabled(false);
             jSlSpinVD.setEnabled(false);
             spinADelay.setEnabled(false);
@@ -299,12 +447,14 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
             spinVolume.setEnabled(stream.hasAudio());
             jSlSpinV.setEnabled(stream.hasAudio());
             tglPause.setEnabled(true);
+
+            titleLabel.setForeground(sActiveLblCol);
+            this.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, sActiveLblCol));
         } else {
-            this.setBorder(BorderFactory.createEmptyBorder());
-            spinH1.setEnabled(stream.hasVideo());
-            jSlSpinCH.setEnabled(stream.hasVideo());
-            spinW1.setEnabled(stream.hasVideo());
-            jSlSpinCW.setEnabled(stream.hasVideo());
+
+            tglPause.setSelected(false);
+            stream.setisPaused(false);
+            titleLabel.setForeground(sStopLblCol);
             spinVDelay.setEnabled(stream.hasVideo());
             jSlSpinVD.setEnabled(stream.hasVideo());
             spinADelay.setEnabled(stream.hasAudio());
@@ -324,22 +474,20 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
             jSlSpinV.setEnabled(stream.hasAudio());
             tglPause.setSelected(false);
             tglPause.setEnabled(false);
+            this.setBorder(BorderFactory.createEtchedBorder());
         }
         tglActiveStream.revalidate();
     }
-    /** This method is called from within the constructor to
-     * initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is
-     * always regenerated by the Form Editor.
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        panPreview = new javax.swing.JPanel();
-        jlbDuration = new javax.swing.JLabel();
-        jSlSpinV = new javax.swing.JSlider();
-        lblCurtain = new javax.swing.JLabel();
         spinX = new javax.swing.JSpinner();
         spinY = new javax.swing.JSpinner();
         spinW = new javax.swing.JSpinner();
@@ -354,18 +502,12 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
         labelH = new javax.swing.JLabel();
         labelO = new javax.swing.JLabel();
         labelZ = new javax.swing.JLabel();
-        labelCW = new javax.swing.JLabel();
-        spinW1 = new javax.swing.JSpinner();
-        labelCH = new javax.swing.JLabel();
-        spinH1 = new javax.swing.JSpinner();
         spinVDelay = new javax.swing.JSpinner();
         spinADelay = new javax.swing.JSpinner();
         spinSeek = new javax.swing.JSpinner();
         labelSeek = new javax.swing.JLabel();
         jSlSpinX = new javax.swing.JSlider();
         jSlSpinY = new javax.swing.JSlider();
-        jSlSpinCW = new javax.swing.JSlider();
-        jSlSpinCH = new javax.swing.JSlider();
         jSlSpinW = new javax.swing.JSlider();
         jSlSpinH = new javax.swing.JSlider();
         jSlSpinO = new javax.swing.JSlider();
@@ -375,86 +517,30 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
         jSlSpinZOrder = new javax.swing.JSlider();
         labelVD = new javax.swing.JLabel();
         labelAD = new javax.swing.JLabel();
-        jSeparator1 = new javax.swing.JSeparator();
-        jSeparator2 = new javax.swing.JSeparator();
-        jSeparator3 = new javax.swing.JSeparator();
-        jSeparator4 = new javax.swing.JSeparator();
-        jSeparator5 = new javax.swing.JSeparator();
-        jLabel2 = new javax.swing.JLabel();
         tglPause = new javax.swing.JToggleButton();
         tglAudio = new javax.swing.JToggleButton();
         jcbLockAR = new javax.swing.JCheckBox();
-        jSeparator6 = new javax.swing.JSeparator();
         tglVideo = new javax.swing.JToggleButton();
         tglPreview = new javax.swing.JToggleButton();
+        jSlSpinV = new javax.swing.JSlider();
+        jlbDuration = new javax.swing.JLabel();
+        labelVol = new javax.swing.JLabel();
+        tglGst = new javax.swing.JToggleButton();
+        tglAVconv = new javax.swing.JToggleButton();
+        tglFFmpeg = new javax.swing.JToggleButton();
+        tglLoop = new javax.swing.JToggleButton();
+        lblBE = new javax.swing.JLabel();
 
         setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.RAISED));
-        setMaximumSize(new java.awt.Dimension(298, 440));
-        setMinimumSize(new java.awt.Dimension(122, 298));
+        setMaximumSize(new java.awt.Dimension(298, 367));
+        setMinimumSize(new java.awt.Dimension(298, 367));
         setName(""); // NOI18N
-        setPreferredSize(new java.awt.Dimension(124, 296));
-        setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        panPreview.setBackground(new java.awt.Color(113, 113, 113));
-        panPreview.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.RAISED));
-        panPreview.setToolTipText("Click on the video to Hide/Unhide");
-        panPreview.setMaximumSize(new java.awt.Dimension(90, 60));
-        panPreview.setMinimumSize(new java.awt.Dimension(90, 60));
-        panPreview.setName("panPreview"); // NOI18N
-        panPreview.setPreferredSize(new java.awt.Dimension(90, 60));
-        panPreview.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                panPreviewMouseClicked(evt);
+        setPreferredSize(new java.awt.Dimension(298, 367));
+        addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                formMousePressed(evt);
             }
         });
-        panPreview.setLayout(new java.awt.BorderLayout());
-
-        jlbDuration.setBackground(java.awt.Color.black);
-        jlbDuration.setFont(new java.awt.Font("Ubuntu Mono", 0, 12)); // NOI18N
-        jlbDuration.setForeground(java.awt.Color.white);
-        jlbDuration.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jlbDuration.setText("Sec.");
-        jlbDuration.setName("jlbDuration"); // NOI18N
-        jlbDuration.setOpaque(true);
-        panPreview.add(jlbDuration, java.awt.BorderLayout.PAGE_END);
-
-        jSlSpinV.setBackground(java.awt.Color.black);
-        jSlSpinV.setForeground(java.awt.Color.white);
-        jSlSpinV.setMaximum(200);
-        jSlSpinV.setToolTipText("Volume Control - Double Click to Mute/Unmute");
-        jSlSpinV.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        jSlSpinV.setMaximumSize(new java.awt.Dimension(110, 30));
-        jSlSpinV.setMinimumSize(new java.awt.Dimension(110, 30));
-        jSlSpinV.setName("jSlSpinV"); // NOI18N
-        jSlSpinV.setPreferredSize(new java.awt.Dimension(110, 25));
-        jSlSpinV.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jSlSpinVMouseClicked(evt);
-            }
-        });
-        jSlSpinV.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                jSlSpinVStateChanged(evt);
-            }
-        });
-        jSlSpinV.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                jSlSpinVFocusLost(evt);
-            }
-        });
-        panPreview.add(jSlSpinV, java.awt.BorderLayout.PAGE_START);
-
-        lblCurtain.setIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/curtain_small.png"))); // NOI18N
-        lblCurtain.setToolTipText("Click on the video to Hide/Unhide");
-        lblCurtain.setName("lblCurtain"); // NOI18N
-        lblCurtain.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                lblCurtainMouseClicked(evt);
-            }
-        });
-        panPreview.add(lblCurtain, java.awt.BorderLayout.CENTER);
-
-        add(panPreview, new org.netbeans.lib.awtextra.AbsoluteConstraints(7, 7, 110, 111));
 
         spinX.setFont(new java.awt.Font("Tahoma", 0, 8)); // NOI18N
         spinX.setName("spinX"); // NOI18N
@@ -463,7 +549,6 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
                 spinXStateChanged(evt);
             }
         });
-        add(spinX, new org.netbeans.lib.awtextra.AbsoluteConstraints(68, 140, 50, -1));
 
         spinY.setFont(new java.awt.Font("Tahoma", 0, 8)); // NOI18N
         spinY.setName("spinY"); // NOI18N
@@ -472,10 +557,9 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
                 spinYStateChanged(evt);
             }
         });
-        add(spinY, new org.netbeans.lib.awtextra.AbsoluteConstraints(68, 160, 50, -1));
 
         spinW.setFont(new java.awt.Font("Tahoma", 0, 8)); // NOI18N
-        spinW.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(1), Integer.valueOf(1), null, Integer.valueOf(1)));
+        spinW.setModel(new javax.swing.SpinnerNumberModel(1, 1, null, 1));
         spinW.setInputVerifier(jSlSpinW.getInputVerifier());
         spinW.setName("spinW"); // NOI18N
         spinW.addChangeListener(new javax.swing.event.ChangeListener() {
@@ -483,37 +567,33 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
                 spinWStateChanged(evt);
             }
         });
-        add(spinW, new org.netbeans.lib.awtextra.AbsoluteConstraints(58, 180, 60, -1));
 
         spinH.setFont(new java.awt.Font("Tahoma", 0, 8)); // NOI18N
-        spinH.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(1), Integer.valueOf(1), null, Integer.valueOf(1)));
+        spinH.setModel(new javax.swing.SpinnerNumberModel(1, 1, null, 1));
         spinH.setName("spinH"); // NOI18N
         spinH.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 spinHStateChanged(evt);
             }
         });
-        add(spinH, new org.netbeans.lib.awtextra.AbsoluteConstraints(58, 200, 60, -1));
 
         spinOpacity.setFont(new java.awt.Font("Tahoma", 0, 8)); // NOI18N
-        spinOpacity.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(0), Integer.valueOf(0), null, Integer.valueOf(1)));
+        spinOpacity.setModel(new javax.swing.SpinnerNumberModel(0, 0, null, 1));
         spinOpacity.setName("spinOpacity"); // NOI18N
         spinOpacity.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 spinOpacityStateChanged(evt);
             }
         });
-        add(spinOpacity, new org.netbeans.lib.awtextra.AbsoluteConstraints(68, 241, 50, -1));
 
         spinVolume.setFont(new java.awt.Font("Tahoma", 0, 8)); // NOI18N
-        spinVolume.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(1), Integer.valueOf(1), null, Integer.valueOf(1)));
+        spinVolume.setModel(new javax.swing.SpinnerNumberModel(1, 1, null, 1));
         spinVolume.setName("spinVolume"); // NOI18N
         spinVolume.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 spinVolumeStateChanged(evt);
             }
         });
-        add(spinVolume, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 7, 50, -1));
 
         tglActiveStream.setIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/media-playback-start.png"))); // NOI18N
         tglActiveStream.setName("tglActiveStream"); // NOI18N
@@ -524,7 +604,6 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
                 tglActiveStreamActionPerformed(evt);
             }
         });
-        add(tglActiveStream, new org.netbeans.lib.awtextra.AbsoluteConstraints(7, 120, 50, 20));
 
         spinZOrder.setFont(new java.awt.Font("Tahoma", 0, 8)); // NOI18N
         spinZOrder.setName("spinZOrder"); // NOI18N
@@ -533,33 +612,27 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
                 spinZOrderStateChanged(evt);
             }
         });
-        add(spinZOrder, new org.netbeans.lib.awtextra.AbsoluteConstraints(68, 261, 50, -1));
 
         labelX.setFont(new java.awt.Font("Tahoma", 0, 8)); // NOI18N
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("truckliststudio/Languages"); // NOI18N
         labelX.setText(bundle.getString("X")); // NOI18N
         labelX.setName("labelX"); // NOI18N
-        add(labelX, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 150, 10, 10));
 
         labelY.setFont(new java.awt.Font("Tahoma", 0, 8)); // NOI18N
         labelY.setText(bundle.getString("Y")); // NOI18N
         labelY.setName("labelY"); // NOI18N
-        add(labelY, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 170, 10, -1));
 
         labelW.setFont(new java.awt.Font("Tahoma", 0, 8)); // NOI18N
         labelW.setText(bundle.getString("WIDTH")); // NOI18N
         labelW.setName("labelW"); // NOI18N
-        add(labelW, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 190, 52, -1));
 
         labelH.setFont(new java.awt.Font("Tahoma", 0, 8)); // NOI18N
         labelH.setText(bundle.getString("HEIGHT")); // NOI18N
         labelH.setName("labelH"); // NOI18N
-        add(labelH, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 210, 40, -1));
 
         labelO.setFont(new java.awt.Font("Tahoma", 0, 8)); // NOI18N
         labelO.setText(bundle.getString("OPACITY")); // NOI18N
         labelO.setName("labelO"); // NOI18N
-        add(labelO, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 251, 40, -1));
 
         labelZ.setFont(new java.awt.Font("Tahoma", 0, 8)); // NOI18N
         labelZ.setText(bundle.getString("LAYER")); // NOI18N
@@ -567,40 +640,9 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
         labelZ.setMinimumSize(new java.awt.Dimension(30, 10));
         labelZ.setName("labelZ"); // NOI18N
         labelZ.setPreferredSize(new java.awt.Dimension(30, 10));
-        add(labelZ, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 271, 40, 9));
-
-        labelCW.setFont(new java.awt.Font("Tahoma", 0, 8)); // NOI18N
-        labelCW.setText(bundle.getString("CAPTUREWIDTH")); // NOI18N
-        labelCW.setName("labelCW"); // NOI18N
-        add(labelCW, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 300, 50, -1));
-
-        spinW1.setFont(new java.awt.Font("Tahoma", 0, 8)); // NOI18N
-        spinW1.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(1), Integer.valueOf(1), null, Integer.valueOf(1)));
-        spinW1.setName("spinW1"); // NOI18N
-        spinW1.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                spinW1StateChanged(evt);
-            }
-        });
-        add(spinW1, new org.netbeans.lib.awtextra.AbsoluteConstraints(68, 290, 50, -1));
-
-        labelCH.setFont(new java.awt.Font("Tahoma", 0, 8)); // NOI18N
-        labelCH.setText(bundle.getString("CAPTUREHEIGHT")); // NOI18N
-        labelCH.setName("labelCH"); // NOI18N
-        add(labelCH, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 320, 60, -1));
-
-        spinH1.setFont(new java.awt.Font("Tahoma", 0, 8)); // NOI18N
-        spinH1.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(1), Integer.valueOf(1), null, Integer.valueOf(1)));
-        spinH1.setName("spinH1"); // NOI18N
-        spinH1.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                spinH1StateChanged(evt);
-            }
-        });
-        add(spinH1, new org.netbeans.lib.awtextra.AbsoluteConstraints(68, 310, 50, -1));
 
         spinVDelay.setFont(new java.awt.Font("Tahoma", 0, 8)); // NOI18N
-        spinVDelay.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(0), Integer.valueOf(0), null, Integer.valueOf(1)));
+        spinVDelay.setModel(new javax.swing.SpinnerNumberModel(0, 0, null, 1));
         spinVDelay.setToolTipText("Milliseconds");
         spinVDelay.setName("spinVDelay"); // NOI18N
         spinVDelay.addChangeListener(new javax.swing.event.ChangeListener() {
@@ -608,10 +650,9 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
                 spinVDelayStateChanged(evt);
             }
         });
-        add(spinVDelay, new org.netbeans.lib.awtextra.AbsoluteConstraints(58, 330, 60, -1));
 
         spinADelay.setFont(new java.awt.Font("Tahoma", 0, 8)); // NOI18N
-        spinADelay.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(0), Integer.valueOf(0), null, Integer.valueOf(1)));
+        spinADelay.setModel(new javax.swing.SpinnerNumberModel(0, 0, null, 1));
         spinADelay.setToolTipText("Milliseconds");
         spinADelay.setName("spinADelay"); // NOI18N
         spinADelay.addChangeListener(new javax.swing.event.ChangeListener() {
@@ -619,17 +660,15 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
                 spinADelayStateChanged(evt);
             }
         });
-        add(spinADelay, new org.netbeans.lib.awtextra.AbsoluteConstraints(58, 350, 60, -1));
 
         spinSeek.setFont(new java.awt.Font("Tahoma", 0, 8)); // NOI18N
-        spinSeek.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(0), Integer.valueOf(0), null, Integer.valueOf(1)));
+        spinSeek.setModel(new javax.swing.SpinnerNumberModel(0, 0, null, 1));
         spinSeek.setName("spinSeek"); // NOI18N
         spinSeek.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 spinSeekStateChanged(evt);
             }
         });
-        add(spinSeek, new org.netbeans.lib.awtextra.AbsoluteConstraints(58, 370, 60, -1));
 
         labelSeek.setFont(new java.awt.Font("Tahoma", 0, 8)); // NOI18N
         labelSeek.setText(bundle.getString("SEEK")); // NOI18N
@@ -637,7 +676,6 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
         labelSeek.setMinimumSize(new java.awt.Dimension(30, 10));
         labelSeek.setName("labelSeek"); // NOI18N
         labelSeek.setPreferredSize(new java.awt.Dimension(30, 10));
-        add(labelSeek, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 380, 50, 9));
 
         jSlSpinX.setMaximum(MasterMixer.getInstance().getWidth());
         jSlSpinX.setMinimum(- MasterMixer.getInstance().getWidth());
@@ -649,7 +687,6 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
                 jSlSpinXStateChanged(evt);
             }
         });
-        add(jSlSpinX, new org.netbeans.lib.awtextra.AbsoluteConstraints(127, 140, 150, 20));
 
         jSlSpinY.setMaximum(MasterMixer.getInstance().getHeight());
         jSlSpinY.setMinimum(- MasterMixer.getInstance().getHeight());
@@ -662,33 +699,6 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
                 jSlSpinYStateChanged(evt);
             }
         });
-        add(jSlSpinY, new org.netbeans.lib.awtextra.AbsoluteConstraints(127, 160, 150, 20));
-
-        jSlSpinCW.setMajorTickSpacing(10);
-        jSlSpinCW.setMaximum(1920);
-        jSlSpinCW.setMinimum(1);
-        jSlSpinCW.setMinorTickSpacing(1);
-        jSlSpinCW.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        jSlSpinCW.setName("jSlSpinCW"); // NOI18N
-        jSlSpinCW.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                jSlSpinCWStateChanged(evt);
-            }
-        });
-        add(jSlSpinCW, new org.netbeans.lib.awtextra.AbsoluteConstraints(127, 290, 150, 20));
-
-        jSlSpinCH.setMajorTickSpacing(10);
-        jSlSpinCH.setMaximum(1080);
-        jSlSpinCH.setMinimum(1);
-        jSlSpinCH.setMinorTickSpacing(1);
-        jSlSpinCH.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        jSlSpinCH.setName("jSlSpinCH"); // NOI18N
-        jSlSpinCH.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                jSlSpinCHStateChanged(evt);
-            }
-        });
-        add(jSlSpinCH, new org.netbeans.lib.awtextra.AbsoluteConstraints(127, 310, 150, 20));
 
         jSlSpinW.setMajorTickSpacing(10);
         jSlSpinW.setMaximum(MasterMixer.getInstance().getWidth());
@@ -701,7 +711,6 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
                 jSlSpinWStateChanged(evt);
             }
         });
-        add(jSlSpinW, new org.netbeans.lib.awtextra.AbsoluteConstraints(127, 180, 150, 20));
 
         jSlSpinH.setMajorTickSpacing(10);
         jSlSpinH.setMaximum(MasterMixer.getInstance().getHeight());
@@ -714,7 +723,6 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
                 jSlSpinHStateChanged(evt);
             }
         });
-        add(jSlSpinH, new org.netbeans.lib.awtextra.AbsoluteConstraints(127, 200, 150, 20));
 
         jSlSpinO.setValue(100);
         jSlSpinO.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
@@ -724,7 +732,6 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
                 jSlSpinOStateChanged(evt);
             }
         });
-        add(jSlSpinO, new org.netbeans.lib.awtextra.AbsoluteConstraints(127, 240, 150, 20));
 
         jSlSpinVD.setMaximum(10000);
         jSlSpinVD.setPaintLabels(true);
@@ -736,8 +743,6 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
                 jSlSpinVDStateChanged(evt);
             }
         });
-        add(jSlSpinVD, new org.netbeans.lib.awtextra.AbsoluteConstraints(127, 330, 150, 20));
-        jSlSpinVD.getAccessibleContext().setAccessibleDescription("");
 
         jSlSpinAD.setMaximum(10000);
         jSlSpinAD.setPaintLabels(true);
@@ -749,7 +754,6 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
                 jSlSpinADStateChanged(evt);
             }
         });
-        add(jSlSpinAD, new org.netbeans.lib.awtextra.AbsoluteConstraints(127, 350, 150, 20));
 
         jSlSpinSeek.setMaximum(10000);
         jSlSpinSeek.setPaintLabels(true);
@@ -761,7 +765,6 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
                 jSlSpinSeekStateChanged(evt);
             }
         });
-        add(jSlSpinSeek, new org.netbeans.lib.awtextra.AbsoluteConstraints(127, 370, 150, 20));
 
         jSlSpinZOrder.setMajorTickSpacing(10);
         jSlSpinZOrder.setMaximum(10);
@@ -777,41 +780,14 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
                 jSlSpinZOrderStateChanged(evt);
             }
         });
-        add(jSlSpinZOrder, new org.netbeans.lib.awtextra.AbsoluteConstraints(127, 259, 150, 30));
 
         labelVD.setFont(new java.awt.Font("Tahoma", 0, 8)); // NOI18N
         labelVD.setText(bundle.getString("VIDEO_DELAY")); // NOI18N
         labelVD.setName("labelVD"); // NOI18N
-        add(labelVD, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 340, 60, 9));
 
         labelAD.setFont(new java.awt.Font("Tahoma", 0, 8)); // NOI18N
         labelAD.setText(bundle.getString("AUDIO_DELAY")); // NOI18N
         labelAD.setName("labelAD"); // NOI18N
-        add(labelAD, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 360, 60, 9));
-
-        jSeparator1.setName("jSeparator1"); // NOI18N
-        jSeparator1.setPreferredSize(new java.awt.Dimension(48, 10));
-        add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(126, 229, 150, 10));
-
-        jSeparator2.setOrientation(javax.swing.SwingConstants.VERTICAL);
-        jSeparator2.setName("jSeparator2"); // NOI18N
-        add(jSeparator2, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 290, 10, 100));
-
-        jSeparator3.setName("jSeparator3"); // NOI18N
-        jSeparator3.setPreferredSize(new java.awt.Dimension(48, 10));
-        add(jSeparator3, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 284, 110, 10));
-
-        jSeparator4.setOrientation(javax.swing.SwingConstants.VERTICAL);
-        jSeparator4.setName("jSeparator4"); // NOI18N
-        add(jSeparator4, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 7, 10, 126));
-
-        jSeparator5.setOrientation(javax.swing.SwingConstants.VERTICAL);
-        jSeparator5.setName("jSeparator5"); // NOI18N
-        add(jSeparator5, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 141, 10, 140));
-
-        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/splash100.png"))); // NOI18N
-        jLabel2.setName("jLabel2"); // NOI18N
-        add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(143, 14, 120, 110));
 
         tglPause.setIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/media-playback-pause.png"))); // NOI18N
         tglPause.setEnabled(false);
@@ -823,7 +799,6 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
                 tglPauseActionPerformed(evt);
             }
         });
-        add(tglPause, new org.netbeans.lib.awtextra.AbsoluteConstraints(87, 120, 30, 20));
 
         tglAudio.setFont(new java.awt.Font("Ubuntu", 0, 12)); // NOI18N
         tglAudio.setIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/audio-volume-muted.png"))); // NOI18N
@@ -840,9 +815,9 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
                 tglAudioActionPerformed(evt);
             }
         });
-        add(tglAudio, new org.netbeans.lib.awtextra.AbsoluteConstraints(57, 120, 30, 20));
 
         jcbLockAR.setFont(new java.awt.Font("Tahoma", 0, 8)); // NOI18N
+        jcbLockAR.setToolTipText("Lock A/R");
         jcbLockAR.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
         jcbLockAR.setIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/LockButton-open_small.png"))); // NOI18N
         jcbLockAR.setName("jcbLockAR"); // NOI18N
@@ -853,11 +828,6 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
                 jcbLockARActionPerformed(evt);
             }
         });
-        add(jcbLockAR, new org.netbeans.lib.awtextra.AbsoluteConstraints(44, 190, -1, -1));
-
-        jSeparator6.setName("jSeparator6"); // NOI18N
-        jSeparator6.setPreferredSize(new java.awt.Dimension(48, 10));
-        add(jSeparator6, new org.netbeans.lib.awtextra.AbsoluteConstraints(126, 135, 150, 10));
 
         tglVideo.setFont(new java.awt.Font("Ubuntu", 0, 12)); // NOI18N
         tglVideo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/edit-delete.png"))); // NOI18N
@@ -874,7 +844,6 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
                 tglVideoActionPerformed(evt);
             }
         });
-        add(tglVideo, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 40, -1, -1));
 
         tglPreview.setFont(new java.awt.Font("Ubuntu", 0, 5)); // NOI18N
         tglPreview.setIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/PreviewButton2.png"))); // NOI18N
@@ -887,29 +856,315 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
                 tglPreviewActionPerformed(evt);
             }
         });
-        add(tglPreview, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 222, 112, 20));
+
+        jSlSpinV.setForeground(java.awt.Color.white);
+        jSlSpinV.setMaximum(200);
+        jSlSpinV.setToolTipText("Volume Control - Double Click to Mute/Unmute");
+        jSlSpinV.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jSlSpinV.setMaximumSize(new java.awt.Dimension(110, 30));
+        jSlSpinV.setMinimumSize(new java.awt.Dimension(110, 30));
+        jSlSpinV.setName("jSlSpinV"); // NOI18N
+        jSlSpinV.setPreferredSize(new java.awt.Dimension(110, 25));
+        jSlSpinV.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                jSlSpinVStateChanged(evt);
+            }
+        });
+        jSlSpinV.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                jSlSpinVFocusLost(evt);
+            }
+        });
+        jSlSpinV.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jSlSpinVMouseClicked(evt);
+            }
+        });
+
+        jlbDuration.setBackground(java.awt.Color.black);
+        jlbDuration.setFont(new java.awt.Font("Ubuntu Mono", 0, 12)); // NOI18N
+        jlbDuration.setForeground(java.awt.Color.white);
+        jlbDuration.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlbDuration.setText("Sec.");
+        jlbDuration.setName("jlbDuration"); // NOI18N
+        jlbDuration.setOpaque(true);
+
+        labelVol.setIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/volume_icon_25.png"))); // NOI18N
+        labelVol.setName("labelVol"); // NOI18N
+
+        tglGst.setIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/gstreamer.png"))); // NOI18N
+        tglGst.setToolTipText("Use GStreamer Backend.");
+        tglGst.setFocusable(false);
+        tglGst.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        tglGst.setMaximumSize(new java.awt.Dimension(29, 28));
+        tglGst.setMinimumSize(new java.awt.Dimension(25, 25));
+        tglGst.setName("tglGst"); // NOI18N
+        tglGst.setPreferredSize(new java.awt.Dimension(28, 29));
+        tglGst.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/gstreamer.png"))); // NOI18N
+        tglGst.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/gstreamerSelected.png"))); // NOI18N
+        tglGst.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        tglGst.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tglGstActionPerformed(evt);
+            }
+        });
+
+        tglAVconv.setIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/FFmpeg.png"))); // NOI18N
+        tglAVconv.setToolTipText("Use Libav Backend.");
+        tglAVconv.setFocusable(false);
+        tglAVconv.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        tglAVconv.setMaximumSize(new java.awt.Dimension(29, 28));
+        tglAVconv.setMinimumSize(new java.awt.Dimension(25, 25));
+        tglAVconv.setName("tglAVconv"); // NOI18N
+        tglAVconv.setPreferredSize(new java.awt.Dimension(28, 29));
+        tglAVconv.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/FFmpeg.png"))); // NOI18N
+        tglAVconv.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/FFmpegSelected.png"))); // NOI18N
+        tglAVconv.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        tglAVconv.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tglAVconvActionPerformed(evt);
+            }
+        });
+
+        tglFFmpeg.setIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/FFmpeg.png"))); // NOI18N
+        tglFFmpeg.setToolTipText("Use FFmpeg Backend.");
+        tglFFmpeg.setFocusable(false);
+        tglFFmpeg.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        tglFFmpeg.setMaximumSize(new java.awt.Dimension(29, 28));
+        tglFFmpeg.setMinimumSize(new java.awt.Dimension(25, 25));
+        tglFFmpeg.setName("tglFFmpeg"); // NOI18N
+        tglFFmpeg.setPreferredSize(new java.awt.Dimension(28, 29));
+        tglFFmpeg.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/FFmpeg.png"))); // NOI18N
+        tglFFmpeg.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/FFmpegSelected.png"))); // NOI18N
+        tglFFmpeg.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        tglFFmpeg.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tglFFmpegActionPerformed(evt);
+            }
+        });
+
+        tglLoop.setIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/loop4.png"))); // NOI18N
+        tglLoop.setToolTipText("Stream Loop ON/OFF");
+        tglLoop.setFocusable(false);
+        tglLoop.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        tglLoop.setMaximumSize(new java.awt.Dimension(29, 28));
+        tglLoop.setMinimumSize(new java.awt.Dimension(25, 25));
+        tglLoop.setName("tglLoop"); // NOI18N
+        tglLoop.setPreferredSize(new java.awt.Dimension(28, 29));
+        tglLoop.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/loop4.png"))); // NOI18N
+        tglLoop.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/loop4-activated.png"))); // NOI18N
+        tglLoop.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        tglLoop.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tglLoopActionPerformed(evt);
+            }
+        });
+
+        lblBE.setFont(new java.awt.Font("Tahoma", 0, 8)); // NOI18N
+        lblBE.setText(bundle.getString("SOURCEBACKEND")); // NOI18N
+        lblBE.setName("lblBE"); // NOI18N
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        this.setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(13, 13, 13)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jlbDuration, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(labelO, javax.swing.GroupLayout.DEFAULT_SIZE, 38, Short.MAX_VALUE)
+                                    .addComponent(labelH, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(labelW, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(spinOpacity, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jSlSpinO, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(spinW, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(spinH, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(jSlSpinW, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                                            .addComponent(jSlSpinH, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jcbLockAR)
+                                        .addGap(1, 1, 1))))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addComponent(labelAD, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(labelZ, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(labelVD, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(labelSeek, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(spinSeek, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jSlSpinSeek, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(spinADelay, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jSlSpinAD, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(spinVDelay, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jSlSpinVD, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(spinZOrder, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jSlSpinZOrder, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addComponent(labelVol, javax.swing.GroupLayout.DEFAULT_SIZE, 38, Short.MAX_VALUE)
+                                    .addComponent(labelY, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(labelX, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(lblBE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(spinX, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jSlSpinX, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(spinY, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jSlSpinY, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                                    .addComponent(jSlSpinV, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(tglAVconv, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(tglFFmpeg, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(tglGst, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(spinVolume, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 65, Short.MAX_VALUE)))))
+                        .addGap(13, 13, 13))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(tglActiveStream, javax.swing.GroupLayout.DEFAULT_SIZE, 38, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(tglPause, javax.swing.GroupLayout.DEFAULT_SIZE, 37, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(tglVideo, javax.swing.GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(tglAudio, javax.swing.GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(tglPreview, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(tglLoop, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
+                        .addContainerGap())))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(tglActiveStream, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(tglAudio, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(tglPause, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(tglPreview, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(tglVideo, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(tglLoop, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jlbDuration)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(labelVol)
+                    .addComponent(jSlSpinV, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(tglFFmpeg, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(tglAVconv, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(tglGst, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(spinVolume, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lblBE, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(labelX)
+                        .addComponent(spinX, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jSlSpinX, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(labelY)
+                        .addComponent(spinY, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jSlSpinY, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jSlSpinW, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(labelW)
+                                .addComponent(spinW, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(labelH)
+                                .addComponent(spinH, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jSlSpinH, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(jcbLockAR, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(spinOpacity, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(labelO))
+                    .addComponent(jSlSpinO, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(spinZOrder, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(labelZ, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jSlSpinZOrder, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(7, 7, 7)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(labelVD)
+                        .addComponent(spinVDelay, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jSlSpinVD, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(labelAD)
+                        .addComponent(spinADelay, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jSlSpinAD, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(spinSeek, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(labelSeek, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jSlSpinSeek, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(19, Short.MAX_VALUE))
+        );
+
+        jSlSpinVD.getAccessibleContext().setAccessibleDescription("");
 
         getAccessibleContext().setAccessibleDescription("");
         getAccessibleContext().setAccessibleParent(this);
     }// </editor-fold>//GEN-END:initComponents
     private void tglActiveStreamActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tglActiveStreamActionPerformed
         if (tglActiveStream.isSelected()) {
-            if (stream.getisATrack() && !stream.getPreView()){
+            if (stream.getisATrack() && !stream.getPreView()) {
                 String name = stream.getName();
                 listenerTP.startItsTrack(name);
             } else {
-                if (tglVideo.isSelected()){
+                if (tglVideo.isSelected()) {
                     stream.setOnlyAudio(true);
                 } else {
                     stream.setOnlyAudio(false);
                 }
-    //            System.out.println("Play Volume: " + volume);
                 tglVideo.setEnabled(false);
-                this.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.green));
-                spinW1.setEnabled(false);
-                jSlSpinCW.setEnabled(false);
-                spinH1.setEnabled(false);
-                jSlSpinCH.setEnabled(false);
+                titleLabel.setForeground(sActiveLblCol);
                 spinVDelay.setEnabled(false);
                 jSlSpinVD.setEnabled(false);
                 spinADelay.setEnabled(false);
@@ -919,6 +1174,7 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
                 tglAudio.setEnabled(false);
                 tglPreview.setEnabled(false);
                 tglPause.setEnabled(true);
+                this.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, sActiveLblCol));
                 stream.read();
             }
         } else {
@@ -926,11 +1182,7 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
                 listTracks.repaint();
                 lblPlayingTrack.setText("");
             }
-            this.setBorder(BorderFactory.createEmptyBorder());
-            spinH1.setEnabled(stream.hasVideo());
-            jSlSpinCH.setEnabled(stream.hasVideo());
-            spinW1.setEnabled(stream.hasVideo());
-            jSlSpinCW.setEnabled(stream.hasVideo());
+            titleLabel.setForeground(sStopLblCol);
             spinVDelay.setEnabled(stream.hasVideo());
             jSlSpinVD.setEnabled(stream.hasVideo());
             spinADelay.setEnabled(stream.hasAudio());
@@ -962,9 +1214,10 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
                     stream.setVolume(volume);
                 }
             }
-            if (stream.getisATrack() && !stream.getPreView()){
+            if (stream.getisATrack() && !stream.getPreView()) {
                 listenerTP.stopItsTrack();
             }
+            this.setBorder(BorderFactory.createEtchedBorder());
         }
     }//GEN-LAST:event_tglActiveStreamActionPerformed
 
@@ -975,14 +1228,14 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
 
     private void spinZOrderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spinZOrderStateChanged
         stream.setZOrder((Integer) spinZOrder.getValue());
-        jSlSpinZOrder.setValue((Integer) spinZOrder.getValue());      
+        jSlSpinZOrder.setValue((Integer) spinZOrder.getValue());
     }//GEN-LAST:event_spinZOrderStateChanged
 
     private void spinWStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spinWStateChanged
         int w = (Integer) spinW.getValue();
         jSlSpinW.setValue(w);
         int h = oldH;
-        if (lockRatio){
+        if (lockRatio) {
             h = (oldH * w) / oldW;
             spinH.setValue(h);
         }
@@ -992,20 +1245,20 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
     private void spinHStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spinHStateChanged
         int h = (Integer) spinH.getValue();
         jSlSpinH.setValue(h);
-        if (!lockRatio){
+        if (!lockRatio) {
             oldH = stream.getHeight();
         }
         stream.setHeight(h);
     }//GEN-LAST:event_spinHStateChanged
 
     private void spinXStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spinXStateChanged
-        stream.setX((Integer)spinX.getValue());
-        jSlSpinX.setValue((Integer)spinX.getValue());
+        stream.setX((Integer) spinX.getValue());
+        jSlSpinX.setValue((Integer) spinX.getValue());
     }//GEN-LAST:event_spinXStateChanged
 
     private void spinYStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spinYStateChanged
-        stream.setY((Integer)spinY.getValue());
-        jSlSpinY.setValue((Integer)spinY.getValue());
+        stream.setY((Integer) spinY.getValue());
+        jSlSpinY.setValue((Integer) spinY.getValue());
     }//GEN-LAST:event_spinYStateChanged
 
     private void spinVolumeStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spinVolumeStateChanged
@@ -1014,44 +1267,34 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
         jSlSpinV.setValue(jVol);
         Object value = spinVolume.getValue();
         float v = 0;
-        if (value instanceof Float){
-            v = (Float)value;
-        } else if (value instanceof Integer){
-            v = ((Number)value).floatValue();
+        if (value instanceof Float) {
+            v = (Float) value;
+        } else if (value instanceof Integer) {
+            v = ((Number) value).floatValue();
         }
         if (stream.getisPaused()) {
-            if (v/100f != 0) {
-                vol = v/100f;
+            if (v / 100f != 0) {
+                vol = v / 100f;
             }
         } else {
-            stream.setVolume(v/100f);
-            volume = v/100f;
+            stream.setVolume(v / 100f);
+            volume = v / 100f;
         }
     }//GEN-LAST:event_spinVolumeStateChanged
 
-    private void spinW1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spinW1StateChanged
-       stream.setCaptureWidth((Integer)spinW1.getValue());
-       jSlSpinCW.setValue((Integer)spinW1.getValue());
-    }//GEN-LAST:event_spinW1StateChanged
-
-    private void spinH1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spinH1StateChanged
-        stream.setCaptureHeight((Integer)spinH1.getValue());
-        jSlSpinCH.setValue((Integer)spinH1.getValue());
-    }//GEN-LAST:event_spinH1StateChanged
-
     private void spinVDelayStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spinVDelayStateChanged
-        stream.setVDelay((Integer)spinVDelay.getValue()); 
-        jSlSpinVD.setValue((Integer)spinVDelay.getValue());        
+        stream.setVDelay((Integer) spinVDelay.getValue());
+        jSlSpinVD.setValue((Integer) spinVDelay.getValue());
     }//GEN-LAST:event_spinVDelayStateChanged
 
     private void spinADelayStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spinADelayStateChanged
-        stream.setADelay((Integer)spinADelay.getValue());
-        jSlSpinAD.setValue((Integer)spinADelay.getValue());  
+        stream.setADelay((Integer) spinADelay.getValue());
+        jSlSpinAD.setValue((Integer) spinADelay.getValue());
     }//GEN-LAST:event_spinADelayStateChanged
 
     private void spinSeekStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spinSeekStateChanged
-        stream.setSeek((Integer)spinSeek.getValue());
-        jSlSpinSeek.setValue((Integer)spinSeek.getValue());     
+        stream.setSeek((Integer) spinSeek.getValue());
+        jSlSpinSeek.setValue((Integer) spinSeek.getValue());
     }//GEN-LAST:event_spinSeekStateChanged
 
     private void jSlSpinXStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSlSpinXStateChanged
@@ -1061,14 +1304,6 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
     private void jSlSpinYStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSlSpinYStateChanged
         spinY.setValue(jSlSpinY.getValue());
     }//GEN-LAST:event_jSlSpinYStateChanged
-
-    private void jSlSpinCWStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSlSpinCWStateChanged
-        spinW1.setValue(jSlSpinCW.getValue());
-    }//GEN-LAST:event_jSlSpinCWStateChanged
-
-    private void jSlSpinCHStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSlSpinCHStateChanged
-        spinH1.setValue(jSlSpinCH.getValue());
-    }//GEN-LAST:event_jSlSpinCHStateChanged
 
     private void jSlSpinWStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSlSpinWStateChanged
         int w = (Integer) jSlSpinW.getValue();
@@ -1081,7 +1316,7 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
     }//GEN-LAST:event_jSlSpinHStateChanged
 
     private void jSlSpinOStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSlSpinOStateChanged
-        spinOpacity.setValue(jSlSpinO.getValue());        
+        spinOpacity.setValue(jSlSpinO.getValue());
     }//GEN-LAST:event_jSlSpinOStateChanged
 
     private void jSlSpinVStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSlSpinVStateChanged
@@ -1089,23 +1324,23 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
     }//GEN-LAST:event_jSlSpinVStateChanged
 
     private void jSlSpinVDStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSlSpinVDStateChanged
-        spinVDelay.setValue(jSlSpinVD.getValue());        
+        spinVDelay.setValue(jSlSpinVD.getValue());
     }//GEN-LAST:event_jSlSpinVDStateChanged
 
     private void jSlSpinADStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSlSpinADStateChanged
-        spinADelay.setValue(jSlSpinAD.getValue());      
+        spinADelay.setValue(jSlSpinAD.getValue());
     }//GEN-LAST:event_jSlSpinADStateChanged
 
     private void jSlSpinSeekStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSlSpinSeekStateChanged
-        spinSeek.setValue(jSlSpinSeek.getValue());      
+        spinSeek.setValue(jSlSpinSeek.getValue());
     }//GEN-LAST:event_jSlSpinSeekStateChanged
 
     private void jSlSpinZOrderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSlSpinZOrderStateChanged
-        spinZOrder.setValue(jSlSpinZOrder.getValue());      
+        spinZOrder.setValue(jSlSpinZOrder.getValue());
     }//GEN-LAST:event_jSlSpinZOrderStateChanged
 
     private void tglAudioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tglAudioActionPerformed
-        if (tglAudio.isSelected()){
+        if (tglAudio.isSelected()) {
             stream.setHasAudio(false);
             stream.setOnlyVideo(true);
             tglVideo.setEnabled(false);
@@ -1117,20 +1352,20 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
     }//GEN-LAST:event_tglAudioActionPerformed
 
     private void tglPauseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tglPauseActionPerformed
-        if (tglPause.isSelected()){
+        if (tglPause.isSelected()) {
             stream.setVolume(0);
             stream.setisPaused(true);
             stream.pause();
         } else {
             stream.setVolume(vol);
-            spinVolume.setValue(vol*100f);
+            spinVolume.setValue(vol * 100f);
             stream.setisPaused(false);
             stream.play();
         }
     }//GEN-LAST:event_tglPauseActionPerformed
 
     private void jcbLockARActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jcbLockARActionPerformed
-        if (jcbLockAR.isSelected()){
+        if (jcbLockAR.isSelected()) {
             spinH.setEnabled(false);
             jSlSpinH.setEnabled(false);
             lockRatio = true;
@@ -1153,49 +1388,49 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
 //                System.out.println("Reset Volume to = "+volume);
                 jSlSpinV.setEnabled(true);
                 try {
-                icon = ImageIO.read(getClass().getResource("/truckliststudio/resources/tango/speaker4.png"));
-            } catch (IOException ex) {
-                Logger.getLogger(StreamPanel.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            UIDefaults sliderDefaults = new UIDefaults();
-            sliderDefaults.put("Slider.paintValue", true);
-            sliderDefaults.put("Slider.thumbHeight", 13);
-            sliderDefaults.put("Slider.thumbWidth", 13);
-
-            sliderDefaults.put("Slider:SliderThumb.backgroundPainter", new Painter() {
-
-                @Override
-                public void paint(Graphics2D g, Object object, int w, int h) {
-                    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                    g.drawImage(icon, 0, -5, null);
+                    icon = ImageIO.read(getClass().getResource("/truckliststudio/resources/tango/speaker4.png"));
+                } catch (IOException ex) {
+                    Logger.getLogger(StreamPanel.class.getName()).log(Level.SEVERE, null, ex);
                 }
-            });
+                UIDefaults sliderDefaults = new UIDefaults();
+                sliderDefaults.put("Slider.paintValue", true);
+                sliderDefaults.put("Slider.thumbHeight", 13);
+                sliderDefaults.put("Slider.thumbWidth", 13);
 
-            sliderDefaults.put("Slider:SliderTrack.backgroundPainter", new Painter() {
-                @Override
+                sliderDefaults.put("Slider:SliderThumb.backgroundPainter", new Painter() {
+
+                    @Override
                     public void paint(Graphics2D g, Object object, int w, int h) {
-                    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                    g.setStroke(new BasicStroke(2f));
-                    g.setColor(Color.WHITE);
-                    g.drawRoundRect(0, 2, w-1, 1, 1, 1);
-                }
-            });
-            
-            jSlSpinV.putClientProperty("JComponent.sizeVariant", "small");
-            jSlSpinV.putClientProperty("Nimbus.Overrides",sliderDefaults);
-            jSlSpinV.putClientProperty("Nimbus.Overrides.InheritDefaults", false);
-            muted = false;
+                        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                        g.drawImage(icon, 0, -5, null);
+                    }
+                });
+
+                sliderDefaults.put("Slider:SliderTrack.backgroundPainter", new Painter() {
+                    @Override
+                    public void paint(Graphics2D g, Object object, int w, int h) {
+                        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                        g.setStroke(new BasicStroke(2f));
+                        g.setColor(Color.WHITE);
+                        g.drawRoundRect(0, 2, w - 1, 1, 1, 1);
+                    }
+                });
+
+                jSlSpinV.putClientProperty("JComponent.sizeVariant", "small");
+                jSlSpinV.putClientProperty("Nimbus.Overrides", sliderDefaults);
+                jSlSpinV.putClientProperty("Nimbus.Overrides.InheritDefaults", false);
+                muted = false;
 
             } else {
                 jSlSpinV.setEnabled(false);
                 Object value = spinVolume.getValue();
                 float v = 0;
-                if (value instanceof Float){
-                    v = (Float)value;
-                } else if (value instanceof Integer){
-                    v = ((Number)value).floatValue();
+                if (value instanceof Float) {
+                    v = (Float) value;
+                } else if (value instanceof Integer) {
+                    v = ((Number) value).floatValue();
                 }
-                volume = v/100f;
+                volume = v / 100f;
 //                System.out.println("Stored Volume = "+volume);
                 stream.setVolume(0);
                 try {
@@ -1204,7 +1439,7 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
                     Logger.getLogger(StreamPanel.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 UIDefaults sliderDefaults = new UIDefaults();
-                
+
                 sliderDefaults.put("Slider.paintValue", true);
                 sliderDefaults.put("Slider.thumbHeight", 13);
                 sliderDefaults.put("Slider.thumbWidth", 13);
@@ -1219,18 +1454,18 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
 
                 sliderDefaults.put("Slider:SliderTrack.backgroundPainter", new Painter() {
                     @Override
-                        public void paint(Graphics2D g, Object object, int w, int h) {
+                    public void paint(Graphics2D g, Object object, int w, int h) {
                         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                         g.setStroke(new BasicStroke(2f));
                         g.setColor(Color.GRAY);
-                        g.fillRoundRect(0, 2, w-1, 2, 2, 2);
+                        g.fillRoundRect(0, 2, w - 1, 2, 2, 2);
                         g.setColor(Color.WHITE);
-                        g.drawRoundRect(0, 2, w-1, 1, 1, 1);
+                        g.drawRoundRect(0, 2, w - 1, 1, 1, 1);
                     }
-                });	
-                
+                });
+
                 jSlSpinV.putClientProperty("JComponent.sizeVariant", "small");
-                jSlSpinV.putClientProperty("Nimbus.Overrides",sliderDefaults);
+                jSlSpinV.putClientProperty("Nimbus.Overrides", sliderDefaults);
                 jSlSpinV.putClientProperty("Nimbus.Overrides.InheritDefaults", false);
                 muted = true;
             }
@@ -1247,48 +1482,115 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
         }
     }//GEN-LAST:event_tglVideoActionPerformed
 
-    private void panPreviewMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_panPreviewMouseClicked
-        panPreview.remove(viewer);
-        lblCurtain.setOpaque(true);
-        lblCurtain.setVisible(true);
-        panPreview.add(lblCurtain);
-        this.repaint();
-        this.revalidate();
-    }//GEN-LAST:event_panPreviewMouseClicked
-
-    private void lblCurtainMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblCurtainMouseClicked
-        lblCurtain.setVisible(false);
-        viewer.setOpaque(true);
-        panPreview.add(viewer, BorderLayout.CENTER);
-        this.repaint();
-        this.revalidate();
-    }//GEN-LAST:event_lblCurtainMouseClicked
-
     private void tglPreviewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tglPreviewActionPerformed
         if (tglPreview.isSelected()) {
             stream.setPreView(true);
         } else {
             stream.setPreView(false);
-            }
+        }
     }//GEN-LAST:event_tglPreviewActionPerformed
 
     private void jSlSpinVFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jSlSpinVFocusLost
-        if (jSlSpinV.getValue()/100f != 0) {
-            vol = jSlSpinV.getValue()/100f;
+        if (jSlSpinV.getValue() / 100f != 0) {
+            vol = jSlSpinV.getValue() / 100f;
         }
     }//GEN-LAST:event_jSlSpinVFocusLost
 
+    private void tglFFmpegActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tglFFmpegActionPerformed
+        if (tglFFmpeg.isSelected()) {
+            stream.setComm("FF");
+            stream.setBackFF(true);
+            tglAVconv.setSelected(false);
+            tglGst.setSelected(false);
+            if (listenerTS != null) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        listenerTS.selectedSource(stream);
+                    }
+                }).start();
+            }
+        } else {
+            stream.setComm("AV");
+            stream.setBackFF(false);
+            tglAVconv.setSelected(true);
+            tglGst.setSelected(false);
+        }
+    }//GEN-LAST:event_tglFFmpegActionPerformed
+
+    private void tglAVconvActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tglAVconvActionPerformed
+        if (tglAVconv.isSelected()) {
+            stream.setComm("AV");
+            stream.setBackFF(false);
+            tglGst.setSelected(false);
+            tglFFmpeg.setSelected(false);
+            if (listenerTS != null) {
+                new Thread(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        listenerTS.selectedSource(stream);
+                    }
+                }).start();
+
+            }
+        } else {
+            tglGst.setSelected(true);
+            tglAVconv.setSelected(false);
+            tglFFmpeg.setSelected(false);
+            stream.setComm("GS");
+            stream.setBackFF(false);
+        }
+    }//GEN-LAST:event_tglAVconvActionPerformed
+
+    private void tglGstActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tglGstActionPerformed
+        if (tglGst.isSelected()) {
+            stream.setComm("GS");
+            stream.setBackFF(false);
+            tglAVconv.setSelected(false);
+            tglFFmpeg.setSelected(false);
+            if (listenerTS != null) {
+                new Thread(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        listenerTS.selectedSource(stream);
+                    }
+                }).start();
+
+            }
+        } else {
+            tglAVconv.setSelected(true);
+            tglGst.setSelected(false);
+            tglFFmpeg.setSelected(false);
+            stream.setBackFF(false);
+            stream.setComm("AV");
+        }
+    }//GEN-LAST:event_tglGstActionPerformed
+
+    private void tglLoopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tglLoopActionPerformed
+        if (tglLoop.isSelected()) {
+            stream.setLoop(true);
+        } else {
+            stream.setLoop(false);
+        }
+    }//GEN-LAST:event_tglLoopActionPerformed
+
+    private void formMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMousePressed
+        if (listenerTS != null) {
+            new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+                    listenerTS.selectedSource(stream);
+                }
+            }).start();
+
+        }
+    }//GEN-LAST:event_formMousePressed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JSeparator jSeparator2;
-    private javax.swing.JSeparator jSeparator3;
-    private javax.swing.JSeparator jSeparator4;
-    private javax.swing.JSeparator jSeparator5;
-    private javax.swing.JSeparator jSeparator6;
     private javax.swing.JSlider jSlSpinAD;
-    private javax.swing.JSlider jSlSpinCH;
-    private javax.swing.JSlider jSlSpinCW;
     private javax.swing.JSlider jSlSpinH;
     private javax.swing.JSlider jSlSpinO;
     private javax.swing.JSlider jSlSpinSeek;
@@ -1301,32 +1603,32 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
     private javax.swing.JCheckBox jcbLockAR;
     private javax.swing.JLabel jlbDuration;
     private javax.swing.JLabel labelAD;
-    private javax.swing.JLabel labelCH;
-    private javax.swing.JLabel labelCW;
     private javax.swing.JLabel labelH;
     private javax.swing.JLabel labelO;
     private javax.swing.JLabel labelSeek;
     private javax.swing.JLabel labelVD;
+    private javax.swing.JLabel labelVol;
     private javax.swing.JLabel labelW;
     private javax.swing.JLabel labelX;
     private javax.swing.JLabel labelY;
     private javax.swing.JLabel labelZ;
-    private javax.swing.JLabel lblCurtain;
-    private javax.swing.JPanel panPreview;
+    private javax.swing.JLabel lblBE;
     private javax.swing.JSpinner spinADelay;
     private javax.swing.JSpinner spinH;
-    private javax.swing.JSpinner spinH1;
     private javax.swing.JSpinner spinOpacity;
     private javax.swing.JSpinner spinSeek;
     private javax.swing.JSpinner spinVDelay;
     private javax.swing.JSpinner spinVolume;
     private javax.swing.JSpinner spinW;
-    private javax.swing.JSpinner spinW1;
     private javax.swing.JSpinner spinX;
     private javax.swing.JSpinner spinY;
     private javax.swing.JSpinner spinZOrder;
+    private javax.swing.JToggleButton tglAVconv;
     private javax.swing.JToggleButton tglActiveStream;
     private javax.swing.JToggleButton tglAudio;
+    private javax.swing.JToggleButton tglFFmpeg;
+    private javax.swing.JToggleButton tglGst;
+    private javax.swing.JToggleButton tglLoop;
     private javax.swing.JToggleButton tglPause;
     private javax.swing.JToggleButton tglPreview;
     private javax.swing.JToggleButton tglVideo;
@@ -1334,18 +1636,10 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener, 
 
     @Override
     public void updatePreview(BufferedImage image) {
-        viewer.setImage(image);
-        viewer.setAudioLevel(stream.getAudioLevelLeft(), stream.getAudioLevelRight());
-        viewer.repaint();
+//        // nothing here.
     }
 
-    @Override
-    public void selectedSource(Stream source) {
-        // nothing here.
-    }
-
-    @Override
-    public void closeSource(String name) {
-        // nothing here.
+    public Stream getStream() {
+        return this.stream;
     }
 }

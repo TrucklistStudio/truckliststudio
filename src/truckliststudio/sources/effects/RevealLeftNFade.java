@@ -6,7 +6,6 @@ package truckliststudio.sources.effects;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import javax.swing.JPanel;
 import truckliststudio.mixers.MasterMixer;
@@ -26,32 +25,20 @@ public class RevealLeftNFade extends Effect {
     private boolean loop = false;
     Graphics2D buffer = null;
     BufferedImage temp = null;
-    
+
     @Override
     public void applyEffect(BufferedImage img) {
-        
+
         int w = img.getWidth();
         int h = img.getHeight();
         int mixerW = MasterMixer.getInstance().getWidth();
-        int wDiff = mixerW-w;
-        filter.setX(widthCount-wDiff);
+        int wDiff = mixerW - w;
+        filter.setX(widthCount - wDiff);
         filter.setY(0);
         filter.setWidth(w);
         filter.setHeight(h);
-        if (widthCount > minWidth+wDiff) {
+        if (widthCount > minWidth + wDiff) {
             buffer = img.createGraphics();
-            buffer.setRenderingHint(RenderingHints.KEY_RENDERING,
-                               RenderingHints.VALUE_RENDER_SPEED);
-            buffer.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                               RenderingHints.VALUE_ANTIALIAS_OFF);
-            buffer.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-                               RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
-            buffer.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS,
-                               RenderingHints.VALUE_FRACTIONALMETRICS_OFF);
-            buffer.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING,
-                               RenderingHints.VALUE_COLOR_RENDER_SPEED);
-            buffer.setRenderingHint(RenderingHints.KEY_DITHERING,
-                               RenderingHints.VALUE_DITHER_DISABLE);
             temp = filter.filter(img, null);
             buffer.setBackground(new Color(0, 0, 0, 0));
             buffer.clearRect(0, 0, w, h);
@@ -60,25 +47,13 @@ public class RevealLeftNFade extends Effect {
             widthCount = widthCount - vel;
         } else {
             buffer = img.createGraphics();
-            buffer.setRenderingHint(RenderingHints.KEY_RENDERING,
-                               RenderingHints.VALUE_RENDER_SPEED);
-            buffer.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                               RenderingHints.VALUE_ANTIALIAS_OFF);
-            buffer.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-                               RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
-            buffer.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS,
-                               RenderingHints.VALUE_FRACTIONALMETRICS_OFF);
-            buffer.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING,
-                               RenderingHints.VALUE_COLOR_RENDER_SPEED);
-            buffer.setRenderingHint(RenderingHints.KEY_DITHERING,
-                           RenderingHints.VALUE_DITHER_DISABLE);
             temp = cloneImage(img);
             buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, opacity / 100F));
             buffer.setBackground(new Color(0, 0, 0, 0));
             buffer.clearRect(0, 0, w, h);
             buffer.drawImage(temp, 0, 0, w, h, 0, 0, temp.getWidth(), temp.getHeight(), null);
             buffer.dispose();
-            opacity --;
+            opacity--;
             if (opacity <= 0) {
                 if (loop) {
                     widthCount = MasterMixer.getInstance().getWidth();
@@ -86,7 +61,7 @@ public class RevealLeftNFade extends Effect {
                 } else {
                     opacity = 1;
                 }
-            }        
+            }
         }
     }
 
@@ -96,26 +71,26 @@ public class RevealLeftNFade extends Effect {
     }
 
     @Override
-    public boolean needApply(){
-        return needApply= true;
+    public boolean needApply() {
+        return needApply = true;
     }
 
     public int getVel() {
         return vel;
     }
-    
+
     public void setVel(int v) {
         this.vel = v;
     }
-    
+
     public void setLoop(boolean lo) {
         this.loop = lo;
     }
-    
+
     public boolean getLoop() {
         return this.loop;
     }
-    
+
     @Override
     public void resetFX() {
         widthCount = MasterMixer.getInstance().getWidth();

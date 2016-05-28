@@ -57,7 +57,7 @@ public class ProcessExecutor {
             ret = kernel.GetProcessId(handle);
 //            System.out.println("Detected Win32 pid: "+ ret);
             
-        } catch (Throwable e) {
+        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
             e.printStackTrace();
         }
         return (ret);

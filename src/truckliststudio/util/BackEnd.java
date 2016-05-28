@@ -13,7 +13,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 package truckliststudio.util;
 
 import java.io.IOException;
@@ -24,7 +24,7 @@ import java.io.IOException;
  */
 public class BackEnd {
 
-    public static boolean avconvDetected(){
+    public static boolean avconvDetected() {
         boolean retValue = false;
         Process p = null;
         try {
@@ -35,15 +35,15 @@ public class BackEnd {
         } catch (IOException | InterruptedException ex) {
 //            System.err.println(ex.getMessage());
         } finally {
-            if (p != null){
+            if (p != null) {
                 p.destroy();
-                p=null;
+                p = null;
             }
         }
         return retValue;
     }
-    
-    public static boolean ffmpegDetected(){
+
+    public static boolean ffmpegDetected() {
         boolean retValue = false;
         Process p = null;
         try {
@@ -54,9 +54,29 @@ public class BackEnd {
         } catch (IOException | InterruptedException ex) {
 //            System.err.println(ex.getMessage());
         } finally {
-            if (p != null){
+            if (p != null) {
                 p.destroy();
-                p=null;
+                p = null;
+            }
+        }
+        return retValue;
+    }
+
+    public static boolean nleDetected() {
+        boolean retValue = false;
+        Process p = null;
+        try {
+
+            p = Runtime.getRuntime().exec("gst-inspect-1.0 nleurisource");
+            p.waitFor();
+//            System.out.println(p.exitValue());
+            retValue = p.exitValue() == 0;
+        } catch (IOException | InterruptedException ex) {
+//            System.err.println(ex.getMessage());
+        } finally {
+            if (p != null) {
+                p.destroy();
+                p = null;
             }
         }
         return retValue;

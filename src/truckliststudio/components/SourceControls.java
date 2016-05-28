@@ -6,11 +6,8 @@ package truckliststudio.components;
 
 import java.awt.Component;
 import java.util.ArrayList;
-import truckliststudio.streams.SourceAudioSource;
 import truckliststudio.streams.SourceImage;
-//import truckliststudio.streams.SourceImageU;
-import truckliststudio.streams.SourceMovie;
-import truckliststudio.streams.SourceMusic;
+import truckliststudio.streams.SourceImageGif;
 import truckliststudio.streams.SourceText;
 import truckliststudio.streams.Stream;
 
@@ -29,15 +26,6 @@ public class SourceControls {
         d = new SourceControlTracks(source);
         d.setName("Track Opt");
         comps.add(d);
-//        if (source instanceof SourceMovie || source instanceof SourceMusic || 
-//            source instanceof SourceImageU || source instanceof SourceAudioSource) {
-//            c = new SourceControlEffects(source);
-//            c.setName("FX");
-//            comps.add(c);
-//            c = new SourceControlGSEffects(source);
-//            c.setName("GS FX");
-//            comps.add(c);
-//        } else 
         if (source instanceof SourceText) {
             c = new SourceControlsText((SourceText) source);
             comps.add(c);
@@ -48,6 +36,8 @@ public class SourceControls {
             c = new SourceControlEffects(source);
             c.setName("FX");
             comps.add(c);
+        } else if (source instanceof SourceImageGif) {
+            
         } else {
             c = new SourceControlEffects(source);
             c.setName("FX");

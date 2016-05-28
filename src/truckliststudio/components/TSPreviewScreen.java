@@ -45,7 +45,6 @@ public class TSPreviewScreen extends javax.swing.JInternalFrame {
         setMaximizable(true);
         setResizable(true);
         setFrameIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/PreviewButton2.png"))); // NOI18N
-        setMaximumSize(new java.awt.Dimension(1280, 1024));
         setVisible(true);
 
         pack();

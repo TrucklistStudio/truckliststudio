@@ -18,9 +18,6 @@ package com.jhlabs.image;
 
 //import static java.lang.Math.PI;
 import static java.lang.Math.min;
-import static java.lang.Math.min;
-import static java.lang.Math.min;
-import static java.lang.Math.min;
 import static java.lang.Math.sqrt;
 
 /**

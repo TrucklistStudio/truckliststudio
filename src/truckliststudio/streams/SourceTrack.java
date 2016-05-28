@@ -17,7 +17,7 @@ import truckliststudio.util.Tools;
  *
  * @author patrick (modified by karl)
  */
-public class SourceTrack  {
+public class SourceTrack {
 
     public static SourceTrack getTrack(String trackName, Stream stream) {
         SourceTrack s = new SourceTrack();
@@ -57,7 +57,7 @@ public class SourceTrack  {
 //        System.out.println("Channel CapHeight: "+s.capHeight);
         return s;
     }
-    
+
     public static SourceTrack getTrackIgnoreContent(String trackName, Stream stream) {
         SourceTrack s = new SourceTrack();
         s.x = stream.x;
@@ -95,7 +95,7 @@ public class SourceTrack  {
 //        System.out.println("Duration: "+s.getDuration());
         return s;
     }
-    
+
     public static SourceTrack getTrackIgnorePlay(String trackName, Stream stream) {
         SourceTrack s = new SourceTrack();
         s.x = stream.x;
@@ -132,7 +132,7 @@ public class SourceTrack  {
 //        System.out.println("Channel CapHeight: "+s.capHeight);
         return s;
     }
-    
+
     public static SourceTrack duplicateTrack(SourceTrack original) {
         SourceTrack clone = new SourceTrack();
         clone.x = original.x;
@@ -152,20 +152,20 @@ public class SourceTrack  {
         clone.capWidth = original.capWidth;
 //        if (stream instanceof SourceText) {
 //            SourceText st = (SourceText) stream;
-            clone.capHeight = original.capHeight;
-            clone.capWidth = original.capWidth;
-            clone.isATimer = original.isATimer;
-            clone.isQRCode = original.isQRCode;
-            clone.isACdown = original.isACdown;
-            clone.isPlayList = original.isPlayList;
-            clone.duration = original.duration;
-            clone.text = original.text;
-            clone.font = original.font;
-            clone.color = original.color;
+        clone.capHeight = original.capHeight;
+        clone.capWidth = original.capWidth;
+        clone.isATimer = original.isATimer;
+        clone.isQRCode = original.isQRCode;
+        clone.isACdown = original.isACdown;
+        clone.isPlayList = original.isPlayList;
+        clone.duration = original.duration;
+        clone.text = original.text;
+        clone.font = original.font;
+        clone.color = original.color;
 //        }
         return clone;
     }
-    
+
     private int x = 0;
     private int y = 0;
     private int capWidth = 0;
@@ -185,6 +185,7 @@ public class SourceTrack  {
     private boolean isPlayList = false;
     private int duration = 0;
     private boolean isPlaying = false;
+    private boolean isCloned = false;
     private boolean isPaused = false;
     ArrayList<Effect> effects = new ArrayList<>();
     private final boolean followMouse = false;
@@ -203,25 +204,29 @@ public class SourceTrack  {
     public void setName(String n) {
         name = n;
     }
+
     public void setText(String nt) {
         text = nt;
     }
+
     public void setFont(String nf) {
         font = nf;
     }
+
     public synchronized void addEffects(Effect fX) {
         effects.add(fX);
     }
+
     public void apply(final Stream s) {
         final SourceTrack instance = this;
-        
+
         new Thread(new Runnable() {
 
             @Override
             public void run() {
-                if (!s.getClass().toString().contains("Sink")){ // Don't Update SinkStreams
+                if (!s.getClass().toString().contains("Sink")) { // Don't Update SinkStreams
                     ExecutorService pool = java.util.concurrent.Executors.newCachedThreadPool();
-                    if (endTransitions != null) { 
+                    if (endTransitions != null) {
                         for (Transition t : s.endTransitions) {
 //                            System.out.println("End Transition: "+t.getClass().getName());
                             pool.submit(t.run(instance));
@@ -233,25 +238,25 @@ public class SourceTrack  {
                             Logger.getLogger(SourceTrack.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
-                    
+
                     s.zorder = getZorder();
-                    
+
                     if (isPlaying) {
-                        
+
                         if (startTransitions != null) {
                             pool = java.util.concurrent.Executors.newCachedThreadPool();
                             for (Transition t : instance.startTransitions) {
 //                                System.out.println("Start Transition: "+t.getClass().getName());
                                 pool.submit(t.run(instance));
                             }
-                            pool.shutdown();                            
+                            pool.shutdown();
                             try {
                                 pool.awaitTermination(10, TimeUnit.SECONDS);
                             } catch (InterruptedException ex) {
                                 Logger.getLogger(SourceTrack.class.getName()).log(Level.SEVERE, null, ex);
                             }
                         }
-                        
+
                         if (!s.isPlaying()) {
                             if (isPaused) {
                                 s.setisPaused(true);
@@ -262,40 +267,32 @@ public class SourceTrack  {
                                 s.setisPaused(false);
                                 s.read();
                             }
+                        } else if (!isPaused) {
+                            s.setisPaused(false);
+                            s.play();
                         } else {
-                            if (!isPaused) {
-                                s.setisPaused(false);
-                                s.play();
-                            } else {
-                                s.setisPaused(true);
-                                s.pause();
-                            }
+                            s.setisPaused(true);
+                            s.pause();
                         }
-                    
-                    } else {
-                        
-                        if (s.getisPaused()) {
-                            if (isPaused) {
-                                s.pause();
-                            } else {
-                                s.pause();
-                                s.stop();
-                            }
+
+                    } else if (s.getisPaused()) {
+                        if (isPaused) {
+                            s.pause();
                         } else {
-                            if (s.isPlaying()) {
-                                if (s.getLoop()) {
-                                    s.setLoop(false);
-                                    Tools.sleep(30);
-                                    s.stop();
-                                    s.setLoop(true);
-                                } else {
+                            s.pause();
+                            s.stop();
+                        }
+                    } else if (s.isPlaying()) {
+                        if (s.getLoop()) {
+                            s.setLoop(false);
+                            Tools.sleep(30);
+                            s.stop();
+                            s.setLoop(true);
+                        } else {
 //                                    Tools.sleep(30);
-                                    s.stop();
-                                }
-//                                s.stop();
-                            }
+                            s.stop();
                         }
-                        
+//                                s.stop();
                     }
 
                     s.x = getX();
@@ -309,15 +306,15 @@ public class SourceTrack  {
                     s.effects.clear();
                     s.startTransitions.clear();
                     s.endTransitions.clear();
-                    if (effects != null) {                        
+                    if (effects != null) {
                         s.effects.addAll(effects);
                     }
-                    if (startTransitions != null){
+                    if (startTransitions != null) {
                         s.startTransitions.addAll(startTransitions);
                     }
-                    if (endTransitions != null) {   
+                    if (endTransitions != null) {
                         s.endTransitions.addAll(endTransitions);
-                    }       
+                    }
                     if (s instanceof SourceText) {
                         SourceText st = (SourceText) s;
                         st.isATimer = getIsATimer();
@@ -373,6 +370,7 @@ public class SourceTrack  {
     public void setCapWidth(int cWidth) {
         capWidth = cWidth;
     }
+
     /**
      * @return the capHeight
      */
@@ -383,6 +381,7 @@ public class SourceTrack  {
     public void setCapHeight(int cHeight) {
         capHeight = cHeight;
     }
+
     /**
      * @return the width
      */
@@ -393,6 +392,7 @@ public class SourceTrack  {
     public void setWidth(int cWidth) {
         width = cWidth;
     }
+
     /**
      * @return the height
      */
@@ -403,6 +403,7 @@ public class SourceTrack  {
     public void setHeight(int cHeight) {
         height = cHeight;
     }
+
     /**
      * @return the opacity
      */
@@ -444,39 +445,39 @@ public class SourceTrack  {
     public int getColor() {
         return color;
     }
-    
+
     public boolean getIsATimer() {
         return isATimer;
     }
-    
+
     public boolean getPlayList() {
         return isPlayList;
     }
-    
+
     public boolean getIsQRCode() {
         return isQRCode;
     }
-    
+
     public boolean getIsACDown() {
         return isACdown;
     }
-    
+
     public int getDuration() {
         return duration;
     }
-    
+
     public void setDuration(int t) {
         duration = t;
     }
-    
+
     public boolean getIsPlaying() {
         return this.isPlaying;
     }
-    
+
     public void setIsPlaying(boolean b) {
         this.isPlaying = b;
     }
-    
+
     /**
      * @return the followMouse
      */
@@ -498,4 +499,11 @@ public class SourceTrack  {
         return captureY;
     }
 
+    public void setIsCloned(boolean cl) {
+        this.isCloned = cl;
+    }
+
+    public boolean getIsCloned() {
+        return isCloned;
+    }
 }

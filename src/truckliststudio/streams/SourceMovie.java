@@ -6,6 +6,7 @@ package truckliststudio.streams;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import static truckliststudio.TrucklistStudio.gsNLE;
 import truckliststudio.externals.ProcessRenderer;
 import truckliststudio.mixers.Frame;
 import truckliststudio.mixers.MasterFrameBuilder;
@@ -33,13 +34,17 @@ public class SourceMovie extends Stream {
     @Override
     public void read() {
         isPlaying = true;
-        lastPreview = new BufferedImage(captureWidth,captureHeight,BufferedImage.TYPE_INT_ARGB);
-        if (getPreView()){
+        lastPreview = new BufferedImage(captureWidth, captureHeight, BufferedImage.TYPE_INT_ARGB);
+        if (getPreView()) {
             PreviewFrameBuilder.register(this);
         } else {
             MasterFrameBuilder.register(this);
         }
-        capture = new ProcessRenderer(this, ProcessRenderer.ACTION.CAPTURE, "movie", comm);
+        if (gsNLE && comm.equals("GS")) {
+            capture = new ProcessRenderer(this, ProcessRenderer.ACTION.CAPTURE, "nlemovie", comm);
+        } else {
+            capture = new ProcessRenderer(this, ProcessRenderer.ACTION.CAPTURE, "movie", comm);
+        }
         capture.read();
     }
 
@@ -48,15 +53,15 @@ public class SourceMovie extends Stream {
         isPaused = true;
         capture.pause();
     }
-    
+
     @Override
     public void stop() {
-        if (loop){
+        if (loop) {
             if (capture != null) {
                 capture.stop();
                 capture = null;
             }
-            if (this.getBackFF()){
+            if (this.getBackFF()) {
                 this.setComm("FF");
             }
             this.read();
@@ -70,7 +75,7 @@ public class SourceMovie extends Stream {
                 }
             }
             isPlaying = false;
-            if (getPreView()){
+            if (getPreView()) {
                 PreviewFrameBuilder.unregister(this);
             } else {
                 MasterFrameBuilder.unregister(this);
@@ -79,36 +84,42 @@ public class SourceMovie extends Stream {
                 capture.stop();
                 capture = null;
             }
-            if (this.getBackFF()){
+            if (this.getBackFF()) {
                 this.setComm("FF");
             }
         }
     }
+
     @Override
     public boolean needSeek() {
-            return needSeekCTRL=true;
+        return needSeekCTRL = true;
     }
+
     @Override
     public boolean isPlaying() {
         return isPlaying;
     }
+
     @Override
     public void setIsPlaying(boolean setIsPlaying) {
         isPlaying = setIsPlaying;
     }
+
     @Override
-    public boolean hasFakeVideo(){
+    public boolean hasFakeVideo() {
         return true;
     }
+
     @Override
-    public boolean hasFakeAudio(){
+    public boolean hasFakeAudio() {
         return true;
     }
+
     @Override
     public BufferedImage getPreview() {
         return lastPreview;
     }
-    
+
     @Override
     public Frame getFrame() {
         return nextFrame;
@@ -120,7 +131,7 @@ public class SourceMovie extends Stream {
         if (capture != null) {
             f = capture.getFrame();
             if (f != null) {
-                BufferedImage img = f.getImage(); 
+                BufferedImage img = f.getImage();
                 applyEffects(img);
             }
             if (f != null) {
@@ -128,7 +139,7 @@ public class SourceMovie extends Stream {
                 lastPreview.getGraphics().drawImage(f.getImage(), 0, 0, null);
             }
         }
-        nextFrame=f;
+        nextFrame = f;
     }
 
     @Override

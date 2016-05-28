@@ -62,7 +62,6 @@ import truckliststudio.sources.effects.Shapes;
 import truckliststudio.sources.effects.Sharpen;
 import truckliststudio.sources.effects.Stretch;
 import truckliststudio.sources.effects.SwapRedBlue;
-import truckliststudio.streams.SourceAudioSource;
 import truckliststudio.streams.SourceTrack;
 import truckliststudio.streams.SourceImageGif;
 import truckliststudio.streams.SourceMovie;
@@ -702,17 +701,19 @@ public class Studio {
                     SubChNames.clear();
                     subSTrans.clear();
                     subETrans.clear();
-                } else if (clazz.toLowerCase().endsWith("sourceaudiosource")) {
-                    stream = new SourceAudioSource();
-                    extstream.add(stream);
-                    extstreamBis.add(stream);
-                    ImgMovMus.add("Mic");
-                    readObject(stream, source);
-                    stream.setComm(comm);
-                    stream.setAudioSource(streamAudioSrc);
-                    stream.setLoaded(true);
-                    loadTransitions(SCL, stream, subSTrans, subETrans, SubChNames, null, null);
-                } else if (clazz.toLowerCase().endsWith("sourceimagegif")) {
+                } 
+//                else if (clazz.toLowerCase().endsWith("sourceaudiosource")) {
+//                    stream = new SourceAudioSource();
+//                    extstream.add(stream);
+//                    extstreamBis.add(stream);
+//                    ImgMovMus.add("Mic");
+//                    readObject(stream, source);
+//                    stream.setComm(comm);
+//                    stream.setAudioSource(streamAudioSrc);
+//                    stream.setLoaded(true);
+//                    loadTransitions(SCL, stream, subSTrans, subETrans, SubChNames, null, null);
+//                } 
+                else if (clazz.toLowerCase().endsWith("sourceimagegif")) {
                     for (int an=0;an < truckliststudio.TrucklistStudio.cboAnimations.getItemCount(); an++){
                         for (String aKey : sNames){
                             if (aKey == null ? truckliststudio.TrucklistStudio.cboAnimations.getItemAt(an).toString() == null : aKey.equals(truckliststudio.TrucklistStudio.cboAnimations.getItemAt(an).toString())){

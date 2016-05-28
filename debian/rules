@@ -23,7 +23,7 @@ include /usr/share/cdbs/1/rules/debhelper.mk
 include /usr/share/cdbs/1/class/ant.mk
 include /usr/share/cdbs/1/rules/utils.mk
 
-JAVA_HOME := /usr/lib/jvm/default-java
+JAVA_HOME := /usr/lib/jvm/java-8-openjdk-$(DEB_BUILD_ARCH)
 DEB_ANT_BUILD_TARGET := jar
 DEB_JARS := AppFramework \
   commons-cli \
@@ -39,10 +39,3 @@ DEB_JARS := AppFramework \
   swing-worker
 
 install/truckliststudio::
-	# Copy the Opencv library
-#ifeq ($(shell uname -m), x86_64)
-#	dh_install -p$(cdbs_curpkg) Opencv-Natives/x64/*.* usr/lib/truckliststudio/lib
-#endif
-#ifeq ($(shell uname -m), i686)
-#	dh_install -p$(cdbs_curpkg) Opencv-Natives/x86/*.* usr/lib/truckliststudio/lib
-#endif

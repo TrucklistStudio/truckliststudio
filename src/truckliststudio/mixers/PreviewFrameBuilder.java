@@ -25,7 +25,6 @@ import truckliststudio.streams.Stream;
 import truckliststudio.util.Tools;
 import java.util.concurrent.CancellationException;
 
-
 /**
  *
  * @author patrick (modified by karl)
@@ -34,7 +33,7 @@ public class PreviewFrameBuilder implements Runnable {
 
     private static final ArrayList<Stream> preStreams = new ArrayList<>();// add private
     private static int fps = 0;
-    private static int sRate = 0; 
+    private static int sRate = 0;
 
     public static synchronized void register(Stream s) {
         if (!preStreams.contains(s)) {
@@ -72,34 +71,26 @@ public class PreviewFrameBuilder implements Runnable {
         BufferedImage image = targetFrame.getImage();
         if (image != null) {
             Graphics2D g = image.createGraphics();
-            
-            g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-            g.setRenderingHint(java.awt.RenderingHints.KEY_ALPHA_INTERPOLATION, java.awt.RenderingHints.VALUE_ALPHA_INTERPOLATION_SPEED);
-            g.setRenderingHint(java.awt.RenderingHints.KEY_RENDERING, java.awt.RenderingHints.VALUE_RENDER_SPEED);
-            g.setRenderingHint(java.awt.RenderingHints.KEY_FRACTIONALMETRICS,java.awt.RenderingHints.VALUE_FRACTIONALMETRICS_OFF);
-            g.setRenderingHint(java.awt.RenderingHints.KEY_DITHERING, java.awt.RenderingHints.VALUE_DITHER_DISABLE);
-            g.setRenderingHint(java.awt.RenderingHints.KEY_COLOR_RENDERING, java.awt.RenderingHints.VALUE_COLOR_RENDER_SPEED);
             g.clearRect(0, 0, image.getWidth(), image.getHeight());
-            
             final float dash1[] = {10.0f};
-            final BasicStroke dashed =
-                new BasicStroke(5.0f,
-                                BasicStroke.CAP_BUTT,
-                                BasicStroke.JOIN_MITER,
-                                10.0f, dash1, 0.0f);
+            final BasicStroke dashed
+                    = new BasicStroke(5.0f,
+                            BasicStroke.CAP_BUTT,
+                            BasicStroke.JOIN_MITER,
+                            10.0f, dash1, 0.0f);
             g.setStroke(dashed);
             g.draw(new RoundRectangle2D.Double(0, 0,
-                                   image.getWidth()/2,
-                                   image.getHeight(),
-                                   10, 10));
-            g.draw(new RoundRectangle2D.Double(image.getWidth()/2, 0,
-                                   image.getWidth()/2,
-                                   image.getHeight(),
-                                   10, 10));
+                    image.getWidth() / 2,
+                    image.getHeight(),
+                    10, 10));
+            g.draw(new RoundRectangle2D.Double(image.getWidth() / 2, 0,
+                    image.getWidth() / 2,
+                    image.getHeight(),
+                    10, 10));
             g.draw(new RoundRectangle2D.Double(0, 0,
-                                   image.getWidth(),
-                                   image.getHeight()/2,
-                                   10, 10));
+                    image.getWidth(),
+                    image.getHeight() / 2,
+                    10, 10));
             for (Frame f : orderedFrames.values()) {
                 imageF = f.getImage();
                 imageX = f.getX();
@@ -128,7 +119,7 @@ public class PreviewFrameBuilder implements Runnable {
                 while (buffer.hasRemaining()) {
                     float mix = buffer.get() * f.getVolume();
                     outputBuffer.mark();
-                    if (outputBuffer.position()< outputBuffer.limit()){ //25fps IOException                     
+                    if (outputBuffer.position() < outputBuffer.limit()) { //25fps IOException                     
                         mix += outputBuffer.get();
                     }
                     outputBuffer.reset();
@@ -137,7 +128,7 @@ public class PreviewFrameBuilder implements Runnable {
                     } else if (mix < Short.MIN_VALUE) {
                         mix = Short.MIN_VALUE;
                     }
-                    if (outputBuffer.position()< outputBuffer.limit()){ //25fps IOException                          
+                    if (outputBuffer.position() < outputBuffer.limit()) { //25fps IOException                          
                         outputBuffer.put((short) mix);
                     }
                 }
@@ -148,7 +139,7 @@ public class PreviewFrameBuilder implements Runnable {
 
     @SuppressWarnings("unchecked")
     @Override
-    public void run() throws NullPointerException{
+    public void run() throws NullPointerException {
         stopMe = false;
         ArrayList<Frame> frames = new ArrayList<>();
         mark = System.currentTimeMillis();
@@ -169,8 +160,8 @@ public class PreviewFrameBuilder implements Runnable {
             if (threadedCaptureMode) {
                 ArrayList<Future<Frame>> resultsT = new ArrayList<>();
 
-            try {
-                    resultsT = ((ArrayList)pool.invokeAll(preStreams, 5, TimeUnit.SECONDS));
+                try {
+                    resultsT = ((ArrayList) pool.invokeAll(preStreams, 5, TimeUnit.SECONDS));
                 } catch (InterruptedException ex) {
                     Logger.getLogger(MasterFrameBuilder.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -179,7 +170,7 @@ public class PreviewFrameBuilder implements Runnable {
                 Frame f;
                 for (Future stream : results) {
                     try {
-                            f = (Frame)stream.get();
+                        f = (Frame) stream.get();
 
                         if (f != null) {
                             frames.add(f);
@@ -200,9 +191,8 @@ public class PreviewFrameBuilder implements Runnable {
                         if (f != null) {
                             frames.add(f);
                         }
+                    } catch (Exception e) {
                     }
-                    catch (Exception e)
-                    {}
                 }
             }
             long now = System.currentTimeMillis();
@@ -211,24 +201,24 @@ public class PreviewFrameBuilder implements Runnable {
             long sleepTime = (timeCode - now);
             // Drop frames if we're running behind - but no more than half of them
 //            if ((sleepTime > 0) || ((frameNum % 2) != 0)) {
-                fps++;
-                mixAudio(frames, targetFrame);
-                mixImages(frames, targetFrame);
-                targetFrame = null;
-                frameBuffer.doneUpdate();
-                PreviewMixer.getInstance().setCurrentFrame(frameBuffer.pop());
+            fps++;
+            mixAudio(frames, targetFrame);
+            mixImages(frames, targetFrame);
+            targetFrame = null;
+            frameBuffer.doneUpdate();
+            PreviewMixer.getInstance().setCurrentFrame(frameBuffer.pop());
 //            }
             float delta = (now - mark);
-                if (delta >= 1000) {
+            if (delta >= 1000) {
                 mark = now;
                 PreviewMixer.getInstance().setFPS(fps / (delta / 1000F));
-                    fps = 0;
-                }
+                fps = 0;
+            }
             //System.out.println("Capture time: " + (captureTime / 1000000.0) + "ms");
             //System.out.println("Timecode: " + timeCode + ", now: " + now + ", diff: " + sleepTime);
-                if (sleepTime > 0) {
+            if (sleepTime > 0) {
                 Tools.sleep(sleepTime);
-                }
+            }
 //            frameNum++;
         }
     }

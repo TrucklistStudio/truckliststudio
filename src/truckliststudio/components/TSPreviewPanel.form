@@ -14,7 +14,7 @@
       <Dimension value="[290, 428]"/>
     </Property>
     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-      <Dimension value="[290, 280]"/>
+      <Dimension value="[320, 180]"/>
     </Property>
   </Properties>
   <AuxValues>

@@ -41,53 +41,45 @@ public abstract class Effect {
         retValue.put(Crop.class.getSimpleName(), new Crop());
         return retValue;
     }
-    protected boolean needApply=true;
+    protected boolean needApply = true;
 
-    public boolean needApply(){
+    public boolean needApply() {
         return needApply;
     }
+
     public abstract void applyEffect(BufferedImage img);
+
     public abstract javax.swing.JPanel getControl();
+
     public abstract void resetFX();
+
     public BufferedImage cloneImage(BufferedImage src) {
         BufferedImage tempimage = java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration().createCompatibleImage(src.getWidth(), src.getHeight(), BufferedImage.TRANSLUCENT);
         Graphics2D tempbuffer = tempimage.createGraphics();
-        tempbuffer.setRenderingHint(java.awt.RenderingHints.KEY_RENDERING,
-                java.awt.RenderingHints.VALUE_RENDER_SPEED);
-        tempbuffer.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING,
-                java.awt.RenderingHints.VALUE_ANTIALIAS_OFF);
-        tempbuffer.setRenderingHint(java.awt.RenderingHints.KEY_TEXT_ANTIALIASING,
-                java.awt.RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
-        tempbuffer.setRenderingHint(java.awt.RenderingHints.KEY_FRACTIONALMETRICS,
-                java.awt.RenderingHints.VALUE_FRACTIONALMETRICS_OFF);
-        tempbuffer.setRenderingHint(java.awt.RenderingHints.KEY_COLOR_RENDERING,
-                java.awt.RenderingHints.VALUE_COLOR_RENDER_SPEED);
-        tempbuffer.setRenderingHint(java.awt.RenderingHints.KEY_DITHERING,
-                java.awt.RenderingHints.VALUE_DITHER_DISABLE);
         tempbuffer.drawImage(src, 0, 0, null);
         tempbuffer.dispose();
         return tempimage;
     }
-    
-    public String getName(){
+
+    public String getName() {
         return getClass().getSimpleName();
     }
-    
+
     @Override
-    public String toString(){
+    public String toString() {
         return getClass().getSimpleName();
     }
-    
-    public void setShape(String shapeImg){
+
+    public void setShape(String shapeImg) {
         // nothing here.
     }
-    
+
     public void setDoOne(boolean b) {
         // nothing here.
     }
-    
+
     public void clearEffect(Effect e) {
         e = null;
     }
 
-    }
+}
