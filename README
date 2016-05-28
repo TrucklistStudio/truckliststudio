@@ -1,6 +1,6 @@
-*******************
-* TrucklistStudio *
-*******************
+*********************************
+* TrucklistStudio for GNU/Linux *
+*********************************
 
 To compile from the command line simply run:
 
@@ -27,25 +27,55 @@ https://plus.google.com/communities/118134381932259626262
 
 http://sourceforge.net/p/truckliststudio/tickets/
 
+Tutorials:
+----------
+
+There are some video examples on how to use truckliststudio here:
+
+https://www.youtube.com/channel/UCOTBw7_WjX-Fe1XXAlv7HGA/videos?sort=dd&view=0&shelf_id=0
+
+Notice:
+-------
+
+The projects now are two:
+TrucklistStudio 0.x
+TrucklistStudioFX 1.x
+I suggest you to keep installed only the TrucklistStudio v 0.x because the FX interface is quite heavy for the CPU.
+So if you add the TrucklistStudioFX 1.x PPA repository please remove it because is in conflict with the normal TrucklistStudio 0.x version.
+
+1) Install ppa-purge
+$ sudo apt-get install ppa-purge
+2) Remove TrucklistStudioFX 1.x PPA:
+$ sudo ppa-purge ppa:soylent-tv/truckliststudiofx
+3) Wait until command is finished. This will remove both Truckliststudio and TruckliststudioFX if installed.
+4) Reinstall only TrucklistStudio 0.x:
+$ sudo apt-get install truckliststudio
+
 *************************************
-* TrucklistStudio 0.7 for GNU/Linux *
+* TrucklistStudio 0.9 for GNU/Linux *
 *************************************
 
 Hello and welcome to TrucklistStudio by Karl Ellis.
 This software is a fork from WebcamStudio by Patrick Balleux.
-This release is a buggy and unstable one, so be gentle.
+This release is stable enough for production.
 
 For Ubuntu users you can add Truckliststudio Daily Builds PPA:
 
 https://code.launchpad.net/~soylent-tv/+archive/ubuntu/truckliststudio
 
+$ sudo add-apt-repositories ppa:soylent-tv/truckliststudio
+$ sudo apt-get update
+$ sudo apt-get install truckliststudio
+
 What you need:
 --------------
-- The dependences are similar to WebcamStudio, so have a look at its README also ...
+- Java >= 1.8   
+- AVCONV - FFMPEG - Windows users should download the proper ffmpeg static binary and put it in their PATH.
+  The URL is: http://ffmpeg.zeranoe.com/builds
+- Some patience ;)
 
-  openjdk-7-jre,
+  openjdk-8-jre,
   java-wrappers,
-  libappframework-java,
   libcommons-cli-java,
   libcommons-codec-java,
   libcommons-httpclient-java,
@@ -54,19 +84,14 @@ What you need:
   liblog4j1.2-java,
   libnetty-java,
   libslf4j-java,
-  libswingworker-java,
   libav-tools or ffmpeg,
   libavformat-extra-53 or libavformat-extra-54 or libavformat56 or libavformat-ffmpeg56,
   gstreamer-tools,
   gstreamer0.10-plugins-good,
-  gstreamer0.10-plugins-bad,
-  gstreamer0.10-plugins-bad-multiverse,
-  gstreamer0.10-plugins-ugly,
+  gstreamer0.10-plugins-base,
   gstreamer0.10-pulseaudio,
-  gstreamer0.10-gnonlin,
-  gstreamer0.10-fluendo-mp3,
   gstreamer1.0-tools,
-  gstreamer1.0-gnonlin,
+  gstreamer1.0-gnonlin or libges-1.0-0,
   gstreamer1.0-alsa,
   gstreamer1.0-fluendo-mp3,
   pavucontrol,
@@ -98,17 +123,17 @@ How to use:
 - You can save your setup in a Studio file in this version.
 - For high res mixing (640x480), you should use a compiled version of FFMPEG/AVCONV on your computer.  This really helps the encoding part!
 - Start with a small setup first (320x240@15fps) before doing the hardcore stuff.
-- This version is mostly stable under linux.  Windows need more testing.
+- This version is mostly stable under linux.
 - Have fun!
 
 
 Some testing to do:
 -------------------
 
-- Add an FME file to broadcast to Justin.tv, Bambuser, Ustream or VaughnTv (IceCast and Red5 are also supported)
+- Add an FME file to broadcast to Justin.tv, Bambuser, Ustream or VaughnTv (IceCast2, Nginx and Red5 are also supported)
 
 *******************************************
-* TrucklistStudio v0.7 (Beta) for Windows *
+* TrucklistStudio v0.9 (Beta) for Windows *
 *******************************************
 
 You can find binaries for Windows here:
@@ -124,8 +149,8 @@ For Windows GStreamer FME Output backend support.
    http://gstreamer.freedesktop.org/data/pkg/windows
 
 2) Choose your architecture msi:
-   - gstreamer-1.0-x86-1.6.x.msi
-   - gstreamer-1.0-x86_64-1.6.x.msi
+   - gstreamer-1.0-x86-1.8.x.msi
+   - gstreamer-1.0-x86_64-1.8.x.msi
 
 3) Choose "Complete" Installation and do not change the default installation dir.
    TS will automatically detect the executables.
@@ -147,7 +172,6 @@ this way you loose the Drag'n'Drop feature ...
 Know Bugs under Windows:
 ========================
 - Drag'n'Drop may not work.
-- AudioSources doesn't work yet.
 
 For anything feel free to post in TrucklistStudio Community:
 https://plus.google.com/communities/118134381932259626262
