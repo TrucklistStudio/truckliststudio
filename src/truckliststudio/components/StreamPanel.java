@@ -324,6 +324,7 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener {
             stream.setComm("FF");
             stream.setBackFF(true);
             tglFFmpeg.setSelected(true);
+            tglFFmpeg.setEnabled(false);
             tglAVconv.setVisible(false);
             tglGst.setVisible(false);
         } else {
@@ -431,6 +432,10 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener {
         spinVolume.setValue(stream.getVolume() * 100);
         spinZOrder.setValue(stream.getZOrder());
         tglActiveStream.setSelected(stream.isPlaying());
+        boolean seek = stream.needSeekCTRL();
+        labelSeek.setVisible(seek);
+        spinSeek.setVisible(seek);
+        jSlSpinSeek.setVisible(seek);
         if (stream.isPlaying()) {
 
             tglPause.setSelected(stream.getisPaused());
@@ -459,8 +464,8 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener {
             jSlSpinVD.setEnabled(stream.hasVideo());
             spinADelay.setEnabled(stream.hasAudio());
             jSlSpinAD.setEnabled(stream.hasAudio());
-            spinSeek.setEnabled(stream.needSeekCTRL());
-            jSlSpinSeek.setEnabled(stream.needSeekCTRL());
+            spinSeek.setEnabled(seek);
+            jSlSpinSeek.setEnabled(seek);
             tglPreview.setEnabled(true);
             if (tglAudio.isSelected()) {
                 tglAudio.setEnabled(true);
@@ -1499,6 +1504,7 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener {
     private void tglFFmpegActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tglFFmpegActionPerformed
         if (tglFFmpeg.isSelected()) {
             stream.setComm("FF");
+            stream.setNeedSeek(false);
             stream.setBackFF(true);
             tglAVconv.setSelected(false);
             tglGst.setSelected(false);
@@ -1516,11 +1522,13 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener {
             tglAVconv.setSelected(true);
             tglGst.setSelected(false);
         }
+        stream.updateStatus();
     }//GEN-LAST:event_tglFFmpegActionPerformed
 
     private void tglAVconvActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tglAVconvActionPerformed
         if (tglAVconv.isSelected()) {
             stream.setComm("AV");
+            stream.setNeedSeek(false);
             stream.setBackFF(false);
             tglGst.setSelected(false);
             tglFFmpeg.setSelected(false);
@@ -1541,11 +1549,13 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener {
             stream.setComm("GS");
             stream.setBackFF(false);
         }
+        stream.updateStatus();
     }//GEN-LAST:event_tglAVconvActionPerformed
 
     private void tglGstActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tglGstActionPerformed
         if (tglGst.isSelected()) {
             stream.setComm("GS");
+            stream.setNeedSeek(true);
             stream.setBackFF(false);
             tglAVconv.setSelected(false);
             tglFFmpeg.setSelected(false);
@@ -1566,6 +1576,7 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener {
             stream.setBackFF(false);
             stream.setComm("AV");
         }
+        stream.updateStatus();
     }//GEN-LAST:event_tglGstActionPerformed
 
     private void tglLoopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tglLoopActionPerformed

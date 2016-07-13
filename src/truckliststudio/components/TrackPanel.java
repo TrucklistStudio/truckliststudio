@@ -54,7 +54,7 @@ import truckliststudio.util.Tools;
  */
 public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Listener, Studio.Listener, Listener, StreamPanel.Listener {
 
-    static MasterTracks master = MasterTracks.getInstance();
+    public static MasterTracks master = MasterTracks.getInstance();
     private static final DefaultListModel model = new DefaultListModel();
     private static final ArrayList<Integer> CHTimers = new ArrayList<>();
     private static final ArrayList<String> arrayListTracks = new ArrayList<>();
@@ -892,24 +892,26 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
         @Override
         public void run() {
             CHptS = null;
-            int CHpTemptime = trkNextTime / 1000;
             trkProgressTime.setValue(0);
             trkProgressTime.setStringPainted(true);
+            int CHpTemptime = trkNextTime / 1000;
             trkProgressTime.setMaximum(CHpTemptime);
+            long beginTime = System.currentTimeMillis() / 1000;;
+            long endTime = beginTime + CHpTemptime;
             while (CHpTemptime > 0 && stopTrkPt == false) {
                 timeToTimer = CHpTemptime;
-                CHptS = Integer.toString(CHpTemptime);
-                trkProgressTime.setValue(CHpTemptime);
+                CHptS = Integer.toString((int)(endTime - System.currentTimeMillis() / 1000));
+                trkProgressTime.setValue((int)(endTime - System.currentTimeMillis() / 1000));
                 trkProgressTime.setString(CHptS);
 
                 for (int i = 0; i < 10; i++) {
                     Tools.sleep(100);
                     if (stopTrkPt) {
                         break;
-                    }
+        }
                 }
 
-                CHpTemptime--;
+                CHpTemptime = (int) (endTime - System.currentTimeMillis() / 1000);
             }
             UpdateCHtUITask.this.stop();
         }

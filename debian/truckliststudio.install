@@ -9,5 +9,6 @@ libraries/jna-*.jar usr/lib/truckliststudio/lib
 libraries/zxing*.jar usr/lib/truckliststudio/lib
 libraries/imgscalr-lib-*.jar usr/lib/truckliststudio/lib
 libraries/Catalano.*.jar usr/lib/truckliststudio/lib
+libraries/commons-io-2.5*.jar usr/lib/truckliststudio/lib
 
 src/truckliststudio/resources/start.gif usr/lib/truckliststudio

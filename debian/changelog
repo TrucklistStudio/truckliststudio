@@ -1,3 +1,10 @@
+truckliststudio (0.9.1) unstable; urgency=low
+
+  * Adds: Tracks Automatic titling based on file-name.
+  * New upstream version
+
+ -- Karl Ellis <soylent.tv@gmail.com>  Mon, 02 May 2016 17:55:37 +0200
+
 truckliststudio (0.9) unstable; urgency=low
 
   * Changes: New Sources User Interface.

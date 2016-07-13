@@ -69,10 +69,12 @@ $ sudo apt-get install truckliststudio
 
 What you need:
 --------------
-- Java >= 1.8   
+- Java >= 1.8
+
 - AVCONV - FFMPEG - Windows users should download the proper ffmpeg static binary and put it in their PATH.
   The URL is: http://ffmpeg.zeranoe.com/builds
-- Some patience ;)
+
+- TS depends on:
 
   openjdk-8-jre,
   java-wrappers,

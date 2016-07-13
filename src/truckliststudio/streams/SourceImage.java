@@ -39,7 +39,7 @@ public class SourceImage extends Stream{
     private void loadImage(File f) throws IOException{
         BufferedImage capImg = ImageIO.read(f);
         bkImage = ImageIO.read(f);
-        image = Scalr.resize(capImg, Scalr.Method.BALANCED, Scalr.Mode.FIT_EXACT, width, height);
+        image = Scalr.resize(capImg, Scalr.Method.ULTRA_QUALITY, Scalr.Mode.FIT_EXACT, width, height);
         captureWidth = image.getWidth();
         captureHeight = image.getHeight();
     }
@@ -143,7 +143,7 @@ public class SourceImage extends Stream{
 //        System.out.println("updatePNG !!!");
         captureWidth = width;
         captureHeight = height;
-        image = Scalr.resize(bkImage, Scalr.Method.BALANCED, Scalr.Mode.FIT_EXACT, width, height);
+        image = Scalr.resize(bkImage, Scalr.Method.ULTRA_QUALITY, Scalr.Mode.FIT_EXACT, width, height);
 //        image = bkImage;
 //        try{
 //            loadImage(file);
@@ -200,6 +200,11 @@ public class SourceImage extends Stream{
     @Override
     public void play() {
         // nothing here.
+    }
+
+    @Override
+    public void setNeedSeek(boolean seek) {
+        // Nothing here
     }
 
 }

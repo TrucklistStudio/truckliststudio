@@ -134,4 +134,9 @@ public class SinkBroadcast extends Stream {
     public void play() {
         // nothing here.
     }
+
+    @Override
+    public void setNeedSeek(boolean seek) {
+        // Nothing here
+    }
 }

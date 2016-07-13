@@ -95,6 +95,7 @@ public abstract class Stream implements Callable<Frame>{
     protected int color = 0;
     protected boolean isATimer = false;
     protected boolean isACDown = false;
+    protected String isIntSrc = "false";
     protected boolean isPlayList = false;
     protected boolean isQRCode = false;
     protected String comm = "AV";
@@ -117,6 +118,7 @@ public abstract class Stream implements Callable<Frame>{
     protected boolean preView = false;
     protected boolean isPaused = false;
     protected boolean isATrack = false;
+    protected boolean isATitle = false;
 
     protected Stream() {
         MasterTracks.getInstance().register(this);
@@ -169,6 +171,14 @@ public abstract class Stream implements Callable<Frame>{
     
     public void setisATrack(boolean isAT) {
         this.isATrack = isAT;
+    }
+    
+    public boolean getisATitle() {
+        return isATitle;
+    }
+    
+    public void setisATitle(boolean isAT) {
+        this.isATitle = isAT;
     }
     
     public boolean getIsATimer() {
@@ -298,6 +308,10 @@ public abstract class Stream implements Callable<Frame>{
         return content;
     }
     
+    public String setContent(String con) {
+        return content = con;
+    }
+    
     public void setFont(String f) {
 //        fontName = f;
 //        updateContent(content);
@@ -325,6 +339,8 @@ public abstract class Stream implements Callable<Frame>{
     public abstract void play();
     
     public abstract boolean needSeek();
+    
+    public abstract void setNeedSeek(boolean seek);
 
     public abstract boolean isPlaying();
  
@@ -774,6 +790,14 @@ public abstract class Stream implements Callable<Frame>{
     public void setVbitrate(String sVbitRate) {
         vbitrate = sVbitRate;
     }
+    public String getIsIntSrc() {
+        return isIntSrc;
+    }
+    
+    public void setIntSrc(String intSrc) {
+        this.isIntSrc = intSrc;
+    }
+    
     public void startItsTrack(String name) {
         
     };

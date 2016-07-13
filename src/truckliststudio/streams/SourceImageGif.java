@@ -148,4 +148,9 @@ public class SourceImageGif extends Stream {
     public void play() {
         // nothing Here.
     }
+
+    @Override
+    public void setNeedSeek(boolean seek) {
+        // Nothing here
+    }
 }

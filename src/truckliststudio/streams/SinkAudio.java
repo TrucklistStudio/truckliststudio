@@ -104,4 +104,9 @@ public class SinkAudio extends Stream {
     public void play() {
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
+    @Override
+    public void setNeedSeek(boolean seek) {
+        // Nothing here
+    }
 }

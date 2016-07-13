@@ -35,7 +35,7 @@ public class MasterTracks {
         String streamName = s.getClass().getName();
         streamName = streamName.replace("truckliststudio.streams.", "");
         if (!s.getClass().toString().contains("Sink")) {
-//            System.out.println(streamName + " registered.");
+            System.out.println(streamName + " registered.");
         }
         streams.add(s);
     }

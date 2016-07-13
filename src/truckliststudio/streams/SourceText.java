@@ -498,6 +498,11 @@ public class SourceText extends Stream {
         return true;
     }
 
+    @Override
+    public void setNeedSeek(boolean seek) {
+        // Nothing here.
+    }
+
     public enum Shape {
         NONE, RECTANGLE, ROUNDRECT, OVAL
     }

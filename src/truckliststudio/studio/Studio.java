@@ -511,7 +511,7 @@ public class Studio {
                 String trackName = null;
                 String comm = null;
                 String streamTime = null;
-                String streamAudioSrc = null;
+                String isIntSrc = null;
                 String strShapez = null;
                 ArrayList<String> SubChNames = new ArrayList<>();
                 ArrayList<String> SubText = new ArrayList<>();
@@ -531,15 +531,19 @@ public class Studio {
                     if (child.getNodeName().equals("file")) {                       
                         file = child.getTextContent();
                         ImgMovMus.add(file);
-                        if (child.getTextContent().contains("/dev/video")){
-                            videoDev = child.getTextContent();
-                            videoDevs.add(videoDev);
-                        }
+//                        if (child.getTextContent().contains("/dev/video")){
+//                            videoDev = child.getTextContent();
+//                            videoDevs.add(videoDev);
+//                        }
                     }
                     if (child.getNodeName().equals("name")) {                       
                         sName = child.getTextContent();
                         sNames.add(sName);
                     }
+                    if (child.getNodeName().equals("isIntSrc")) {                       
+                        isIntSrc = child.getTextContent();
+                    }
+                    
                     if (child.getNodeName().equals("content")) {
                         ObjText = child.getTextContent();
                     }
@@ -558,9 +562,9 @@ public class Studio {
                     if (child.getNodeName().equals("streamTime")) {                       
                         streamTime = child.getTextContent();
                     }
-                    if (child.getNodeName().equals("audioSource")) {                       
-                        streamAudioSrc = child.getTextContent();
-                    }
+//                    if (child.getNodeName().equals("audioSource")) {                       
+//                        streamAudioSrc = child.getTextContent();
+//                    }
                     
                     if (child.getNodeName().equals("Effects")) { // Read Effects
 //                        System.out.println("childnodename: "+child.getNodeName());
@@ -701,23 +705,13 @@ public class Studio {
                     SubChNames.clear();
                     subSTrans.clear();
                     subETrans.clear();
-                } 
-//                else if (clazz.toLowerCase().endsWith("sourceaudiosource")) {
-//                    stream = new SourceAudioSource();
-//                    extstream.add(stream);
-//                    extstreamBis.add(stream);
-//                    ImgMovMus.add("Mic");
-//                    readObject(stream, source);
-//                    stream.setComm(comm);
-//                    stream.setAudioSource(streamAudioSrc);
-//                    stream.setLoaded(true);
-//                    loadTransitions(SCL, stream, subSTrans, subETrans, SubChNames, null, null);
-//                } 
-                else if (clazz.toLowerCase().endsWith("sourceimagegif")) {
+                } else if (clazz.toLowerCase().endsWith("sourceimagegif")) {
                     for (int an=0;an < truckliststudio.TrucklistStudio.cboAnimations.getItemCount(); an++){
                         for (String aKey : sNames){
-                            if (aKey == null ? truckliststudio.TrucklistStudio.cboAnimations.getItemAt(an).toString() == null : aKey.equals(truckliststudio.TrucklistStudio.cboAnimations.getItemAt(an).toString())){
-                                String res = truckliststudio.TrucklistStudio.animations.getProperty(aKey);
+                            System.out.println("aKey="+aKey);
+                            String anim = truckliststudio.TrucklistStudio.cboAnimations.getItemAt(an).toString();
+                            if (aKey == null ? truckliststudio.TrucklistStudio.cboAnimations.getItemAt(an).toString() == null : aKey.contains(anim) && isIntSrc.equals("true") ){ 
+                                String res = truckliststudio.TrucklistStudio.animations.getProperty(anim);
                                 URL url = TrucklistStudio.class.getResource("/truckliststudio/resources/animations/" + res);
                                 stream = new SourceImageGif(aKey, url);
                                 extstream.add(stream);
@@ -725,6 +719,7 @@ public class Studio {
                                 ImgMovMus.add("ImageGif");
                                 readObject(stream, source);  
                                 loadTransitions(SCL, stream, subSTrans, subETrans, SubChNames, null, null);
+                                stream.setIntSrc("true");
                             }
                         }                   
                     }

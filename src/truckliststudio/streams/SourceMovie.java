@@ -92,7 +92,12 @@ public class SourceMovie extends Stream {
 
     @Override
     public boolean needSeek() {
-        return needSeekCTRL = true;
+        if (this.getComm().equals("GS")) {
+         needSeekCTRL = true;
+        } else {
+         needSeekCTRL = false;
+        }
+        return needSeekCTRL;
     }
 
     @Override
@@ -146,6 +151,11 @@ public class SourceMovie extends Stream {
     public void play() {
         isPaused = false;
         capture.play();
+    }
+
+    @Override
+    public void setNeedSeek(boolean seek) {
+        needSeekCTRL = seek;
     }
 
 }

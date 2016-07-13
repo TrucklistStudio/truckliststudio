@@ -261,7 +261,7 @@ public class ProcessRenderer {
                             if (stream.getComm() == "GS"){
                                 String winFile = stream.getFile().getAbsolutePath().replaceAll("\\\\", "\\\\\\\\");
                                 winFile = winFile.replaceAll("\\\\", "\\\\\\\\");
-                                System.out.println("WinFile="+winFile);
+//                                System.out.println("WinFile="+winFile);
                                 command = command.replaceAll(Tags.FILE.toString(), "\"" + winFile + "\"");
                             } else{
                                 command = command.replaceAll(Tags.FILE.toString(), "\"" + stream.getFile().getAbsolutePath().replaceAll("\\\\", "\\\\\\\\") + "\"");
