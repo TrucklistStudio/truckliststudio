@@ -2142,6 +2142,8 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                                 System.out.println("Cannot get Video parameters from this Source !!!");
                             } else {
                                 String[] videoNativeSize = null;
+                                int w = 0;
+                                int h = 0;
                                 if (os == OS.WINDOWS) {
                                     String[] lineRParts = lineR.split(",");
                                     String[] tempNativeSize = lineRParts[3].split(" ");
@@ -2151,9 +2153,17 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                                     String[] tempNativeSize = lineRParts[2].split(" ");
                                     videoNativeSize = tempNativeSize[1].split("x");
                                 }
-
-                                int w = Integer.parseInt(videoNativeSize[0]);
-                                int h = Integer.parseInt(videoNativeSize[1]);
+                                try {
+                                    w = Integer.parseInt(videoNativeSize[0]);
+                                    h = Integer.parseInt(videoNativeSize[1]);
+                                } catch (NumberFormatException e) {
+                                    System.out.println("Number Format Exception! ...trying MS Way...");
+                                    String[] lineRParts = lineR.split(",");
+                                    String[] tempNativeSize = lineRParts[3].split(" ");
+                                    videoNativeSize = tempNativeSize[1].split("x");
+                                    w = Integer.parseInt(videoNativeSize[0]);
+                                    h = Integer.parseInt(videoNativeSize[1]);
+                                }
 
                                 int mixerW = MasterMixer.getInstance().getWidth();
                                 int mixerH = MasterMixer.getInstance().getHeight();
