@@ -329,11 +329,11 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                                         }
                                     }
                                     if (noError && noDouble) {
-                                        ArrayList<String> allChan = new ArrayList<>();
+                                        ArrayList<String> allTracks = new ArrayList<>();
                                         for (String scn : MasterTracks.getInstance().getTracks()) {
-                                            allChan.add(scn);
+                                            allTracks.add(scn);
                                         }
-                                        for (String sc : allChan) {
+                                        for (String sc : allTracks) {
                                             stream.addTrack(SourceTrack.getTrack(sc, stream));
                                         }
                                         StreamPanel frame = new StreamPanel(stream);
@@ -371,6 +371,85 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                                             }
                                         }
                                         success = true;
+                                        if (autoTitle && stream.getisATrack()) {
+                                            boolean isTitle = false;
+                                            SourceText streamTXT = null;
+                                            String trkName = stream.getName();
+                                            String trkTitle = FilenameUtils.removeExtension(trkName);
+                                            for (Stream str : master.getStreams()) {
+
+                                                if (str.getisATitle() && !str.getClass().toString().contains("Sink")) {
+//                                                    System.out.println("Titles=" + str.getName());
+                                                    streamTXT = (SourceText) str;
+                                                    streamTXT.setContent(trkTitle);
+                                                    streamTXT.setIsPlaying(true);
+
+                                                    Stream playingStr = null;
+                                                    for (Stream s : master.getStreams()) {
+                                                        if (s.getisATrack() && s.isPlaying()) {
+                                                            playingStr = s;
+                                                            s.setIsPlaying(false);
+                                                        }
+                                                    }
+
+                                                    boolean wasStopped = true;
+                                                    if (stream.isPlaying()) {
+                                                        wasStopped = false;
+                                                    } else {
+                                                        stream.setIsPlaying(true);
+                                                    }
+
+                                                    master.updateTrack(trkName);
+                                                    master.addTrkTransitions(trkName);
+
+                                                    if (wasStopped) {
+                                                        stream.setIsPlaying(false);
+                                                    }
+
+                                                    if (playingStr != null) {
+                                                        playingStr.setIsPlaying(true);
+                                                    }
+
+                                                    streamTXT.setIsPlaying(false);
+                                                    isTitle = true;
+                                                    break;
+                                                }
+                                            }
+                                            if (!isTitle) {
+
+                                                streamTXT = new SourceText(trkTitle);
+                                                for (String scn : MasterTracks.getInstance().getTracks()) {
+                                                    allTracks.add(scn);
+                                                }
+                                                for (String sc : allTracks) {
+                                                    streamTXT.addTrack(SourceTrack.getTrack(sc, streamTXT));
+                                                }
+                                                streamTXT.setisATitle(true);
+                                                streamTXT.setName("Titles");
+                                                streamTXT.setZOrder(1);
+                                                streamTXT.setIsPlaying(true);
+                                                boolean wasStopped = true;
+                                                if (stream.isPlaying()) {
+                                                    wasStopped = false;
+                                                } else {
+                                                    stream.setIsPlaying(true);
+                                                }
+                                                master.updateTrack(trkName);
+                                                master.addTrkTransitions(trkName);
+                                                if (wasStopped) {
+                                                    stream.setIsPlaying(false);
+                                                }
+                                                streamTXT.setIsPlaying(false);
+                                                StreamPanelText txtTitle = new StreamPanelText((Stream) streamTXT);
+                                                numTexts += 1;
+                                                textDesktop.add(streamTXT.getName(), txtTitle);
+                                                lblText.setForeground(busyTab);
+                                                Font font = new Font("Ubuntu", Font.BOLD, 11);
+                                                lblText.setFont(font);
+                                                lblText.setText("Texts(" + numTexts + ")");
+                                                txtTitle.setParent();
+                                            }
+                                        }
                                     } else {
                                         if (!noError) {
                                             ResourceMonitorLabel label = new ResourceMonitorLabel(System.currentTimeMillis() + 10000, "Error adding " + file.getName() + "!");
@@ -511,7 +590,7 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
         File prgSystemDir = new File("C:\\");
         File[] listFile = prgSystemDir.listFiles();
         for (File f : listFile) {
-            System.out.println("File Name: " + f.getName());
+//            System.out.println("File Name: " + f.getName());
             if (f.getName().equals("Program Files (x86)")) {
                 x64 = true;
                 break;
@@ -527,7 +606,7 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
         File prgSystemDir = new File("C:\\");
         File[] listFile = prgSystemDir.listFiles();
         for (File f : listFile) {
-            System.out.println("File Name: " + f.getName());
+//            System.out.println("File Name: " + f.getName());
             if (f.getName().equals("gstreamer")) {
                 winGS = true;
                 break;
@@ -2144,22 +2223,22 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                                 String[] videoNativeSize = null;
                                 int w = 0;
                                 int h = 0;
-                                if (os == OS.WINDOWS) {
-                                    String[] lineRParts = lineR.split(",");
-                                    String[] tempNativeSize = lineRParts[3].split(" ");
-                                    videoNativeSize = tempNativeSize[1].split("x");
-                                } else {
+//                                if (os == OS.WINDOWS) {
+//                                    String[] lineRParts = lineR.split(",");
+//                                    String[] tempNativeSize = lineRParts[3].split(" ");
+//                                    videoNativeSize = tempNativeSize[1].split("x");
+//                                } else {
                                     String[] lineRParts = lineR.split(",");
                                     String[] tempNativeSize = lineRParts[2].split(" ");
                                     videoNativeSize = tempNativeSize[1].split("x");
-                                }
+//                                }
                                 try {
                                     w = Integer.parseInt(videoNativeSize[0]);
                                     h = Integer.parseInt(videoNativeSize[1]);
                                 } catch (NumberFormatException e) {
                                     System.out.println("Number Format Exception! ...trying MS Way...");
-                                    String[] lineRParts = lineR.split(",");
-                                    String[] tempNativeSize = lineRParts[3].split(" ");
+                                    lineRParts = lineR.split(",");
+                                    tempNativeSize = lineRParts[3].split(" ");
                                     videoNativeSize = tempNativeSize[1].split("x");
                                     w = Integer.parseInt(videoNativeSize[0]);
                                     h = Integer.parseInt(videoNativeSize[1]);
