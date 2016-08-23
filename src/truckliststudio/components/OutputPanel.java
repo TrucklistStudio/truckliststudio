@@ -474,7 +474,7 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
                 fmeSet.setVisible(true);
             }
         });
-        fmeSettings.setIcon(new ImageIcon(getClass().getResource("/truckliststudio/resources/tango/working-4.png"))); // NOI18N
+        fmeSettings.setIcon(new ImageIcon(getClass().getResource("/truckliststudio/resources/tango/working-6.png"))); // NOI18N
         fmePopup.add(fmeSettings);
     }
     
@@ -488,7 +488,7 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
                 sinkSet.setVisible(true);
             }
         });
-        sinkSettings.setIcon(new ImageIcon(getClass().getResource("/truckliststudio/resources/tango/working-4.png"))); // NOI18N
+        sinkSettings.setIcon(new ImageIcon(getClass().getResource("/truckliststudio/resources/tango/working-6.png"))); // NOI18N
         sinkFilePopup.add(sinkSettings);
     }
     
@@ -502,7 +502,7 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
                 sinkSet.setVisible(true);
             }
         });
-        sinkSettings.setIcon(new ImageIcon(getClass().getResource("/truckliststudio/resources/tango/working-4.png"))); // NOI18N
+        sinkSettings.setIcon(new ImageIcon(getClass().getResource("/truckliststudio/resources/tango/working-6.png"))); // NOI18N
         sinkUDPPopup.add(sinkSettings);
     }
     

@@ -41,6 +41,9 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
@@ -149,6 +152,10 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
     public static boolean x64 = false;
     public static boolean winGS = false;
     private boolean editingPhase = true;
+    private boolean mooving = false;
+    private int prevIndex = 0;
+    private int selIndex = 0;
+    boolean loadingFinish = false;
 
     @Override
     public void closeSource(String name) {
@@ -573,12 +580,19 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
         listenerOP.resetSinks(null);
         if (cmdFile != null) {
             loadAtStart(cmdFile, null);
+            while (!loadingFinish) {
+                Tools.sleep(1000);
+                System.out.println("Load Finish: " + loadingFinish);
+            }
         }
         if (cmdOut != null) {
             listenerOP.addLoadingTrack(cmdOut); // used addLoadingTrack to activate Output from command line.
         }
         if (cmdAutoStart) {
-            listenerTSTP.resetSinks(null); // used resetSinks to AutoPlay from command line.
+            if (loadingFinish) {
+                Tools.sleep(2000);
+                listenerTSTP.resetSinks(null); // used resetSinks to AutoPlay from command line.
+            }
         }
         if (cmdRemote) {
             listenerTSTP.setRemoteOn();
@@ -1224,7 +1238,7 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
         jSeparator4.setOpaque(true);
         toolbar.add(jSeparator4);
 
-        tglAutoAR.setIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/ar_button.png"))); // NOI18N
+        tglAutoAR.setIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/ar_flat_button.png"))); // NOI18N
         tglAutoAR.setToolTipText("Automatic A/R detection Switch.");
         tglAutoAR.setFocusable(false);
         tglAutoAR.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -1232,8 +1246,8 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
         tglAutoAR.setMinimumSize(new java.awt.Dimension(25, 25));
         tglAutoAR.setName("tglAutoAR"); // NOI18N
         tglAutoAR.setPreferredSize(new java.awt.Dimension(28, 29));
-        tglAutoAR.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/ar_button.png"))); // NOI18N
-        tglAutoAR.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/ar_button_selected.png"))); // NOI18N
+        tglAutoAR.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/ar_flat_button.png"))); // NOI18N
+        tglAutoAR.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/ar_flat_button_selected.png"))); // NOI18N
         tglAutoAR.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         tglAutoAR.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1242,7 +1256,7 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
         });
         toolbar.add(tglAutoAR);
 
-        tglAutoTrack.setIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/track_button.png"))); // NOI18N
+        tglAutoTrack.setIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/track_button_Flat.png"))); // NOI18N
         tglAutoTrack.setToolTipText("Automatic \"Make a Track\" Switch.");
         tglAutoTrack.setFocusable(false);
         tglAutoTrack.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -1250,8 +1264,8 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
         tglAutoTrack.setMinimumSize(new java.awt.Dimension(25, 25));
         tglAutoTrack.setName("tglAutoTrack"); // NOI18N
         tglAutoTrack.setPreferredSize(new java.awt.Dimension(28, 29));
-        tglAutoTrack.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/track_button.png"))); // NOI18N
-        tglAutoTrack.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/track_button_selected2.png"))); // NOI18N
+        tglAutoTrack.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/track_button_Flat.png"))); // NOI18N
+        tglAutoTrack.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/track_button_selected_Flat.png"))); // NOI18N
         tglAutoTrack.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         tglAutoTrack.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1260,7 +1274,7 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
         });
         toolbar.add(tglAutoTrack);
 
-        tglAutoTitle.setIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/overlayText.png"))); // NOI18N
+        tglAutoTitle.setIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/overlayText_Flat.png"))); // NOI18N
         tglAutoTitle.setToolTipText("Automatic make a Text overlay Title for each Track");
         tglAutoTitle.setFocusable(false);
         tglAutoTitle.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -1268,8 +1282,8 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
         tglAutoTitle.setMinimumSize(new java.awt.Dimension(25, 25));
         tglAutoTitle.setName("tglAutoTitle"); // NOI18N
         tglAutoTitle.setPreferredSize(new java.awt.Dimension(28, 29));
-        tglAutoTitle.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/overlayText.png"))); // NOI18N
-        tglAutoTitle.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/overlayText_active.png"))); // NOI18N
+        tglAutoTitle.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/overlayText_Flat.png"))); // NOI18N
+        tglAutoTitle.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/overlayText_active_Flat.png"))); // NOI18N
         tglAutoTitle.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         tglAutoTitle.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1278,7 +1292,7 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
         });
         toolbar.add(tglAutoTitle);
 
-        btnApplyTitle.setIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/apply_titling.png"))); // NOI18N
+        btnApplyTitle.setIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/apply_titling_Flat.png"))); // NOI18N
         btnApplyTitle.setToolTipText(bundle.getString("ICON_ALL")); // NOI18N
         btnApplyTitle.setFocusable(false);
         btnApplyTitle.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -2223,15 +2237,9 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                                 String[] videoNativeSize = null;
                                 int w = 0;
                                 int h = 0;
-//                                if (os == OS.WINDOWS) {
-//                                    String[] lineRParts = lineR.split(",");
-//                                    String[] tempNativeSize = lineRParts[3].split(" ");
-//                                    videoNativeSize = tempNativeSize[1].split("x");
-//                                } else {
-                                    String[] lineRParts = lineR.split(",");
-                                    String[] tempNativeSize = lineRParts[2].split(" ");
-                                    videoNativeSize = tempNativeSize[1].split("x");
-//                                }
+                                String[] lineRParts = lineR.split(",");
+                                String[] tempNativeSize = lineRParts[2].split(" ");
+                                videoNativeSize = tempNativeSize[1].split("x");
                                 try {
                                     w = Integer.parseInt(videoNativeSize[0]);
                                     h = Integer.parseInt(videoNativeSize[1]);
@@ -3276,74 +3284,143 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
     }//GEN-LAST:event_tabSourcesMouseClicked
 
     private void videoDesktopMouseWheelMoved(java.awt.event.MouseWheelEvent evt) {//GEN-FIRST:event_videoDesktopMouseWheelMoved
-        JTabbedPane tabPane = (JTabbedPane) evt.getSource();
-        int dir = evt.getWheelRotation();
-        int selIndex = tabPane.getSelectedIndex();
-        int maxIndex = tabPane.getTabCount() - 1;
-        if ((selIndex == 0 && dir < 0) || (selIndex == maxIndex && dir > 0)) {
-            selIndex = maxIndex - selIndex;
+        JTabbedPane pane = (JTabbedPane) evt.getSource();
+        int units = evt.getWheelRotation();
+        int oldIndex = pane.getSelectedIndex();
+        int newIndex = oldIndex + units;
+        Tools.sleep(30);
+        if (newIndex < 0) {
+            pane.setSelectedIndex(0);
+        } else if (newIndex >= pane.getTabCount()) {
+            pane.setSelectedIndex(pane.getTabCount() - 1);
         } else {
-            selIndex += dir;
+            pane.setSelectedIndex(newIndex);
         }
-        tabPane.setSelectedIndex(selIndex);
+//        JTabbedPane tabPane = (JTabbedPane) evt.getSource();
+//        int dir = evt.getWheelRotation();
+//        int selIndex = tabPane.getSelectedIndex();
+//        int maxIndex = tabPane.getTabCount() - 1;
+//        if ((selIndex == 0 && dir < 0) || (selIndex == maxIndex && dir > 0)) {
+//            selIndex = maxIndex - selIndex;
+//        } else {
+//            selIndex += dir;
+//        }
+//        tabPane.setSelectedIndex(selIndex);
     }//GEN-LAST:event_videoDesktopMouseWheelMoved
 
     private void musicDesktopMouseWheelMoved(java.awt.event.MouseWheelEvent evt) {//GEN-FIRST:event_musicDesktopMouseWheelMoved
-        JTabbedPane tabPane = (JTabbedPane) evt.getSource();
-        int dir = evt.getWheelRotation();
-        int selIndex = tabPane.getSelectedIndex();
-        int maxIndex = tabPane.getTabCount() - 1;
-        if ((selIndex == 0 && dir < 0) || (selIndex == maxIndex && dir > 0)) {
-            selIndex = maxIndex - selIndex;
+        JTabbedPane pane = (JTabbedPane) evt.getSource();
+        int units = evt.getWheelRotation();
+        int oldIndex = pane.getSelectedIndex();
+        int newIndex = oldIndex + units;
+        Tools.sleep(30);
+        if (newIndex < 0) {
+            pane.setSelectedIndex(0);
+        } else if (newIndex >= pane.getTabCount()) {
+            pane.setSelectedIndex(pane.getTabCount() - 1);
         } else {
-            selIndex += dir;
+            pane.setSelectedIndex(newIndex);
         }
-        tabPane.setSelectedIndex(selIndex);
+//        JTabbedPane tabPane = (JTabbedPane) evt.getSource();
+//        int dir = evt.getWheelRotation();
+//        int selIndex = tabPane.getSelectedIndex();
+//        int maxIndex = tabPane.getTabCount() - 1;
+//        if ((selIndex == 0 && dir < 0) || (selIndex == maxIndex && dir > 0)) {
+//            selIndex = maxIndex - selIndex;
+//        } else {
+//            selIndex += dir;
+//        }
+//        tabPane.setSelectedIndex(selIndex);
     }//GEN-LAST:event_musicDesktopMouseWheelMoved
 
     private void pictureDesktopMouseWheelMoved(java.awt.event.MouseWheelEvent evt) {//GEN-FIRST:event_pictureDesktopMouseWheelMoved
-        JTabbedPane tabPane = (JTabbedPane) evt.getSource();
-        int dir = evt.getWheelRotation();
-        int selIndex = tabPane.getSelectedIndex();
-        int maxIndex = tabPane.getTabCount() - 1;
-        if ((selIndex == 0 && dir < 0) || (selIndex == maxIndex && dir > 0)) {
-            selIndex = maxIndex - selIndex;
+        JTabbedPane pane = (JTabbedPane) evt.getSource();
+        int units = evt.getWheelRotation();
+        int oldIndex = pane.getSelectedIndex();
+        int newIndex = oldIndex + units;
+        Tools.sleep(30);
+        if (newIndex < 0) {
+            pane.setSelectedIndex(0);
+        } else if (newIndex >= pane.getTabCount()) {
+            pane.setSelectedIndex(pane.getTabCount() - 1);
         } else {
-            selIndex += dir;
+            pane.setSelectedIndex(newIndex);
         }
-        tabPane.setSelectedIndex(selIndex);
+//        JTabbedPane tabPane = (JTabbedPane) evt.getSource();
+//        int dir = evt.getWheelRotation();
+//        int selIndex = tabPane.getSelectedIndex();
+//        int maxIndex = tabPane.getTabCount() - 1;
+//        if ((selIndex == 0 && dir < 0) || (selIndex == maxIndex && dir > 0)) {
+//            selIndex = maxIndex - selIndex;
+//        } else {
+//            selIndex += dir;
+//        }
+//        tabPane.setSelectedIndex(selIndex);
     }//GEN-LAST:event_pictureDesktopMouseWheelMoved
 
     private void textDesktopMouseWheelMoved(java.awt.event.MouseWheelEvent evt) {//GEN-FIRST:event_textDesktopMouseWheelMoved
-        JTabbedPane tabPane = (JTabbedPane) evt.getSource();
-        int dir = evt.getWheelRotation();
-        int selIndex = tabPane.getSelectedIndex();
-        int maxIndex = tabPane.getTabCount() - 1;
-        if ((selIndex == 0 && dir < 0) || (selIndex == maxIndex && dir > 0)) {
-            selIndex = maxIndex - selIndex;
+        JTabbedPane pane = (JTabbedPane) evt.getSource();
+        int units = evt.getWheelRotation();
+        int oldIndex = pane.getSelectedIndex();
+        int newIndex = oldIndex + units;
+        Tools.sleep(30);
+        if (newIndex < 0) {
+            pane.setSelectedIndex(0);
+        } else if (newIndex >= pane.getTabCount()) {
+            pane.setSelectedIndex(pane.getTabCount() - 1);
         } else {
-            selIndex += dir;
+            pane.setSelectedIndex(newIndex);
         }
-        tabPane.setSelectedIndex(selIndex);
+//        JTabbedPane tabPane = (JTabbedPane) evt.getSource();
+//        int dir = evt.getWheelRotation();
+//        int selIndex = tabPane.getSelectedIndex();
+//        int maxIndex = tabPane.getTabCount() - 1;
+//        if ((selIndex == 0 && dir < 0) || (selIndex == maxIndex && dir > 0)) {
+//            selIndex = maxIndex - selIndex;
+//        } else {
+//            selIndex += dir;
+//        }
+//        tabPane.setSelectedIndex(selIndex);
     }//GEN-LAST:event_textDesktopMouseWheelMoved
 
     private void videoDesktopStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_videoDesktopStateChanged
         if (editingPhase) {
             JTabbedPane tabPane = (JTabbedPane) evt.getSource();
             int selIndex = tabPane.getSelectedIndex();
-            if (selIndex != -1) {
-                String streamName = tabPane.getTitleAt(selIndex).replace("<html><body><table width='20'>", "").replace("</table></body></html>", "").replace("<span></span>", "");
-                for (Stream s : streamS) {
-                    if (s.getName().equals(streamName)) {
-                        selectedSource(s);
-                        if (s.isPlaying()) {
-                            btnRemoveSource.setEnabled(false);
-                        } else {
-                            btnRemoveSource.setEnabled(true);
+//            System.out.println("StateChanged Index = " + tabPane.getSelectedIndex());
+            Runnable task = () -> {
+                if (selIndex == tabPane.getSelectedIndex()) {
+//                    System.out.println("StateChanged Old Index = " + selIndex);
+                    if (selIndex != -1) {
+                        String streamName = tabPane.getTitleAt(selIndex).replace("<html><body><table width='20'>", "").replace("</table></body></html>", "").replace("<span></span>", "");
+                        for (Stream s : streamS) {
+                            if (s.getName().equals(streamName)) {
+                                selectedSource(s);
+                                if (s.isPlaying()) {
+                                    btnRemoveSource.setEnabled(false);
+                                } else {
+                                    btnRemoveSource.setEnabled(true);
+                                }
+                                break;
+                            }
                         }
                     }
                 }
-            }
+            };
+            worker.schedule(task, 1, TimeUnit.SECONDS);
+//            if (selIndex != -1) {
+//                String streamName = tabPane.getTitleAt(selIndex).replace("<html><body><table width='20'>", "").replace("</table></body></html>", "").replace("<span></span>", "");
+//                for (Stream s : streamS) {
+//                    if (s.getName().equals(streamName)) {
+//                        selectedSource(s);
+//                        if (s.isPlaying()) {
+//                            btnRemoveSource.setEnabled(false);
+//                        } else {
+//                            btnRemoveSource.setEnabled(true);
+//                        }
+//                    }
+//                }
+//            }
         }
     }//GEN-LAST:event_videoDesktopStateChanged
 
@@ -3351,19 +3428,39 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
         if (editingPhase) {
             JTabbedPane tabPane = (JTabbedPane) evt.getSource();
             int selIndex = tabPane.getSelectedIndex();
-            if (selIndex != -1) {
-                String streamName = tabPane.getTitleAt(selIndex).replace("<html><body><table width='20'>", "").replace("</table></body></html>", "").replace("<span></span>", "");
-                for (Stream s : streamS) {
-                    if (s.getName().equals(streamName)) {
-                        selectedSource(s);
-                        if (s.isPlaying()) {
-                            btnRemoveSource.setEnabled(false);
-                        } else {
-                            btnRemoveSource.setEnabled(true);
+            Runnable task = () -> {
+                if (selIndex == tabPane.getSelectedIndex()) {
+//                    System.out.println("StateChanged Old Index = " + selIndex);
+                    if (selIndex != -1) {
+                        String streamName = tabPane.getTitleAt(selIndex).replace("<html><body><table width='20'>", "").replace("</table></body></html>", "").replace("<span></span>", "");
+                        for (Stream s : streamS) {
+                            if (s.getName().equals(streamName)) {
+                                selectedSource(s);
+                                if (s.isPlaying()) {
+                                    btnRemoveSource.setEnabled(false);
+                                } else {
+                                    btnRemoveSource.setEnabled(true);
+                                }
+                                break;
+                            }
                         }
                     }
                 }
-            }
+            };
+            worker.schedule(task, 1, TimeUnit.SECONDS);
+//            if (selIndex != -1) {
+//                String streamName = tabPane.getTitleAt(selIndex).replace("<html><body><table width='20'>", "").replace("</table></body></html>", "").replace("<span></span>", "");
+//                for (Stream s : streamS) {
+//                    if (s.getName().equals(streamName)) {
+//                        selectedSource(s);
+//                        if (s.isPlaying()) {
+//                            btnRemoveSource.setEnabled(false);
+//                        } else {
+//                            btnRemoveSource.setEnabled(true);
+//                        }
+//                    }
+//                }
+//            }
         }
     }//GEN-LAST:event_musicDesktopStateChanged
 
@@ -3371,19 +3468,39 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
         if (editingPhase) {
             JTabbedPane tabPane = (JTabbedPane) evt.getSource();
             int selIndex = tabPane.getSelectedIndex();
-            if (selIndex != -1) {
-                String streamName = tabPane.getTitleAt(selIndex).replace("<html><body><table width='20'>", "").replace("</table></body></html>", "").replace("<span></span>", "");
-                for (Stream s : streamS) {
-                    if (s.getName().equals(streamName)) {
-                        selectedSource(s);
-                        if (s.isPlaying()) {
-                            btnRemoveSource.setEnabled(false);
-                        } else {
-                            btnRemoveSource.setEnabled(true);
+            Runnable task = () -> {
+                if (selIndex == tabPane.getSelectedIndex()) {
+//                    System.out.println("StateChanged Old Index = " + selIndex);
+                    if (selIndex != -1) {
+                        String streamName = tabPane.getTitleAt(selIndex).replace("<html><body><table width='20'>", "").replace("</table></body></html>", "").replace("<span></span>", "");
+                        for (Stream s : streamS) {
+                            if (s.getName().equals(streamName)) {
+                                selectedSource(s);
+                                if (s.isPlaying()) {
+                                    btnRemoveSource.setEnabled(false);
+                                } else {
+                                    btnRemoveSource.setEnabled(true);
+                                }
+                                break;
+                            }
                         }
                     }
                 }
-            }
+            };
+            worker.schedule(task, 1, TimeUnit.SECONDS);
+//            if (selIndex != -1) {
+//                String streamName = tabPane.getTitleAt(selIndex).replace("<html><body><table width='20'>", "").replace("</table></body></html>", "").replace("<span></span>", "");
+//                for (Stream s : streamS) {
+//                    if (s.getName().equals(streamName)) {
+//                        selectedSource(s);
+//                        if (s.isPlaying()) {
+//                            btnRemoveSource.setEnabled(false);
+//                        } else {
+//                            btnRemoveSource.setEnabled(true);
+//                        }
+//                    }
+//                }
+//            }
         }
     }//GEN-LAST:event_pictureDesktopStateChanged
 
@@ -3391,19 +3508,39 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
         if (editingPhase) {
             JTabbedPane tabPane = (JTabbedPane) evt.getSource();
             int selIndex = tabPane.getSelectedIndex();
-            if (selIndex != -1) {
-                String streamName = tabPane.getTitleAt(selIndex);
-                for (Stream s : streamS) {
-                    if (s.getName().equals(streamName)) {
-                        selectedSource(s);
-                        if (s.isPlaying()) {
-                            btnRemoveSource.setEnabled(false);
-                        } else {
-                            btnRemoveSource.setEnabled(true);
+            Runnable task = () -> {
+                if (selIndex == tabPane.getSelectedIndex()) {
+//                    System.out.println("StateChanged Old Index = " + selIndex);
+                    if (selIndex != -1) {
+                        String streamName = tabPane.getTitleAt(selIndex).replace("<html><body><table width='20'>", "").replace("</table></body></html>", "").replace("<span></span>", "");
+                        for (Stream s : streamS) {
+                            if (s.getName().equals(streamName)) {
+                                selectedSource(s);
+                                if (s.isPlaying()) {
+                                    btnRemoveSource.setEnabled(false);
+                                } else {
+                                    btnRemoveSource.setEnabled(true);
+                                }
+                                break;
+                            }
                         }
                     }
                 }
-            }
+            };
+            worker.schedule(task, 1, TimeUnit.SECONDS);
+//            if (selIndex != -1) {
+//                String streamName = tabPane.getTitleAt(selIndex);
+//                for (Stream s : streamS) {
+//                    if (s.getName().equals(streamName)) {
+//                        selectedSource(s);
+//                        if (s.isPlaying()) {
+//                            btnRemoveSource.setEnabled(false);
+//                        } else {
+//                            btnRemoveSource.setEnabled(true);
+//                        }
+//                    }
+//                }
+//            }
         }
     }//GEN-LAST:event_textDesktopStateChanged
 
@@ -3453,7 +3590,7 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
     private void btnApplyTitleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnApplyTitleActionPerformed
         int result = JOptionPane.showConfirmDialog(this, "!!! Warning !!! Overwrites all previous Tracks titles.", "Attention", JOptionPane.YES_NO_CANCEL_OPTION);
         if (result == JFileChooser.APPROVE_OPTION) {
-            
+
             ArrayList<Stream> trkList = new ArrayList<>();
             for (Stream s : master.getStreams()) {
                 if (s.getisATrack() && !s.getClass().toString().contains("Sink")) {
@@ -3695,6 +3832,7 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
     private javax.swing.JTabbedPane videoDesktop;
     private javax.swing.JScrollPane videoScroll;
     // End of variables declaration//GEN-END:variables
+    private static final ScheduledExecutorService worker = Executors.newSingleThreadScheduledExecutor();
 
     @Override
     public void selectedSource(Stream source) {
@@ -3708,6 +3846,7 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
 
         tabControls.removeAll();
         tabControls.repaint();
+        
         ArrayList<Component> comps = SourceControls.getControls(source);
         for (Component c : comps) {
             String cName = c.getName();
@@ -3866,6 +4005,7 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                 }
                 setTrkStudioState(true);
                 editingPhase = true;
+                loadingFinish = true;
                 return null;
             }
 

@@ -756,7 +756,7 @@
                         <Component class="javax.swing.JToggleButton" name="tglAutoAR">
                           <Properties>
                             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                              <Image iconType="3" name="/truckliststudio/resources/tango/ar_button.png"/>
+                              <Image iconType="3" name="/truckliststudio/resources/tango/ar_flat_button.png"/>
                             </Property>
                             <Property name="toolTipText" type="java.lang.String" value="Automatic A/R detection Switch."/>
                             <Property name="focusable" type="boolean" value="false"/>
@@ -772,10 +772,10 @@
                               <Dimension value="[28, 29]"/>
                             </Property>
                             <Property name="rolloverIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                              <Image iconType="3" name="/truckliststudio/resources/tango/ar_button.png"/>
+                              <Image iconType="3" name="/truckliststudio/resources/tango/ar_flat_button.png"/>
                             </Property>
                             <Property name="selectedIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                              <Image iconType="3" name="/truckliststudio/resources/tango/ar_button_selected.png"/>
+                              <Image iconType="3" name="/truckliststudio/resources/tango/ar_flat_button_selected.png"/>
                             </Property>
                             <Property name="verticalTextPosition" type="int" value="3"/>
                           </Properties>
@@ -786,7 +786,7 @@
                         <Component class="javax.swing.JToggleButton" name="tglAutoTrack">
                           <Properties>
                             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                              <Image iconType="3" name="/truckliststudio/resources/tango/track_button.png"/>
+                              <Image iconType="3" name="/truckliststudio/resources/tango/track_button_Flat.png"/>
                             </Property>
                             <Property name="toolTipText" type="java.lang.String" value="Automatic &quot;Make a Track&quot; Switch."/>
                             <Property name="focusable" type="boolean" value="false"/>
@@ -802,10 +802,10 @@
                               <Dimension value="[28, 29]"/>
                             </Property>
                             <Property name="rolloverIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                              <Image iconType="3" name="/truckliststudio/resources/tango/track_button.png"/>
+                              <Image iconType="3" name="/truckliststudio/resources/tango/track_button_Flat.png"/>
                             </Property>
                             <Property name="selectedIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                              <Image iconType="3" name="/truckliststudio/resources/tango/track_button_selected2.png"/>
+                              <Image iconType="3" name="/truckliststudio/resources/tango/track_button_selected_Flat.png"/>
                             </Property>
                             <Property name="verticalTextPosition" type="int" value="3"/>
                           </Properties>
@@ -816,7 +816,7 @@
                         <Component class="javax.swing.JToggleButton" name="tglAutoTitle">
                           <Properties>
                             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                              <Image iconType="3" name="/truckliststudio/resources/tango/overlayText.png"/>
+                              <Image iconType="3" name="/truckliststudio/resources/tango/overlayText_Flat.png"/>
                             </Property>
                             <Property name="toolTipText" type="java.lang.String" value="Automatic make a Text overlay Title for each Track"/>
                             <Property name="focusable" type="boolean" value="false"/>
@@ -832,10 +832,10 @@
                               <Dimension value="[28, 29]"/>
                             </Property>
                             <Property name="rolloverIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                              <Image iconType="3" name="/truckliststudio/resources/tango/overlayText.png"/>
+                              <Image iconType="3" name="/truckliststudio/resources/tango/overlayText_Flat.png"/>
                             </Property>
                             <Property name="selectedIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                              <Image iconType="3" name="/truckliststudio/resources/tango/overlayText_active.png"/>
+                              <Image iconType="3" name="/truckliststudio/resources/tango/overlayText_active_Flat.png"/>
                             </Property>
                             <Property name="verticalTextPosition" type="int" value="3"/>
                           </Properties>
@@ -846,7 +846,7 @@
                         <Component class="javax.swing.JButton" name="btnApplyTitle">
                           <Properties>
                             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                              <Image iconType="3" name="/truckliststudio/resources/tango/apply_titling.png"/>
+                              <Image iconType="3" name="/truckliststudio/resources/tango/apply_titling_Flat.png"/>
                             </Property>
                             <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
                               <ResourceString bundle="truckliststudio/Languages.properties" key="ICON_ALL" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>

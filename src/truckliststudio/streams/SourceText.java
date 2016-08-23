@@ -392,7 +392,7 @@ public class SourceText extends Stream {
             buffer.setColor(new Color(color));
             int tHeight = textHeight;
 //            System.out.println("FontHeight: "+textHeight);
-            int k = (int) (textHeight * (15.0f / 100.0f));
+            int k = (int) (textHeight * (25.0f / 100.0f));
             for (String line : linee) {
                 buffer.drawString(line, (captureWidth - textWidth) / 2, tHeight - k); //
                 tHeight += textHeight;

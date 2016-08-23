@@ -119,9 +119,9 @@
                   <Group type="102" attributes="0">
                       <Component id="jSeparator1" min="-2" pref="3" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="lblTrackDuration" max="-2" attributes="0"/>
-                          <Component id="trkDuration" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                          <Component id="trkDuration" max="32767" attributes="0"/>
+                          <Component id="lblTrackDuration" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="jSeparator2" min="-2" pref="3" max="-2" attributes="0"/>

@@ -632,7 +632,7 @@ public class StreamPanelText extends javax.swing.JPanel implements Stream.Listen
             }
         });
 
-        tglBouncing.setIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/ar_button.png"))); // NOI18N
+        tglBouncing.setIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/ar_flat_button.png"))); // NOI18N
         tglBouncing.setToolTipText("H Bounching");
         tglBouncing.setName("tglBouncing"); // NOI18N
         tglBouncing.addActionListener(new java.awt.event.ActionListener() {

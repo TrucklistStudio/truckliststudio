@@ -454,6 +454,7 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener {
             tglPause.setEnabled(true);
 
             titleLabel.setForeground(sActiveLblCol);
+            JTp.setSelectedIndex(tabIndex);
             this.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, sActiveLblCol));
         } else {
 
