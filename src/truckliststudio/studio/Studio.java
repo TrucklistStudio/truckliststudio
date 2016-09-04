@@ -531,10 +531,6 @@ public class Studio {
                     if (child.getNodeName().equals("file")) {                       
                         file = child.getTextContent();
                         ImgMovMus.add(file);
-//                        if (child.getTextContent().contains("/dev/video")){
-//                            videoDev = child.getTextContent();
-//                            videoDevs.add(videoDev);
-//                        }
                     }
                     if (child.getNodeName().equals("name")) {                       
                         sName = child.getTextContent();
@@ -562,10 +558,7 @@ public class Studio {
                     if (child.getNodeName().equals("streamTime")) {                       
                         streamTime = child.getTextContent();
                     }
-//                    if (child.getNodeName().equals("audioSource")) {                       
-//                        streamAudioSrc = child.getTextContent();
-//                    }
-                    
+
                     if (child.getNodeName().equals("Effects")) { // Read Effects
 //                        System.out.println("childnodename: "+child.getNodeName());
                         for (int nc = 0; nc < child.getChildNodes().getLength(); nc++) {
@@ -708,7 +701,7 @@ public class Studio {
                 } else if (clazz.toLowerCase().endsWith("sourceimagegif")) {
                     for (int an=0;an < truckliststudio.TrucklistStudio.cboAnimations.getItemCount(); an++){
                         for (String aKey : sNames){
-                            System.out.println("aKey="+aKey);
+//                            System.out.println("aKey="+aKey);
                             String anim = truckliststudio.TrucklistStudio.cboAnimations.getItemAt(an).toString();
                             if (aKey == null ? truckliststudio.TrucklistStudio.cboAnimations.getItemAt(an).toString() == null : aKey.contains(anim) && isIntSrc.equals("true") ){ 
                                 String res = truckliststudio.TrucklistStudio.animations.getProperty(anim);

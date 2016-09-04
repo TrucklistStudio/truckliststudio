@@ -30,11 +30,15 @@ public class SourceControlsText extends javax.swing.JPanel {
         initComponents();
         SpinnerNumberModel model = new SpinnerNumberModel(100, 0, 100, 1);
         spinBGOpacity.setModel(model);
-        if( stream.getLoaded()){
-            txtHexColor.setText(Integer.toHexString(stream.getBackgroundColor()));
-        } else {
-            txtHexColor.setText("000000");
+//        if( stream.getLoaded()){
+        String bgColor = Integer.toHexString(stream.getBackgroundColor());
+        if (bgColor.equals("0")) {
+            bgColor = "000000";
         }
+            txtHexColor.setText(bgColor);
+//        } else {
+//            txtHexColor.setText("000000");
+//        }
         switch(stream.getBackground()){
             case NONE:
                 rdNone.setSelected(true);

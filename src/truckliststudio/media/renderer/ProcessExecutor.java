@@ -89,7 +89,7 @@ public class ProcessExecutor {
     }
     String batchPidCommand = userHomeDir+"/.webcamstudio/"+"WSBust.sh";
     fileP.setExecutable(true);
-    Tools.sleep(10);
+    Tools.sleep(20);
     try {
         Process getChildPids = rt.exec(batchPidCommand);
         Tools.sleep(10);
