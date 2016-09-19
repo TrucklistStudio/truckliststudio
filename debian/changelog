@@ -1,3 +1,10 @@
+truckliststudio (0.9.2) stable; urgency=low
+
+  * Fixes: If "AutoTitle" is selected invoking "Make A Track" doesn't create the overlay text.
+  * New upstream version
+
+ -- Karl Ellis <soylent.tv@gmail.com>  Mon, 19 Sep 2016 17:38:07 +0200
+
 truckliststudio (0.9.2) unstable; urgency=low
 
   * Changes: Going Flat.
