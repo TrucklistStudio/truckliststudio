@@ -44,13 +44,6 @@ public class SinkSettings extends javax.swing.JFrame implements Stream.Listener 
             thisSinkUDP = null;
             lblName.setText(thisSinkFile.getName());
             this.setTitle(thisSinkFile.getName() + " Settings");
-    //        textURL.setText(thisSinkFile.getUrl());
-    //        if (thisSinkFile.getStream().equals("")) {
-    //            textStream.setText("");
-    //            textStream.setEnabled(false);
-    //        } else {
-    //            textStream.setText(thisSinkFile.getStream());
-    //        }
             if (thisSinkFile.getVbitrate().equals("")) {
                 spinVideoRate.setValue(0);
                 spinVideoRate.setEnabled(false);
@@ -75,30 +68,6 @@ public class SinkSettings extends javax.swing.JFrame implements Stream.Listener 
             } else {
                 spinAudioRate.setValue(Integer.parseInt(thisSinkFile.getAbitrate()));
             }
-    //        if (thisSinkFile.getMount().equals("")) {
-    //            textMount.setText("");
-    //            textMount.setEnabled(false);
-    //        } else {
-    //            textMount.setText(thisSinkFile.getMount());
-    //        }
-    //        if (thisSinkFile.getPassword().equals("")) {
-    //            textPsw.setText("");
-    //            textPsw.setEnabled(false);
-    //        } else {
-    //            textPsw.setText(thisSinkFile.getPassword());
-    //        }
-    //        if (thisSinkFile.getPort().equals("")) {
-    //            spinPort.setValue(0);
-    //            spinPort.setEnabled(false);
-    //        } else {
-    //            spinPort.setValue(Integer.parseInt(thisSinkFile.getPort()));
-    //        }
-    //        if (thisSinkFile.getKeyInt().equals("")) {
-    //            spinKeyInt.setValue(0);
-    //            spinKeyInt.setEnabled(false);
-    //        } else {
-    //            spinKeyInt.setValue(Integer.parseInt(thisSinkFile.getKeyInt()));
-    //        }
         } else {
             thisSinkUDP = udp;
             thisSinkFile = null;
@@ -372,65 +341,18 @@ public class SinkSettings extends javax.swing.JFrame implements Stream.Listener 
     @SuppressWarnings("deprecation")
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOKActionPerformed
         if (thisSinkFile != null) {
-//            if (thisSinkFile.getUrl().equals("")) {
-//
-//            } else {
-//                thisSinkFile.setUrl(textURL.getText());
-//            }
-//
-//            if (thisSinkFile.getStream().equals("")) {
-//
-//            } else {
-//                thisSinkFile.setStream(textStream.getText());
-//            }
-
             if (thisSinkFile.getVbitrate().equals("")) {
 
             } else {
                 thisSinkFile.setVbitrate(Integer.toString(spinVideoRate.getValue().hashCode()));
             }
-
-    //        if (thisFME.getWidth().equals("")) {
-    //            
-    //        } else {
-    //            thisFME.setWidth(Integer.toString(spinOutW.getValue().hashCode()));
-    //        }
-    //        
-    //        if (thisFME.getHeight().equals("")) {
-    //            
-    //        } else {
-    //            thisFME.setHeight(Integer.toString(spinOutH.getValue().hashCode()));
-    //        }
-
+            
             if (thisSinkFile.getAbitrate().equals("")) {
 
             } else {
                 thisSinkFile.setAbitrate(Integer.toString(spinAudioRate.getValue().hashCode()));
             }
 
-//            if (thisSinkFile.getMount().equals("")) {
-//
-//            } else {
-//                thisSinkFile.setMount(textMount.getText());
-//            }
-//
-//            if (thisSinkFile.getPassword().equals("")) {
-//
-//            } else {
-//                thisSinkFile.setPassword(textPsw.getText());
-//            }
-//
-//            if (thisSinkFile.getPort().equals("")) {
-//
-//            } else {
-//                thisSinkFile.setPort(Integer.toString(spinPort.getValue().hashCode()));
-//            }
-//
-//            if (thisSinkFile.getKeyInt().equals("")) {
-//
-//            } else {
-//                thisSinkFile.setKeyInt(Integer.toString(spinKeyInt.getValue().hashCode()));
-//            }
         } else {
             if (thisSinkUDP.getVbitrate().equals("")) {
 

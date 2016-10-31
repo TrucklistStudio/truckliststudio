@@ -69,34 +69,24 @@ public class Capturer {
                             Tools.sleep(20);
                             if (fakeAudioIn != null) {
                                 if (fakeAudioIn.available() != 0) {
-                                    noVideoPres=false;
+                                    noVideoPres = false;
                                     Tools.sleep(stream.getVDelay());
                                     videoIn = fakeVideoIn;
-                                    
+
                                     if (!duration.equals("N/A")) {
-                                        int millisDuration = Integer.parseInt(duration.replace("s", ""))*1000;
+                                        int millisDuration = Integer.parseInt(duration.replace("s", "")) * 1000;
                                         streamEndTime = (int) System.currentTimeMillis() + millisDuration;
                                         streamTotalEnd = streamEndTime;
                                     }
-                                    
+
 //                                    System.out.println("Start Video ...");
                                 }
-//                            } else if (stream.getName().contains("Desktop")) {
-//                                noVideoPres=false;
-//                                Tools.sleep(stream.getVDelay());
-//                                videoIn = new DataInputStream(new BufferedInputStream(prVideo.getInputStream(), 4096));
-//                                System.out.println("Start Video ...");
-//                            } else if (stream.getClass().getName().contains("SourceWebcam")) {
-//                                noVideoPres=false;
-//                                Tools.sleep(stream.getVDelay());
-//                                videoIn = new DataInputStream(new BufferedInputStream(prVideo.getInputStream(), 4096));
-//                                System.out.println("Start Video ...");
                             } else if (!stream.hasAudio()) {
-                                noVideoPres=false;
+                                noVideoPres = false;
                                 Tools.sleep(stream.getVDelay());
                                 videoIn = fakeVideoIn;
                                 if (!duration.equals("N/A")) {
-                                    int millisDuration = Integer.parseInt(stream.getStreamTime().replace("s", ""))*1000;
+                                    int millisDuration = Integer.parseInt(stream.getStreamTime().replace("s", "")) * 1000;
                                     streamEndTime = (int) System.currentTimeMillis() + millisDuration;
                                     streamTotalEnd = streamEndTime;
                                 }
@@ -107,7 +97,7 @@ public class Capturer {
                     } catch (IOException ex) {
                         Logger.getLogger(Capturer.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                } 
+                }
             });
             vCapture.setPriority(Thread.MIN_PRIORITY);
             vCapture.start();
@@ -117,56 +107,56 @@ public class Capturer {
 
                 @Override
                 public void run() {
-                    try {                    
+                    try {
 //                        System.out.println(stream.getName() + " Audio accepted...");
                         if (stream.hasFakeAudio()) {
                             fakeAudioIn = new DataInputStream(new BufferedInputStream(prAudio.getInputStream(), 4096));
                         }
                         do {
                             Tools.sleep(20);
-                            if (fakeVideoIn != null)  {
+                            if (fakeVideoIn != null) {
                                 if (fakeVideoIn.available() != 0) {
-                                    noAudioPres = false; 
+                                    noAudioPres = false;
                                     Tools.sleep(stream.getADelay());
                                     audioIn = fakeAudioIn;
 //                                    System.out.println("Start Audio ...");
                                 }
-                            } else if (stream.getName().endsWith(".mp3") || !stream.hasVideo() ) {
+                            } else if (stream.getName().endsWith(".mp3") || !stream.hasVideo()) {
                                 noAudioPres = false;
                                 Tools.sleep(stream.getADelay());
                                 audioIn = new DataInputStream(new BufferedInputStream(prAudio.getInputStream(), 4096));
 //                                System.out.println("Start Audio ...");  
-                            } 
-                        }   while (noAudioPres);
+                            }
+                        } while (noAudioPres);
                     } catch (IOException ex) {
                         Logger.getLogger(Capturer.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
-            }); 
+            });
             aCapture.setPriority(Thread.MIN_PRIORITY);
             aCapture.start();
         }
     }
-    
+
     public void abort() {
         try {
-        if (videoIn != null) {
-            videoIn.close();
-            videoIn = null;
-            fakeVideoIn.close();
-            fakeVideoIn = null;
-        }
-        if (audioIn != null) {
-            audioIn.close();
-            audioIn = null;
-        }
-        if (fakeAudioIn != null) {
-            fakeAudioIn.close();
-            fakeAudioIn = null;
-        }
+            if (videoIn != null) {
+                videoIn.close();
+                videoIn = null;
+                fakeVideoIn.close();
+                fakeVideoIn = null;
+            }
+            if (audioIn != null) {
+                audioIn.close();
+                audioIn = null;
+            }
+            if (fakeAudioIn != null) {
+                fakeAudioIn.close();
+                fakeAudioIn = null;
+            }
         } catch (IOException ex) {
             Logger.getLogger(Capturer.class.getName()).log(Level.SEVERE, null, ex);
-    }
+        }
     }
 
     public void vPause() {
@@ -174,19 +164,19 @@ public class Capturer {
         currTime = (int) System.currentTimeMillis();
 //        System.out.println("VideoCapture Paused ...");
     }
-    
+
     public void aPause() {
         aPauseFlag = true;
 //        System.out.println("AudioCapture Paused ...");
     }
-    
+
     public void vPlay() {
         vPauseFlag = false;
         totalPauseTime += pauseTime;
         streamTotalEnd = streamEndTime + totalPauseTime;
 //        System.out.println("VideoCapture Resumed ...");
     }
-    
+
     public void aPlay() {
         aPauseFlag = false;
 //        System.out.println("AudioCapture Resumed ...");
@@ -198,7 +188,7 @@ public class Capturer {
                 if (vPauseFlag) {
                     image.readFully(videoIn);
                     return image;
-                } else if ((int)System.currentTimeMillis() < streamTotalEnd) {
+                } else if ((int) System.currentTimeMillis() < streamTotalEnd) {
                     image.readFully(videoIn);
                     return image;
                 } else {
@@ -214,7 +204,7 @@ public class Capturer {
     }
 
     private byte[] getNextAudio() throws IOException {
-        if (audioIn != null && audioIn.available()>0 && !aPauseFlag) { //
+        if (audioIn != null && audioIn.available() > 0 && !aPauseFlag) { //
             audioIn.readFully(audio);
             return audio;
         } else {
@@ -229,17 +219,13 @@ public class Capturer {
             if (stream.hasVideo()) {
 //                System.out.println("getFrame");
                 BufferedImage quantumImage = getNextImage();
-                if (quantumImage != null){
+                if (quantumImage != null) {
                     nextImage = toCompatibleImage(quantumImage);
-                } else {
-                    if (stream instanceof SourceMovie || stream instanceof SourceMusic ) {
-                        if (vPauseFlag) {
-                            pauseTime = (int) System.currentTimeMillis() - currTime;
-                        } else {
-                            if ((int)System.currentTimeMillis() > streamTotalEnd && streamEndTime != 0) {
-                                throw new IOException("Time EOS Reached !!!");
-                            }
-                        }
+                } else if (stream instanceof SourceMovie || stream instanceof SourceMusic) {
+                    if (vPauseFlag) {
+                        pauseTime = (int) System.currentTimeMillis() - currTime;
+                    } else if ((int) System.currentTimeMillis() > streamTotalEnd && streamEndTime != 0) {
+                        throw new IOException("Time EOS Reached !!!");
                     }
                 }
             }
@@ -258,5 +244,5 @@ public class Capturer {
 //            Logger.getLogger(Capturer.class.getName()).log(Level.SEVERE, null, ioe);
         }
         return frame;
-    }    
+    }
 }

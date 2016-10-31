@@ -35,7 +35,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import truckliststudio.TrucklistStudio;
 import truckliststudio.tracks.MasterTracks;
-import truckliststudio.tracks.transitions.Transition;
 import truckliststudio.mixers.MasterMixer;
 import truckliststudio.sources.effects.Blink;
 import truckliststudio.sources.effects.ChromaKey;
@@ -324,7 +323,7 @@ public class Studio {
             }
         }
     }
-    private static void loadTransitions(ArrayList<SourceTrack> SCL, Stream stream, ArrayList<String> subSTrans, ArrayList<String> subETrans, ArrayList<String> SubChNames, ArrayList<String> SubText, ArrayList<String> SubFont) {
+    private static void loadTrack(ArrayList<SourceTrack> SCL, Stream stream, ArrayList<String> SubChNames, ArrayList<String> SubText, ArrayList<String> SubFont) {
         int op=0;
         for (SourceTrack scs : SCL) {
             scs.setName(SubChNames.get(op));
@@ -332,61 +331,11 @@ public class Studio {
                 scs.setText(SubText.get(op));
                 scs.setFont(SubFont.get(op));
             }
-            if (!subSTrans.isEmpty() && subSTrans.get(op) != null){
-                if (subSTrans.get(op).endsWith("FadeIn")){
-                    Transition t = Transition.getInstance(stream, "FadeIn");
-                    scs.startTransitions.add(t);
-                } if (subSTrans.get(op).endsWith("AudioFadeIn")){
-                    Transition t = Transition.getInstance(stream, "AudioFadeIn");
-                    scs.startTransitions.add(t);
-                } if (subSTrans.get(op).endsWith("TranslateIn")){
-                    Transition t = Transition.getInstance(stream, "TranslateIn");
-                    scs.startTransitions.add(t);
-                } if (subSTrans.get(op).endsWith("ResizeIn")){
-                    Transition t = Transition.getInstance(stream, "ResizeIn");
-                    scs.startTransitions.add(t);
-                } if (subSTrans.get(op).endsWith("RevealLeft")){
-                    Transition t = Transition.getInstance(stream, "RevealLeft");
-                    scs.startTransitions.add(t);
-                } if (subSTrans.get(op).endsWith("CornerResize")){
-                    Transition t = Transition.getInstance(stream, "CornerResize");
-                    scs.startTransitions.add(t);
-                } if (subSTrans.get(op).endsWith("RevealRight")){
-                    Transition t = Transition.getInstance(stream, "RevealRight");
-                    scs.startTransitions.add(t);
-                }
-            }
-            if (!subETrans.isEmpty() && subETrans.get(op) != null){
-                if (subETrans.get(op).endsWith("FadeOut")){
-                    Transition t = Transition.getInstance(stream, "FadeOut");
-                    scs.endTransitions.add(t);
-                } if (subETrans.get(op).endsWith("TranslateOut")){
-                    Transition t = Transition.getInstance(stream, "TranslateOut");
-                    scs.endTransitions.add(t);
-                } if (subETrans.get(op).endsWith("AudioFadeOut")){
-                    Transition t = Transition.getInstance(stream, "AudioFadeOut");
-                    scs.endTransitions.add(t);
-                } if (subETrans.get(op).endsWith("ShrinkOut")){
-                    Transition t = Transition.getInstance(stream, "ShrinkOut");
-                    scs.endTransitions.add(t);
-                } if (subETrans.get(op).endsWith("HideLeft")){
-                    Transition t = Transition.getInstance(stream, "HideLeft");
-                    scs.endTransitions.add(t);
-                } if (subETrans.get(op).endsWith("HideRight")){
-                    Transition t = Transition.getInstance(stream, "HideRight");
-                    scs.endTransitions.add(t);
-                } if (subETrans.get(op).endsWith("CornerShrink")){
-                    Transition t = Transition.getInstance(stream, "CornerShrink");
-                    scs.endTransitions.add(t);
-                }
-            }
             stream.addTrack(scs);
             op+=1;
         }
         SCL.clear();
         SubChNames.clear();
-        subSTrans.clear();
-        subETrans.clear();
     }
     
     private static Effect loadEffects(String sClazz, Node SuperChild){
@@ -656,7 +605,7 @@ public class Studio {
                         }
                     }
                     stream.setLoaded(true);
-                    loadTransitions(SCL, stream, subSTrans, subETrans, SubChNames, null, null);
+                    loadTrack(SCL, stream, SubChNames, null, null);
                     stream.setName(sName);
                     stream.setTrkName(trackName);
                     fXL.clear();
@@ -692,7 +641,7 @@ public class Studio {
                     }
                     text.setFont(fontName);
                     text.setLoaded(true);
-                    loadTransitions(SCL, text, subSTrans, subETrans, SubChNames, SubText, SubFont);
+                    loadTrack(SCL, text, SubChNames, SubText, SubFont);
                     text.setName(sName);
                     SCL.clear();
                     SubChNames.clear();
@@ -711,7 +660,7 @@ public class Studio {
                                 extstreamBis.add(stream);
                                 ImgMovMus.add("ImageGif");
                                 readObject(stream, source);  
-                                loadTransitions(SCL, stream, subSTrans, subETrans, SubChNames, null, null);
+                                loadTrack(SCL, stream, SubChNames, null, null);
                                 stream.setIntSrc("true");
                             }
                         }                   

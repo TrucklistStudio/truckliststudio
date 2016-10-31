@@ -36,6 +36,7 @@ import javax.swing.JSpinner;
 import javax.swing.JToggleButton;
 import javax.swing.ListCellRenderer;
 import truckliststudio.TrucklistStudio;
+import static truckliststudio.TrucklistStudio.selColLbl2;
 import static truckliststudio.TrucklistStudio.setListenerTSTP;
 import static truckliststudio.TrucklistStudio.theme;
 import static truckliststudio.components.StreamPanel.setListenerTP;
@@ -727,10 +728,8 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
             int SelectCHIndex = listTracks.getSelectedIndex();
             if (lblPlayingTrack.getText().equals(selectTrack)) {
                 btnRemove.setEnabled(false);
-//                btnRename.setEnabled(false);
             } else {
                 btnRemove.setEnabled(true);
-//                btnRename.setEnabled(true);
             }
             trkDuration.setValue(CHTimers.get(SelectCHIndex) / 1000);
             tglRemote.setEnabled(true);
@@ -768,7 +767,7 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
     private void btnRemoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveActionPerformed
         if (listTracks.getSelectedIndex() != -1) {
             String name = listTracks.getSelectedValue().toString();
-            int result = JOptionPane.showConfirmDialog(this, name + " will be Deleted !!!", "Attention", JOptionPane.YES_NO_CANCEL_OPTION);
+            int result = JOptionPane.showConfirmDialog(this, "Track \"" + name + "\" will be Deleted !!!", "Attention", JOptionPane.YES_NO_CANCEL_OPTION);
             if (result == JFileChooser.APPROVE_OPTION) {
                 ArrayList<Stream> allStreams = MasterTracks.getInstance().getStreams();
                 for (Stream s : allStreams) {
@@ -798,10 +797,13 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
                     listTracks.revalidate();
                 }
                 updateTrackOn();
-                ResourceMonitorLabel label = new ResourceMonitorLabel(System.currentTimeMillis() + 10000, name + " Deleted!");
+                if (name.length() > 25) {
+                    name = name.substring(0, 25) + " ...";
+                }
+                ResourceMonitorLabel label = new ResourceMonitorLabel(System.currentTimeMillis() + 10000, "<html>&nbsp;Track <font color=" + selColLbl2 + ">\"" + name + "\"</font> Deleted.</html>");
                 ResourceMonitor.getInstance().addMessage(label);
             } else {
-                ResourceMonitorLabel label = new ResourceMonitorLabel(System.currentTimeMillis() + 10000, "Delete Track Cancelled!");
+                ResourceMonitorLabel label = new ResourceMonitorLabel(System.currentTimeMillis() + 10000, "Delete Track Cancelled.");
                 ResourceMonitor.getInstance().addMessage(label);
             }
 //        System.out.println("StreamDurationArray="+CHTimers.toString());
@@ -860,7 +862,10 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
             }
             listTracks.setSelectedIndex(0);
         } else {
-            ResourceMonitorLabel label = new ResourceMonitorLabel(System.currentTimeMillis() + 10000, "Track " + name + " Duplicated !!!");
+            if (name.length() > 25) {
+                name = name.substring(0, 25) + " ...";
+            }
+            ResourceMonitorLabel label = new ResourceMonitorLabel(System.currentTimeMillis() + 10000, "<html>&nbsp;Track <font color=" + selColLbl2 + ">\"" + name + "\"</font> Duplicated.</html>");
             ResourceMonitor.getInstance().addMessage(label);
         }
     }
@@ -899,15 +904,15 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
             long endTime = beginTime + CHpTemptime;
             while (CHpTemptime > 0 && stopTrkPt == false) {
                 timeToTimer = CHpTemptime;
-                CHptS = Integer.toString((int)(endTime - System.currentTimeMillis() / 1000));
-                trkProgressTime.setValue((int)(endTime - System.currentTimeMillis() / 1000));
+                CHptS = Integer.toString((int) (endTime - System.currentTimeMillis() / 1000));
+                trkProgressTime.setValue((int) (endTime - System.currentTimeMillis() / 1000));
                 trkProgressTime.setString(CHptS);
 
                 for (int i = 0; i < 10; i++) {
                     Tools.sleep(100);
                     if (stopTrkPt) {
                         break;
-        }
+                    }
                 }
 
                 CHpTemptime = (int) (endTime - System.currentTimeMillis() / 1000);
@@ -944,7 +949,6 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
             String name = listTracks.getSelectedValue().toString();
             System.out.println("Playing: " + name);
             lblPlayingTrack.setText(name);
-            listTracks.repaint();
             if (trkNextTime != 0) {
                 trkT = new Timer();
                 trkT.schedule(new TSelectActionPerformed(), trkNextTime);
@@ -962,8 +966,8 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
                 trkProgressTime.setValue(0);
                 trkProgressTime.setString("0");
             }
-//            btnRename.setEnabled(false);
             btnRemove.setEnabled(false);
+            listTracks.repaint();
         }
     }
 
@@ -975,8 +979,11 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
         if (listTracks.getSelectedIndex() != -1) {
             String name = listTracks.getSelectedValue().toString();
             master.updateTrack(name);
-            master.addTrkTransitions(name);
-            ResourceMonitorLabel label = new ResourceMonitorLabel(System.currentTimeMillis() + 10000, "Track " + name + " Updated");
+//            master.addTrkTransitions(name);
+            if (name.length() > 25) {
+                name = name.substring(0, 25) + " ...";
+            }
+            ResourceMonitorLabel label = new ResourceMonitorLabel(System.currentTimeMillis() + 10000, "<html>&nbsp;Track <font color=" + selColLbl2 + ">\"" + name + "\"</font> Updated.</html>");
             ResourceMonitor.getInstance().addMessage(label);
         }
     }//GEN-LAST:event_btnUpdateActionPerformed
@@ -991,6 +998,11 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
         trkProgressTime.setValue(0);
         trkProgressTime.setString("0");
         tglStartTrack.setSelected(false);
+        if (theme.equals("Dark")) {
+            lblOnAir.setForeground(Color.WHITE);
+        } else {
+            lblOnAir.setForeground(Color.BLACK);
+        }
     }
 
     public void RemoteStopCHTimerOnlyActionPerformed() {
@@ -1000,6 +1012,11 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
         inTimer = false;
         trkProgressTime.setValue(0);
         trkProgressTime.setString("0");
+        if (theme.equals("Dark")) {
+            lblOnAir.setForeground(Color.WHITE);
+        } else {
+            lblOnAir.setForeground(Color.BLACK);
+        }
     }
 
     private void btnStopAllStreamActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStopAllStreamActionPerformed
@@ -1012,7 +1029,6 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
         Tools.sleep(30);
         lblPlayingTrack.setText("");
         btnRemove.setEnabled(true);
-//        btnRename.setEnabled(true);
         if (inTimer) {
             RemoteStopCHTimerActionPerformed();
         } else {
@@ -1025,7 +1041,7 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
         ResourceMonitorLabel label = new ResourceMonitorLabel(System.currentTimeMillis() + 10000, "All Stopped.");
         ResourceMonitor.getInstance().addMessage(label);
         listTracks.repaint();
-        System.gc();
+//        System.gc();
     }//GEN-LAST:event_btnStopAllStreamActionPerformed
 
     @SuppressWarnings("unchecked")
@@ -1103,7 +1119,10 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
         } else {
 //            System.out.println("stream Destroy !!!");
 //            stream.destroy();
-            ResourceMonitorLabel label = new ResourceMonitorLabel(System.currentTimeMillis() + 5000, "Track " + sourceName + " Duplicated !!!");
+            if (sourceName.length() > 25) {
+                sourceName = sourceName.substring(0, 25) + " ...";
+            }
+            ResourceMonitorLabel label = new ResourceMonitorLabel(System.currentTimeMillis() + 10000, "<html>&nbsp;Track <font color=" + selColLbl2 + ">\"" + sourceName + "\"</font> Duplicated.</html>");
             ResourceMonitor.getInstance().addMessage(label);
         }
     }
@@ -1391,14 +1410,14 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
         ResourceMonitorLabel label = new ResourceMonitorLabel(System.currentTimeMillis() + 10000, "Streams Stopped.");
         ResourceMonitor.getInstance().addMessage(label);
         listTracks.repaint();
-        System.gc();
+//        System.gc();
     }//GEN-LAST:event_btnStopOnlyStreamActionPerformed
 
     private void listTracksMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_listTracksMouseClicked
         if (evt.getClickCount() == 2 && !evt.isConsumed()) {
             evt.consume();
             if (!tglStartTrack.isSelected()) {
-
+                
                 if (listTracks.getSelectedIndex() != -1) {
                     String name = listTracks.getSelectedValue().toString();
                     master.selectTrack(name);
@@ -1406,7 +1425,6 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
                     System.out.println("Playing: " + name);
                     lblPlayingTrack.setText(name);
                     btnRemove.setEnabled(false);
-//                    btnRename.setEnabled(false);
                     tglRemote.setEnabled(true);
 
                     if (CHTimers.get(listTracks.getSelectedIndex()) != 0) {
@@ -1435,7 +1453,6 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
                         System.out.println("Playing: " + name);
                         lblPlayingTrack.setText(name);
                         btnRemove.setEnabled(false);
-//                        btnRename.setEnabled(false);
                         tglRemote.setEnabled(true);
 
                         if (CHTimers.get(listTracks.getSelectedIndex()) != 0) {
@@ -1514,11 +1531,8 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
         System.out.println("Playing: " + name);
         lblPlayingTrack.setText(name);
         btnRemove.setEnabled(false);
-//        btnRename.setEnabled(false);
         tglRemote.setEnabled(true);
         tglStartTrack.setSelected(true);
-        listTracks.repaint();
-
         if (CHTimers.get(trkOn) != 0) {
             inTimer = true;
             trkT = new Timer();
@@ -1528,7 +1542,9 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
             stopTrkPt = false;
             trkT.schedule(new UpdateCHtUITask(), 0);
         }
-//        updateTrackOn();
+        listTracks.ensureIndexIsVisible(trkOn);
+        listTracks.setSelectedIndex(trkOn);
+//        listTracks.repaint();
     }
 
     public void stopItsTrack() {
@@ -1550,7 +1566,6 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
                 System.out.println("Playing: " + name);
                 lblPlayingTrack.setText(name);
                 btnRemove.setEnabled(false);
-//                    btnRename.setEnabled(false);
                 tglRemote.setEnabled(true);
 
                 if (CHTimers.get(listTracks.getSelectedIndex()) != 0) {
@@ -1600,7 +1615,7 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
             String name = listTracks.getSelectedValue().toString();
             System.out.println("Playing: " + name);
             lblPlayingTrack.setText(name);
-            listTracks.repaint();
+//            listTracks.repaint();
             if (trkNextTime != 0) {
                 trkT = new Timer();
                 trkT.schedule(new TSelectActionPerformed(), trkNextTime);
@@ -1855,12 +1870,11 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
     private void btnDuplicateTrkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDuplicateTrkActionPerformed
         if (listTracks.getSelectedIndex() != -1) {
             int selectedTrkIndex = listTracks.getSelectedIndex();
-            String selectedTrkName = arrayListTracks.get(selectedTrkIndex);
+            final String selectedTrkName = arrayListTracks.get(selectedTrkIndex);
 
             int count = 0;
             count = arrayListTracks.stream().filter((trkName) -> (trkName.contains(selectedTrkName))).map((_item) -> 1).reduce(count, Integer::sum);
             String duplicatedTrkName = selectedTrkName + "(" + count + ")";
-            boolean found = false;
             boolean nodup = false;
             ArrayList<String> temp = new ArrayList<>();
             for (String c : arrayListTracks) {
@@ -1871,7 +1885,6 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
                     if (trkName.equals(duplicatedTrkName)) {
                         count++;
                         duplicatedTrkName = selectedTrkName + "(" + count + ")";
-                        found = true;
                     }
                 }
                 List<String> duplicates = new ArrayList<>();
@@ -1914,7 +1927,13 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
             CHTimers.add(selectedTrkTimer);
             arrayListTracks.add(duplicatedTrkName);
             listTracks.revalidate();
-//            System.out.println("Tracks="+arrayListTracks);
+            //            System.out.println("Tracks="+arrayListTracks);
+            String labelName = selectedTrkName;
+            if (selectedTrkName.length() > 25) {
+                labelName = selectedTrkName.substring(0, 25) + " ...";
+            }
+            ResourceMonitorLabel label = new ResourceMonitorLabel(System.currentTimeMillis() + 10000, "<html>&nbsp;Track <font color=" + selColLbl2 + ">\"" + labelName + "\"</font> Duplicated.</html>");
+            ResourceMonitor.getInstance().addMessage(label);
         }
     }//GEN-LAST:event_btnDuplicateTrkActionPerformed
 

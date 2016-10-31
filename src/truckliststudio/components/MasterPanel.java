@@ -224,7 +224,7 @@ public class MasterPanel extends javax.swing.JPanel implements MasterMixer.SinkL
                     .addGroup(panMixerLayout.createSequentialGroup()
                         .addComponent(btnApply, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, 0)
-                        .addComponent(btnApplyToStreams, javax.swing.GroupLayout.DEFAULT_SIZE, 129, Short.MAX_VALUE))
+                        .addComponent(btnApplyToStreams, javax.swing.GroupLayout.PREFERRED_SIZE, 129, Short.MAX_VALUE))
                     .addGroup(panMixerLayout.createSequentialGroup()
                         .addComponent(jLabel3)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -272,7 +272,7 @@ public class MasterPanel extends javax.swing.JPanel implements MasterMixer.SinkL
         panPreview.setLayout(null);
 
         btnPreview.setIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/PreviewButton2.png"))); // NOI18N
-        btnPreview.setToolTipText("WebcamStudio Preview Window");
+        btnPreview.setToolTipText("TrucklistStudio Preview Window");
         btnPreview.setMinimumSize(new java.awt.Dimension(0, 0));
         btnPreview.setName("btnPreview"); // NOI18N
         btnPreview.setPreferredSize(new java.awt.Dimension(20, 20));
@@ -288,7 +288,7 @@ public class MasterPanel extends javax.swing.JPanel implements MasterMixer.SinkL
         lblHeight2.setText(bundle.getString("FAST PREVIEW")); // NOI18N
         lblHeight2.setName("lblHeight2"); // NOI18N
         panPreview.add(lblHeight2);
-        lblHeight2.setBounds(90, 46, 90, 12);
+        lblHeight2.setBounds(90, 46, 90, 13);
 
         tglSound.setIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/audio-card.png"))); // NOI18N
         tglSound.setToolTipText("Java Sound AudioSystem Out (Unstable)");
@@ -662,6 +662,7 @@ public class MasterPanel extends javax.swing.JPanel implements MasterMixer.SinkL
 //            return null;
 //        }
 //    }
+    
     @Override
     public void newPreFrame(Frame frame) {
         BufferedImage img = cloneImage(frame.getImage());

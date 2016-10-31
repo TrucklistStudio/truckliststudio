@@ -9,7 +9,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
 import truckliststudio.tracks.MasterTracks;
-import truckliststudio.tracks.transitions.Transition;
 import truckliststudio.mixers.Frame;
 import truckliststudio.mixers.MasterMixer;
 import truckliststudio.mixers.PreviewFrameBuilder;
@@ -107,8 +106,6 @@ public abstract class Stream implements Callable<Frame>{
     protected boolean loop = false;
     protected String trkName = "NoTrack";
     protected Frame nextFrame = null;
-    public ArrayList<Transition> startTransitions = new ArrayList<>();
-    public ArrayList<Transition> endTransitions = new ArrayList<>();
     Listener listener = null;
     protected String panelType = "Panel";
     protected String streamTime = "N/A";
@@ -124,30 +121,6 @@ public abstract class Stream implements Callable<Frame>{
         MasterTracks.getInstance().register(this);
     }
 
-    public void addStartTransition(Transition t) {
-        startTransitions.add(t);
-    }
-
-    public void addEndTransition(Transition t) {
-        endTransitions.add(t);
-    }
-
-    public void removeStartTransition(Transition t) {
-        startTransitions.remove(t);
-    }
-
-    public void removeEndTransition(Transition t) {
-        endTransitions.remove(t);
-    }
-
-    public ArrayList<Transition> getStartTransitions() {
-        return startTransitions;
-    }
-
-    public ArrayList<Transition> getEndTransitions() {
-        return endTransitions;
-    }
-    
     public String getComm() {
         return comm;
     }
@@ -163,7 +136,6 @@ public abstract class Stream implements Callable<Frame>{
     public void setisPaused(boolean isP) {
         this.isPaused = isP;
     }
-    
     
     public boolean getisATrack() {
         return isATrack;

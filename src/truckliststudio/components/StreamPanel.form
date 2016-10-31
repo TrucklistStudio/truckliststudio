@@ -362,7 +362,6 @@
           <Image iconType="3" name="/truckliststudio/resources/tango/media-playback-start.png"/>
         </Property>
         <Property name="name" type="java.lang.String" value="tglActiveStream" noResource="true"/>
-        <Property name="rolloverEnabled" type="boolean" value="false"/>
         <Property name="selectedIcon" type="javax.swing.Icon" noResource="true" editor="org.netbeans.modules.form.editors2.IconEditor">
           <Image iconType="3" name="/truckliststudio/resources/tango/media-playback-stop.png"/>
         </Property>

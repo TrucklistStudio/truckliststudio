@@ -432,7 +432,9 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener {
         spinVolume.setValue(stream.getVolume() * 100);
         spinZOrder.setValue(stream.getZOrder());
         tglActiveStream.setSelected(stream.isPlaying());
-        boolean seek = stream.needSeekCTRL();
+        //boolean seek = stream.needSeekCTRL();
+        // Workaround to Wait until use of ges-launch-1.0
+        boolean seek = false;
         labelSeek.setVisible(seek);
         spinSeek.setVisible(seek);
         jSlSpinSeek.setVisible(seek);
@@ -1160,30 +1162,30 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener {
     }// </editor-fold>//GEN-END:initComponents
     private void tglActiveStreamActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tglActiveStreamActionPerformed
         if (tglActiveStream.isSelected()) {
-            if (stream.getisATrack() && !stream.getPreView()) {
-                String name = stream.getName();
-                listenerTP.startItsTrack(name);
-            } else {
-                if (tglVideo.isSelected()) {
-                    stream.setOnlyAudio(true);
+                if (stream.getisATrack() && !stream.getPreView()) {
+                    String name = stream.getName();
+                    listenerTP.startItsTrack(name);
                 } else {
-                    stream.setOnlyAudio(false);
+                    if (tglVideo.isSelected()) {
+                        stream.setOnlyAudio(true);
+                    } else {
+                        stream.setOnlyAudio(false);
+                    }
+                    tglVideo.setEnabled(false);
+                    titleLabel.setForeground(sActiveLblCol);
+                    spinVDelay.setEnabled(false);
+                    jSlSpinVD.setEnabled(false);
+                    spinADelay.setEnabled(false);
+                    jSlSpinAD.setEnabled(false);
+                    spinSeek.setEnabled(false);
+                    jSlSpinSeek.setEnabled(false);
+                    tglAudio.setEnabled(false);
+                    tglPreview.setEnabled(false);
+                    tglPause.setEnabled(true);
+                    this.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, sActiveLblCol));
+                    stream.read();
                 }
-                tglVideo.setEnabled(false);
-                titleLabel.setForeground(sActiveLblCol);
-                spinVDelay.setEnabled(false);
-                jSlSpinVD.setEnabled(false);
-                spinADelay.setEnabled(false);
-                jSlSpinAD.setEnabled(false);
-                spinSeek.setEnabled(false);
-                jSlSpinSeek.setEnabled(false);
-                tglAudio.setEnabled(false);
-                tglPreview.setEnabled(false);
-                tglPause.setEnabled(true);
-                this.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, sActiveLblCol));
-                stream.read();
-            }
-        } else {
+            } else {
             if (stream.getisATrack() && lblPlayingTrack.getText().contains(stream.getName())) {
                 listTracks.repaint();
                 lblPlayingTrack.setText("");

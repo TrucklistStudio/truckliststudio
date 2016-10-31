@@ -8,7 +8,10 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import static truckliststudio.TrucklistStudio.selColLbl2;
 import truckliststudio.components.GifDecoder;
+import truckliststudio.components.ResourceMonitor;
+import truckliststudio.components.ResourceMonitorLabel;
 import truckliststudio.mixers.Frame;
 import truckliststudio.mixers.MasterFrameBuilder;
 import truckliststudio.mixers.PreviewFrameBuilder;
@@ -68,14 +71,24 @@ public class SourceImageGif extends Stream {
 
     @Override
     public void read() {
-        playing=true;
+        if (file != null) {
+            if (!file.exists()) {
+                String sName = this.getName();
+                if (sName.length() > 25) {
+                    sName = sName.substring(0, 25) + " ...";
+                }
+                ResourceMonitorLabel label = new ResourceMonitorLabel(System.currentTimeMillis() + 9000, "<html>&nbsp;<font color=red>WARNING !!!</font> File <font color=" + selColLbl2 + ">\"" + sName + "\"</font> not found !!!</html>");
+                ResourceMonitor.getInstance().addMessage(label);
+            }
+        }
+        playing = true;
         stop = false;
         try {
             loadImage();
             frame = new Frame(uuid, image, null);
             frame.setOutputFormat(x, y, width, height, opacity, volume);
             frame.setZOrder(zorder);
-            if (getPreView()){
+            if (getPreView()) {
                 PreviewFrameBuilder.register(this);
             } else {
                 MasterFrameBuilder.register(this);
@@ -84,17 +97,17 @@ public class SourceImageGif extends Stream {
             e.printStackTrace();
         }
     }
-    
+
     @Override
     public void pause() {
         // nothing here.
     }
-    
+
     @Override
     public void stop() {
-        playing=false;
+        playing = false;
         stop = true;
-        if (getPreView()){
+        if (getPreView()) {
             PreviewFrameBuilder.unregister(this);
         } else {
             MasterFrameBuilder.unregister(this);
@@ -103,8 +116,9 @@ public class SourceImageGif extends Stream {
 
     @Override
     public boolean needSeek() {
-            return needSeekCTRL=false;
+        return needSeekCTRL = false;
     }
+
     @Override
     public Frame getFrame() {
         return nextFrame;
@@ -114,10 +128,12 @@ public class SourceImageGif extends Stream {
     public boolean isPlaying() {
         return playing;
     }
+
     @Override
     public void setIsPlaying(boolean setIsPlaying) {
         playing = setIsPlaying;
     }
+
     @Override
     public BufferedImage getPreview() {
         return image;
@@ -141,9 +157,9 @@ public class SourceImageGif extends Stream {
             frame.setOutputFormat(x, y, width, height, opacity, volume);
             frame.setZOrder(zorder);
         }
-        nextFrame=frame;
+        nextFrame = frame;
     }
-    
+
     @Override
     public void play() {
         // nothing Here.

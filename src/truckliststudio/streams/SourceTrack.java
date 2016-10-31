@@ -6,10 +6,6 @@ package truckliststudio.streams;
 
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import truckliststudio.tracks.transitions.Transition;
 import truckliststudio.sources.effects.Effect;
 import truckliststudio.util.Tools;
 
@@ -31,8 +27,6 @@ public class SourceTrack {
 //        System.out.println("Channel Height: "+s.height);
         s.opacity = stream.opacity;
         s.effects.addAll(stream.effects);
-        s.startTransitions.addAll(stream.startTransitions);
-        s.endTransitions.addAll(stream.endTransitions);
         s.volume = stream.volume;
         s.zorder = stream.zorder;
         s.name = trackName;
@@ -70,8 +64,6 @@ public class SourceTrack {
 //        System.out.println("Channel Height: "+s.height);
         s.opacity = stream.opacity;
         s.effects.addAll(stream.effects);
-        s.startTransitions.addAll(stream.startTransitions);
-        s.endTransitions.addAll(stream.endTransitions);
         s.volume = stream.volume;
         s.zorder = stream.zorder;
         s.name = trackName;
@@ -108,8 +100,6 @@ public class SourceTrack {
 //        System.out.println("Channel Height: "+s.height);
         s.opacity = stream.opacity;
         s.effects.addAll(stream.effects);
-        s.startTransitions.addAll(stream.startTransitions);
-        s.endTransitions.addAll(stream.endTransitions);
         s.volume = stream.volume;
         s.zorder = stream.zorder;
         s.name = trackName;
@@ -141,8 +131,6 @@ public class SourceTrack {
         clone.height = original.height;
         clone.opacity = original.opacity;
         clone.effects.addAll(original.effects);
-        clone.startTransitions.addAll(original.startTransitions);
-        clone.endTransitions.addAll(original.endTransitions);
         clone.volume = original.volume;
         clone.zorder = original.zorder;
         clone.name = original.getName();
@@ -191,8 +179,6 @@ public class SourceTrack {
     private final boolean followMouse = false;
     private final int captureX = 0;
     private final int captureY = 0;
-    public ArrayList<Transition> startTransitions = new ArrayList<>();
-    public ArrayList<Transition> endTransitions = new ArrayList<>();
 
     public SourceTrack() {
     }
@@ -226,37 +212,8 @@ public class SourceTrack {
             public void run() {
                 if (!s.getClass().toString().contains("Sink")) { // Don't Update SinkStreams
                     ExecutorService pool = java.util.concurrent.Executors.newCachedThreadPool();
-                    if (endTransitions != null) {
-                        for (Transition t : s.endTransitions) {
-//                            System.out.println("End Transition: "+t.getClass().getName());
-                            pool.submit(t.run(instance));
-                        }
-                        pool.shutdown();
-                        try {
-                            pool.awaitTermination(10, TimeUnit.SECONDS);
-                        } catch (InterruptedException ex) {
-                            Logger.getLogger(SourceTrack.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                    }
-
                     s.zorder = getZorder();
-
                     if (isPlaying) {
-
-                        if (startTransitions != null) {
-                            pool = java.util.concurrent.Executors.newCachedThreadPool();
-                            for (Transition t : instance.startTransitions) {
-//                                System.out.println("Start Transition: "+t.getClass().getName());
-                                pool.submit(t.run(instance));
-                            }
-                            pool.shutdown();
-                            try {
-                                pool.awaitTermination(10, TimeUnit.SECONDS);
-                            } catch (InterruptedException ex) {
-                                Logger.getLogger(SourceTrack.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-                        }
-
                         if (!s.isPlaying()) {
                             if (isPaused) {
                                 s.setisPaused(true);
@@ -289,10 +246,8 @@ public class SourceTrack {
                             s.stop();
                             s.setLoop(true);
                         } else {
-//                                    Tools.sleep(30);
                             s.stop();
                         }
-//                                s.stop();
                     }
 
                     s.x = getX();
@@ -304,16 +259,8 @@ public class SourceTrack {
                     s.captureHeight = getCapHeight();
                     s.captureWidth = getCapWidth();
                     s.effects.clear();
-                    s.startTransitions.clear();
-                    s.endTransitions.clear();
                     if (effects != null) {
                         s.effects.addAll(effects);
-                    }
-                    if (startTransitions != null) {
-                        s.startTransitions.addAll(startTransitions);
-                    }
-                    if (endTransitions != null) {
-                        s.endTransitions.addAll(endTransitions);
                     }
                     if (s instanceof SourceText) {
                         SourceText st = (SourceText) s;

@@ -17,6 +17,7 @@ import static truckliststudio.TrucklistStudio.autoTitle;
 import static truckliststudio.TrucklistStudio.busyTab;
 import static truckliststudio.TrucklistStudio.lblText;
 import static truckliststudio.TrucklistStudio.numTexts;
+import static truckliststudio.TrucklistStudio.selColLbl2;
 import static truckliststudio.TrucklistStudio.textDesktop;
 import static truckliststudio.components.TrackPanel.master;
 import truckliststudio.streams.SourceTrack;
@@ -44,7 +45,9 @@ public class SourceControlTracks extends javax.swing.JPanel {
         initComponents();
         this.source = source;
         if (source instanceof SourceMovie || source instanceof SourceMusic) {
-
+            if (source.getisATrack()) {
+                btnMakeATrack.setEnabled(false);   
+            }
         } else {
             btnMakeATrack.setEnabled(false);
         }
@@ -59,20 +62,19 @@ public class SourceControlTracks extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
         btnApplyAllCh = new javax.swing.JButton();
         btnApplyAllChSet = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
         btnApplyAllChPos = new javax.swing.JButton();
         btnMakeATrack = new javax.swing.JButton();
 
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("truckliststudio/Languages"); // NOI18N
         setName(bundle.getString("CHANNELS_CTRL")); // NOI18N
         setPreferredSize(new java.awt.Dimension(400, 112));
-        setLayout(new java.awt.CardLayout());
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        jPanel1.setName("jPanel1"); // NOI18N
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel1.setText("Copy Current Stream Settings in All Tracks");
+        jLabel1.setName("jLabel1"); // NOI18N
 
         btnApplyAllCh.setIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/chan-app4.png"))); // NOI18N
         btnApplyAllCh.setText("Copy State & Settings");
@@ -94,10 +96,6 @@ public class SourceControlTracks extends javax.swing.JPanel {
             }
         });
 
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("Copy Current Stream Settings in All Tracks");
-        jLabel1.setName("jLabel1"); // NOI18N
-
         btnApplyAllChPos.setIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/chan-app5.png"))); // NOI18N
         btnApplyAllChPos.setText("Copy Only Style & Position");
         btnApplyAllChPos.setToolTipText("Stream Settings except the Text Content & Playing State to all Tracks.");
@@ -118,25 +116,25 @@ public class SourceControlTracks extends javax.swing.JPanel {
             }
         });
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        this.setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(14, 14, 14)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnApplyAllCh, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnApplyAllChSet, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 372, Short.MAX_VALUE)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
+                    .addComponent(btnApplyAllChSet, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(btnApplyAllChPos, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 372, Short.MAX_VALUE)
-                    .addComponent(btnMakeATrack, javax.swing.GroupLayout.DEFAULT_SIZE, 372, Short.MAX_VALUE))
-                .addContainerGap())
+                        .addGap(0, 72, Short.MAX_VALUE))
+                    .addComponent(btnApplyAllChPos, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnMakeATrack, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(14, 14, 14))
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -147,10 +145,8 @@ public class SourceControlTracks extends javax.swing.JPanel {
                 .addComponent(btnApplyAllChPos, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnMakeATrack, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-
-        add(jPanel1, "card2");
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnApplyAllChActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnApplyAllChActionPerformed
@@ -161,7 +157,11 @@ public class SourceControlTracks extends javax.swing.JPanel {
             source.removeTrackAt(i);
             source.addTrackAt(sch, i);
         }
-        ResourceMonitorLabel label = new ResourceMonitorLabel(System.currentTimeMillis() + 10000, source.getName() + " copied to all Tracks.");
+        String name = source.getName();
+        if (name.length() > 25) {
+            name = name.substring(0, 25) + " ...";
+        }
+        ResourceMonitorLabel label = new ResourceMonitorLabel(System.currentTimeMillis() + 10000, "<html><font color=" + selColLbl2 + ">\"" + name + "\"</font> copied to all Tracks.");
         ResourceMonitor.getInstance().addMessage(label);
     }//GEN-LAST:event_btnApplyAllChActionPerformed
 
@@ -179,7 +179,11 @@ public class SourceControlTracks extends javax.swing.JPanel {
             source.removeTrackAt(i);
             source.addTrackAt(sch, i);
         }
-        ResourceMonitorLabel label = new ResourceMonitorLabel(System.currentTimeMillis() + 10000, source.getName() + " copied to all Tracks.");
+        String name = source.getName();
+        if (name.length() > 25) {
+            name = name.substring(0, 25) + " ...";
+        }
+        ResourceMonitorLabel label = new ResourceMonitorLabel(System.currentTimeMillis() + 10000, "<html><font color=" + selColLbl2 + ">\"" + name + "\"</font> copied to all Tracks.");
         ResourceMonitor.getInstance().addMessage(label);
     }//GEN-LAST:event_btnApplyAllChPosActionPerformed
 
@@ -223,7 +227,6 @@ public class SourceControlTracks extends javax.swing.JPanel {
                     }
 
                     master.updateTrack(trkName);
-                    master.addTrkTransitions(trkName);
 
                     if (wasStopped) {
                         source.setIsPlaying(false);
@@ -257,7 +260,6 @@ public class SourceControlTracks extends javax.swing.JPanel {
                     source.setIsPlaying(true);
                 }
                 master.updateTrack(trkName);
-                master.addTrkTransitions(trkName);
                 if (wasStopped) {
                     source.setIsPlaying(false);
                 }
@@ -287,7 +289,11 @@ public class SourceControlTracks extends javax.swing.JPanel {
                 source.addTrackAt(sch, i);
             }
         }
-        ResourceMonitorLabel label = new ResourceMonitorLabel(System.currentTimeMillis() + 10000, source.getName() + " copied to all Tracks.");
+        String name = source.getName();
+        if (name.length() > 25) {
+            name = name.substring(0, 25) + " ...";
+        }
+        ResourceMonitorLabel label = new ResourceMonitorLabel(System.currentTimeMillis() + 10000, "<html><font color=" + selColLbl2 + ">\"" + name + "\"</font> copied to all Tracks.");
         ResourceMonitor.getInstance().addMessage(label);
     }//GEN-LAST:event_btnApplyAllChSetActionPerformed
 
@@ -298,6 +304,5 @@ public class SourceControlTracks extends javax.swing.JPanel {
     private javax.swing.JButton btnApplyAllChSet;
     private javax.swing.JButton btnMakeATrack;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JPanel jPanel1;
     // End of variables declaration//GEN-END:variables
 }

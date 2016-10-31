@@ -7,6 +7,9 @@ package truckliststudio.streams;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import static truckliststudio.TrucklistStudio.gsNLE;
+import static truckliststudio.TrucklistStudio.selColLbl2;
+import truckliststudio.components.ResourceMonitor;
+import truckliststudio.components.ResourceMonitorLabel;
 import truckliststudio.externals.ProcessRenderer;
 import truckliststudio.mixers.Frame;
 import truckliststudio.mixers.MasterFrameBuilder;
@@ -33,6 +36,14 @@ public class SourceMovie extends Stream {
 
     @Override
     public void read() {
+        if (!this.getFile().exists()) {
+            String sName = this.getName();
+            if (sName.length() > 25) {
+                sName = sName.substring(0, 25) + " ...";
+            }
+            ResourceMonitorLabel label = new ResourceMonitorLabel(System.currentTimeMillis() + 8000, "<html>&nbsp;<font color=red>WARNING !!!</font> File <font color=" + selColLbl2 + ">\"" + sName + "\"</font> not found !!!</html>");
+            ResourceMonitor.getInstance().addMessage(label);
+        }
         isPlaying = true;
         lastPreview = new BufferedImage(captureWidth, captureHeight, BufferedImage.TYPE_INT_ARGB);
         if (getPreView()) {
@@ -93,9 +104,9 @@ public class SourceMovie extends Stream {
     @Override
     public boolean needSeek() {
         if (this.getComm().equals("GS")) {
-         needSeekCTRL = true;
+            needSeekCTRL = true;
         } else {
-         needSeekCTRL = false;
+            needSeekCTRL = false;
         }
         return needSeekCTRL;
     }

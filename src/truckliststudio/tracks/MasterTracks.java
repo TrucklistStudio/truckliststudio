@@ -81,20 +81,6 @@ public class MasterTracks {
         return track;
     }
 
-    public void addTrkTransitions(String name) {
-        for (Stream s : streams) {
-            for (SourceTrack sc : s.getTracks()) {
-                if (!sc.getName().equals(name)) {
-//                    System.out.println("Adding to channel: "+sc.getName());
-                    sc.startTransitions.clear();
-                    sc.startTransitions.addAll(s.getStartTransitions());
-                    sc.endTransitions.clear();
-                    sc.endTransitions.addAll(s.getEndTransitions());
-                }
-            }
-        }
-    }
-
     public void addToTracks(String name) {
         trackNames.add(name);
 
@@ -203,7 +189,7 @@ public class MasterTracks {
         for (Stream stream : streams) {
             for (SourceTrack sc : stream.getTracks()) {
                 if (sc.getName().equals(name)) {
-                    sc.apply(stream);
+                        sc.apply(stream);
                     break;
                 }
             }
@@ -216,15 +202,6 @@ public class MasterTracks {
 
     public void stopAllStream() {
         for (Stream s : streams) {
-//            System.out.println("Stream stopped: "+s);
-//            if (s.getLoop()) {
-//                s.setLoop(false);
-//                Tools.sleep(30);
-//                s.stop();
-//                s.setLoop(true);
-//            } else {
-//                Tools.sleep(30);
-//                s.stop();
             if (s.isPlaying()) {
                 if (s.getLoop()) {
                     s.setLoop(false);
@@ -241,13 +218,6 @@ public class MasterTracks {
 
     public void endAllStream() {
         for (Stream s : streams) {
-//            if (s.getLoop()) {
-//                s.setLoop(false);
-//                Tools.sleep(30);
-//                s.stop();
-//            } else {
-//                Tools.sleep(30);
-//                s.stop();
             if (s.isPlaying()) {
                 if (s.getLoop()) {
                     s.setLoop(false);
@@ -279,14 +249,6 @@ public class MasterTracks {
         for (Stream s : streams) {
             String streamName = s.getClass().getName();
             if (!streamName.contains("Sink")) {
-//                if (s.getLoop()) {
-//                    s.setLoop(false);
-//                    Tools.sleep(30);
-//                    s.stop();
-//                    s.setLoop(true);
-//                } else {
-//                    Tools.sleep(30);
-//                    s.stop();
                 if (s.isPlaying()) {
                     if (s.getLoop()) {
                         s.setLoop(false);

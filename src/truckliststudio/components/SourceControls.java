@@ -21,8 +21,6 @@ public class SourceControls {
         ArrayList<Component> comps = new ArrayList<>();
         Component c = null;
         Component d = null;
-        c = new SourceControlTransitions(source);
-        comps.add(c);
         d = new SourceControlTracks(source);
         d.setName("Track Opt");
         comps.add(d);

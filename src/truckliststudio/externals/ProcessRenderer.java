@@ -55,7 +55,6 @@ public class ProcessRenderer {
     Stream stream;
     ProcessExecutor processVideo;
     ProcessExecutor processAudio;
-//    Capturer capture;
     Capturer captureC;
     Process pV = null;
     Process pA = null;
@@ -67,9 +66,9 @@ public class ProcessRenderer {
     public ProcessRenderer(Stream s, ACTION action, String plugin, String bkEnd) {
         stream = s;
 //        System.out.println("BackEnd:"+bkEnd);
-        
+
         if (bkEnd.equals("FF")) {
-            if (action == OUTPUT){
+            if (action == OUTPUT) {
 //                System.out.println("Action Output - BackEnd FF !!!");
                 this.oPlug = "ffmpeg_output";
                 this.plugin = plugin;
@@ -79,24 +78,20 @@ public class ProcessRenderer {
                 this.plugin = "ffmpeg_" + plugin;
                 s.setComm("AV");
             }
-        } else {
-            if (action == OUTPUT){
-                if (bkEnd.equals("AV")) {
-                    this.oPlug = "output";
-                    this.plugin = plugin;
-                } else {
-                    this.oPlug = "gst_output";
-                    this.plugin = plugin;
-                }
+        } else if (action == OUTPUT) {
+            if (bkEnd.equals("AV")) {
+                this.oPlug = "output";
+                this.plugin = plugin;
             } else {
-                if (distro.toLowerCase().equals("ubuntu") || distro.toLowerCase().equals("windows")){
-                    this.plugin = plugin;
-                } else if ("AV".equals(bkEnd) && plugin.equals("audiosource")) {
-                    this.plugin = "av_" + plugin;
-                } else { //if ("AV".equals(bkEnd))
-                    this.plugin = plugin;
-                }
+                this.oPlug = "gst_output";
+                this.plugin = plugin;
             }
+        } else if (distro.toLowerCase().equals("ubuntu") || distro.toLowerCase().equals("windows")) {
+            this.plugin = plugin;
+        } else if ("AV".equals(bkEnd) && plugin.equals("audiosource")) {
+            this.plugin = "av_" + plugin;
+        } else { //if ("AV".equals(bkEnd))
+            this.plugin = plugin;
         }
 //        System.out.println("OPlugin:"+oPlug);
 //        System.out.println("Plugin: "+this.plugin);
@@ -113,10 +108,11 @@ public class ProcessRenderer {
                 Logger.getLogger(ProcessRenderer.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        processVideo = new ProcessExecutor(s.getName());        
+        processVideo = new ProcessExecutor(s.getName());
         processAudio = new ProcessExecutor(s.getName());
 
     }
+
     public ProcessRenderer(Stream s, FME fme, String plugin) {
         stream = s;
         this.plugin = plugin;
@@ -138,7 +134,7 @@ public class ProcessRenderer {
         }
         processVideo = new ProcessExecutor(s.getName());
         processAudio = new ProcessExecutor(s.getName());
-        
+
     }
 
     private String translateTag(String value) {
@@ -171,7 +167,7 @@ public class ProcessRenderer {
                     path = path.replaceAll("OS", Tools.getOSName());
                     break;
                 case OUTPUT:
-                    path = "/truckliststudio/externals/OS/outputs/"+ oPlug +".properties";
+                    path = "/truckliststudio/externals/OS/outputs/" + oPlug + ".properties";
                     path = path.replaceAll("OS", Tools.getOSName());
                     break;
             }
@@ -240,7 +236,7 @@ public class ProcessRenderer {
                     if (fme != null) {
                         command = command.replaceAll(Tags.KEYINT.toString(), "" + fme.getKeyInt());
                     } else {
-                        command = command.replaceAll(Tags.KEYINT.toString(), "" + Integer.toString(5*mixer.getRate()));
+                        command = command.replaceAll(Tags.KEYINT.toString(), "" + Integer.toString(5 * mixer.getRate()));
                     }
                 case PORT:
                     if (fme != null && fme.getPort() != "") {
@@ -258,24 +254,22 @@ public class ProcessRenderer {
                 case FILE:
                     if (stream.getFile() != null) {
                         if (Tools.getOS() == OS.WINDOWS) {
-                            if (stream.getComm() == "GS"){
+                            if (stream.getComm() == "GS") {
                                 String winFile = stream.getFile().getAbsolutePath().replaceAll("\\\\", "\\\\\\\\");
                                 winFile = winFile.replaceAll("\\\\", "\\\\\\\\");
 //                                System.out.println("WinFile="+winFile);
                                 command = command.replaceAll(Tags.FILE.toString(), "\"" + winFile + "\"");
-                            } else{
+                            } else {
                                 command = command.replaceAll(Tags.FILE.toString(), "\"" + stream.getFile().getAbsolutePath().replaceAll("\\\\", "\\\\\\\\") + "\"");
                             }
+                        } else if (stream.getFile().getAbsolutePath().contains("http")) {
+                            command = command.replaceAll(Tags.FILE.toString(), "" + stream.getFile().getAbsolutePath().replace(userHomeDir + "/", "") + "");
                         } else {
-                            if (stream.getFile().getAbsolutePath().contains("http")) {
-                                command = command.replaceAll(Tags.FILE.toString(), "" + stream.getFile().getAbsolutePath().replace(userHomeDir+"/", "") + "");
-                            } else {
-                                String sFile = stream.getFile().getAbsolutePath().replaceAll(" ", "\\ ");
-                                if (stream instanceof SinkFile){
-                                    sFile = sFile.replaceAll(" ", "_");
-                                }
-                                command = command.replaceAll(Tags.FILE.toString(), "" + sFile + "");
+                            String sFile = stream.getFile().getAbsolutePath().replaceAll(" ", "\\ ");
+                            if (stream instanceof SinkFile) {
+                                sFile = sFile.replaceAll(" ", "_");
                             }
+                            command = command.replaceAll(Tags.FILE.toString(), "" + sFile + "");
                         }
                     }
                     break;
@@ -338,19 +332,17 @@ public class ProcessRenderer {
                 String commandAudio = null;
                 // System.out.println(plugins.keySet().toString());
                 if (stream.hasVideo()) {
-                    if ("AV".equals(stream.getComm())){                        
+                    if ("AV".equals(stream.getComm())) {
                         commandVideo = plugins.getProperty("AVvideo").replaceAll("  ", " "); //AVvideoC
+                    } else if (!"".equals(stream.getGSEffect())) {
+                        commandVideo = plugins.getProperty("GSvideoFX").replaceAll("  ", " "); //Making sure there is no double spaces
                     } else {
-                        if (!"".equals(stream.getGSEffect())) {
-                            commandVideo = plugins.getProperty("GSvideoFX").replaceAll("  ", " "); //Making sure there is no double spaces
-                        } else {
-                            commandVideo = plugins.getProperty("GSvideo").replaceAll("  ", " "); //Making sure there is no double spaces
-                        }
+                        commandVideo = plugins.getProperty("GSvideo").replaceAll("  ", " "); //Making sure there is no double spaces
                     }
                 }
-                
+
                 if (stream.hasAudio()) {
-                    if ("AV".equals(stream.getComm())){
+                    if ("AV".equals(stream.getComm())) {
                         commandAudio = plugins.getProperty("AVaudio").replaceAll("  ", " "); //AVaudioC
                     } else {
                         commandAudio = plugins.getProperty("GSaudio").replaceAll("  ", " "); //Making sure there is no double spaces
@@ -362,9 +354,9 @@ public class ProcessRenderer {
                     String[] parmsVideo = commandVideo.split("ABCDE");
                     try {
                         for (String p : parmsVideo) {
-                            cmdVideo = cmdVideo + p + " ";                            
+                            cmdVideo = cmdVideo + p + " ";
                         }
-//                        System.out.print("CommandVideo: "+cmdVideo+"\n");
+                        System.out.print("CommandVideo: " + cmdVideo + "\n");
                         pV = processVideo.executeC(parmsVideo);
                     } catch (IOException | InterruptedException e) {
                         Logger.getLogger(ProcessRenderer.class.getName()).log(Level.SEVERE, null, e);
@@ -380,7 +372,7 @@ public class ProcessRenderer {
                         for (String p : parmsAudio) {
                             cmdAudio = cmdAudio + p + " ";
                         }
-//                        System.out.print("CommandAudio: "+cmdAudio+"\n");
+                        System.out.print("CommandAudio: " + cmdAudio + "\n");
                         pA = processAudio.executeC(parmsAudio);
                     } catch (IOException | InterruptedException e) {
                         Logger.getLogger(ProcessRenderer.class.getName()).log(Level.SEVERE, null, e);
@@ -388,22 +380,20 @@ public class ProcessRenderer {
                 } else {
                     processAudio = null;
                 }
-//                if (!isAAudioSource) {
-                    captureC = new Capturer(stream, pV, pA);
-//                }
+                captureC = new Capturer(stream, pV, pA);
             }
         }).start();
     }
-        
+
     public void writeCom() {
         stopped = false;
         stopMe = false;
-        new  Thread(new Runnable() {
+        new Thread(new Runnable() {
 
             @Override
             public void run() {
                 try {
-                exporter = new Exporter(stream);
+                    exporter = new Exporter(stream);
                 } catch (SocketException ex) {
                     Logger.getLogger(ProcessRenderer.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -415,44 +405,44 @@ public class ProcessRenderer {
                 audioPort = exporter.getAudioPort();
                 String command = plugins.getProperty(plugin).replaceAll("  ", " "); //Making sure there is no double spaces
                 command = setParameters(command);
-//                System.out.println("Command Out: "+command);
+                System.out.println("Command Out: " + command);
                 if (distro.toLowerCase().equals("windows")) {
-                    file=new File(userHomeDir+"/.truckliststudio/"+"WSBro.bat");
+                    file = new File(userHomeDir + "/.truckliststudio/" + "WSBro.bat");
                     FileOutputStream fos;
                     Writer dos = null;
                     try {
                         fos = new FileOutputStream(file);
-                        dos= new OutputStreamWriter(fos);
+                        dos = new OutputStreamWriter(fos);
                     } catch (FileNotFoundException ex) {
                         Logger.getLogger(ProcessRenderer.class.getName()).log(Level.SEVERE, null, ex);
                     }
                     try {
-                        dos.write(command+"\n");
+                        dos.write(command + "\n");
                         dos.close();
                     } catch (IOException ex) {
                         Logger.getLogger(ProcessRenderer.class.getName()).log(Level.SEVERE, null, ex);
                     }
                     file.setExecutable(true);
-                    batchCommand = userHomeDir+"/.truckliststudio/"+"WSBro.bat";
+                    batchCommand = userHomeDir + "/.truckliststudio/" + "WSBro.bat";
                 } else {
-                    file=new File(userHomeDir+"/.truckliststudio/"+"WSBro.sh");
+                    file = new File(userHomeDir + "/.truckliststudio/" + "WSBro.sh");
                     FileOutputStream fos;
                     Writer dos = null;
                     try {
                         fos = new FileOutputStream(file);
-                        dos= new OutputStreamWriter(fos);
+                        dos = new OutputStreamWriter(fos);
                     } catch (FileNotFoundException ex) {
                         Logger.getLogger(ProcessRenderer.class.getName()).log(Level.SEVERE, null, ex);
                     }
                     try {
                         dos.write("#!/bin/bash\n");
-                        dos.write(command+"\n");
+                        dos.write(command + "\n");
                         dos.close();
                     } catch (IOException ex) {
                         Logger.getLogger(ProcessRenderer.class.getName()).log(Level.SEVERE, null, ex);
                     }
                     file.setExecutable(true);
-                    batchCommand = userHomeDir+"/.truckliststudio/"+"WSBro.sh";
+                    batchCommand = userHomeDir + "/.truckliststudio/" + "WSBro.sh";
                 }
                 try {
                     if (stream.hasVideo()) {
@@ -470,7 +460,7 @@ public class ProcessRenderer {
         }).start();
 
     }
-    
+
     public void pause() //Author Martijn Courteaux Code
     {
         if (processVideo != null) {
@@ -480,7 +470,7 @@ public class ProcessRenderer {
             captureC.aPause();
         }
     }
-    
+
     public void play() {
         if (processVideo != null) {
             captureC.vPlay();
@@ -489,7 +479,7 @@ public class ProcessRenderer {
             captureC.aPlay();
         }
     }
-    
+
     public void stop() {
         stopMe = true;
         stopped = true;

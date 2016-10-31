@@ -539,11 +539,10 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
 
         tglAudioOut.setIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/audio-card.png"))); // NOI18N
         tglAudioOut.setText("Audio Output");
-        tglAudioOut.setToolTipText("WebcamStudio Master Audio Output");
+        tglAudioOut.setToolTipText("TrucklistStudio Master Audio Output");
         tglAudioOut.setMinimumSize(new java.awt.Dimension(135, 21));
         tglAudioOut.setName("tglAudioOut"); // NOI18N
         tglAudioOut.setPreferredSize(new java.awt.Dimension(32, 22));
-        tglAudioOut.setRolloverEnabled(false);
         tglAudioOut.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 tglAudioOutActionPerformed(evt);
@@ -557,7 +556,6 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
         tglRecordToFile.setMinimumSize(new java.awt.Dimension(87, 21));
         tglRecordToFile.setName("tglRecordToFile"); // NOI18N
         tglRecordToFile.setPreferredSize(new java.awt.Dimension(87, 22));
-        tglRecordToFile.setRolloverEnabled(false);
         tglRecordToFile.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/media-playback-stop.png"))); // NOI18N
         tglRecordToFile.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -572,7 +570,6 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
         tglUDP.setMinimumSize(new java.awt.Dimension(237, 21));
         tglUDP.setName("tglUDP"); // NOI18N
         tglUDP.setPreferredSize(new java.awt.Dimension(237, 22));
-        tglUDP.setRolloverEnabled(false);
         tglUDP.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/media-playback-stop.png"))); // NOI18N
         tglUDP.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

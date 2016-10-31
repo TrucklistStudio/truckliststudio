@@ -10,6 +10,9 @@ import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import org.imgscalr.Scalr;
+import static truckliststudio.TrucklistStudio.selColLbl2;
+import truckliststudio.components.ResourceMonitor;
+import truckliststudio.components.ResourceMonitorLabel;
 import truckliststudio.mixers.Frame;
 import truckliststudio.mixers.MasterFrameBuilder;
 import truckliststudio.mixers.MasterMixer;
@@ -46,6 +49,14 @@ public class SourceImage extends Stream{
     
     @Override
     public void read() {
+        if (!this.getFile().exists()) {
+            String sName = this.getName();
+            if (sName.length() > 25) {
+                sName = sName.substring(0, 25) + " ...";
+            }
+            ResourceMonitorLabel label = new ResourceMonitorLabel(System.currentTimeMillis() + 10000, "<html>&nbsp;<font color=red>WARNING !!!</font> File <font color=" + selColLbl2 + ">\"" + sName + "\"</font> not found !!!</html>");
+            ResourceMonitor.getInstance().addMessage(label);
+        }
         isPlaying = true;   
         try{
             loadImage(file);

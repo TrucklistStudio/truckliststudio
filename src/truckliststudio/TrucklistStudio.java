@@ -32,6 +32,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -56,6 +57,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
@@ -147,7 +149,7 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
     public static Color busyTab = Color.red;
     private Color resetTab = Color.black;
     private String selColLbl = "black";
-    private String selColLbl2 = "green";
+    public static String selColLbl2 = "green";
     ArrayList<JTabbedPane> tabs = new ArrayList<>();
     public static boolean x64 = false;
     public static boolean winGS = false;
@@ -407,7 +409,6 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                                                     }
 
                                                     master.updateTrack(trkName);
-                                                    master.addTrkTransitions(trkName);
 
                                                     if (wasStopped) {
                                                         stream.setIsPlaying(false);
@@ -442,7 +443,6 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                                                     stream.setIsPlaying(true);
                                                 }
                                                 master.updateTrack(trkName);
-                                                master.addTrkTransitions(trkName);
                                                 if (wasStopped) {
                                                     stream.setIsPlaying(false);
                                                 }
@@ -1513,7 +1513,7 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                 listenerOP.resetBtnStates(null);
                 listenerOP.resetSinks(null);
                 tabControls.removeAll();
-                tabControls.repaint();
+//                tabControls.repaint();
                 Tools.sleep(300);
 
                 cleanDesktops();
@@ -1699,7 +1699,6 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                                     }
 
                                     master.updateTrack(trkName);
-                                    master.addTrkTransitions(trkName);
 
                                     if (wasStopped) {
                                         s.setIsPlaying(false);
@@ -1733,7 +1732,6 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                                     s.setIsPlaying(true);
                                 }
                                 master.updateTrack(trkName);
-                                master.addTrkTransitions(trkName);
                                 if (wasStopped) {
                                     s.setIsPlaying(false);
                                 }
@@ -1786,7 +1784,7 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
             int count = 0;
             count = streamS.stream().filter((s) -> (s.getName().contains(key))).map((_item) -> 1).reduce(count, Integer::sum);
             String duplicatedTrkName = key + "(" + count + ")";
-            boolean found = false;
+//            boolean found = false;
             boolean nodup = false;
             ArrayList<String> temp = new ArrayList<>();
             for (Stream c : streamS) {
@@ -1797,7 +1795,7 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                     if (s.getName().equals(duplicatedTrkName)) {
                         count++;
                         duplicatedTrkName = key + "(" + count + ")";
-                        found = true;
+//                        found = true;
                     }
                 }
                 List<String> duplicates = new ArrayList<>();
@@ -1889,7 +1887,7 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                 sName = ((StreamPanel) tabPaneSelected.getComponentAt(index)).getStream().getName();
             }
 
-            int result = JOptionPane.showConfirmDialog(this, sName + " will be Removed !!!", "Attention", JOptionPane.YES_NO_CANCEL_OPTION);
+            int result = JOptionPane.showConfirmDialog(this, "Stream \"" + sName + "\" will be Removed !!!", "Attention", JOptionPane.YES_NO_CANCEL_OPTION);
             if (result == JFileChooser.APPROVE_OPTION) {
                 lblSourceSelected.setText("");
 
@@ -1919,8 +1917,8 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                         MasterFrameBuilder.unregister(sV);
                         sV.destroy();
                         sV = null;
-                        truckliststudio.TrucklistStudio.tabControls.removeAll();
-                        truckliststudio.TrucklistStudio.tabControls.repaint();
+                        tabControls.removeAll();
+//                        tabControls.repaint();
                         break;
                     case 1:
                         numMusics -= 1;
@@ -1947,8 +1945,8 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                         MasterFrameBuilder.unregister(sA);
                         sA.destroy();
                         sA = null;
-                        truckliststudio.TrucklistStudio.tabControls.removeAll();
-                        truckliststudio.TrucklistStudio.tabControls.repaint();
+                        tabControls.removeAll();
+//                        tabControls.repaint();
                         break;
                     case 2:
                         numPictures -= 1;
@@ -1970,8 +1968,8 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                         MasterFrameBuilder.unregister(sP);
                         sP.destroy();
                         sP = null;
-                        truckliststudio.TrucklistStudio.tabControls.removeAll();
-                        truckliststudio.TrucklistStudio.tabControls.repaint();
+                        tabControls.removeAll();
+//                        tabControls.repaint();
                         break;
                     case 3:
                         numTexts -= 1;
@@ -1992,17 +1990,20 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                         MasterFrameBuilder.unregister(sT);
                         sT.destroy();
                         sT = null;
-                        truckliststudio.TrucklistStudio.tabControls.removeAll();
-                        truckliststudio.TrucklistStudio.tabControls.repaint();
+                        tabControls.removeAll();
+//                        tabControls.repaint();
                         break;
                     default:
                         break;
                 }
                 listenerTSTP.closeItsTrack(sName);
-                ResourceMonitorLabel label = new ResourceMonitorLabel(System.currentTimeMillis() + 10000, sName + " Removed!");
+                if (sName.length() > 25) {
+                    sName = sName.substring(0, 25) + " ...";
+                }
+                ResourceMonitorLabel label = new ResourceMonitorLabel(System.currentTimeMillis() + 10000, "<html>&nbsp;Stream <font color=" + selColLbl2 + ">\"" + sName + "\"</font> Removed.</html>");
                 ResourceMonitor.getInstance().addMessage(label);
             } else {
-                ResourceMonitorLabel label = new ResourceMonitorLabel(System.currentTimeMillis() + 10000, "Remove Source Cancelled!");
+                ResourceMonitorLabel label = new ResourceMonitorLabel(System.currentTimeMillis() + 10000, "Remove Stream Cancelled.");
                 ResourceMonitor.getInstance().addMessage(label);
             }
         }
@@ -2342,7 +2343,6 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
         if (retval == JFileChooser.APPROVE_OPTION) {
             final WaitingDialog waitingD = new WaitingDialog(this);
             setTrkStudioState(false);
-//            editingPhase = false;
             SwingWorker<?, ?> worker = new SwingWorker<Void, Integer>() {
                 @Override
                 protected Void doInBackground() throws InterruptedException {
@@ -2378,7 +2378,7 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                         listenerOP.resetBtnStates(fEvt);
                         tabControls.removeAll();
                         lblSourceSelected.setText("");
-                        tabControls.repaint();
+//                        tabControls.repaint();
                         Tools.sleep(300);
 
                         cleanDesktops();
@@ -2500,7 +2500,6 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                         setTitle("TrucklistStudio " + Version.version + " (" + file.getName() + ")");
                     }
                     setTrkStudioState(true);
-//                    editingPhase = true;
                     cancel = false;
                     return null;
                 }
@@ -2580,7 +2579,7 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
             listenerOP.resetSinks(evt);
             tabControls.removeAll();
             lblSourceSelected.setText("");
-            tabControls.repaint();
+//            tabControls.repaint();
             Tools.sleep(300);
 
             cleanDesktops();
@@ -3019,7 +3018,6 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                                                     }
 
                                                     master.updateTrack(trkName);
-                                                    master.addTrkTransitions(trkName);
 
                                                     if (wasStopped) {
                                                         s.setIsPlaying(false);
@@ -3053,7 +3051,6 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                                                     s.setIsPlaying(true);
                                                 }
                                                 master.updateTrack(trkName);
-                                                master.addTrkTransitions(trkName);
                                                 if (wasStopped) {
                                                     s.setIsPlaying(false);
                                                 }
@@ -3132,7 +3129,6 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                         ResourceMonitor.getInstance().addMessage(label);
                     }
                     setTrkStudioState(true);
-//                    editingPhase = true;
                     return null;
 
                 }
@@ -3358,7 +3354,7 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                     }
                 }
             };
-            worker.schedule(task, 1, TimeUnit.SECONDS);
+            worker.schedule(task, 1000, TimeUnit.MILLISECONDS);
         }
     }//GEN-LAST:event_videoDesktopStateChanged
 
@@ -3509,7 +3505,6 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                         }
 
                         master.updateTrack(trkName);
-                        master.addTrkTransitions(trkName);
 
                         if (wasStopped) {
                             s.setIsPlaying(false);
@@ -3544,7 +3539,6 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                         s.setIsPlaying(true);
                     }
                     master.updateTrack(trkName);
-                    master.addTrkTransitions(trkName);
                     if (wasStopped) {
                         s.setIsPlaying(false);
                     }
@@ -3722,22 +3716,28 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
         } else {
             shortName = sourceName;
         }
+//        System.out.println("Selected Source Tabs: "+tabControls.getTabCount());
+        final Runnable addComps = new Runnable() {
+            public void run() {
+                ArrayList<Component> comps = SourceControls.getControls(source);
+                for (Component c : comps) {
+                    String cName = c.getName();
+                    tabControls.addTab(cName, c);
+                }
+            }
+        };
 
         tabControls.removeAll();
-        tabControls.repaint();
+//        tabControls.repaint();
 
-        ArrayList<Component> comps = SourceControls.getControls(source);
-        for (Component c : comps) {
-            String cName = c.getName();
-            tabControls.add(cName, c);
-        }
+        SwingUtilities.invokeLater(addComps);
+
         lblSourceSelected.setText("<html>&nbsp;&nbsp;<font color=" + selColLbl + ">Selected:</font><font color=" + selColLbl2 + "> \"" + shortName + "\"</font></html>");
     }
 
     public void loadAtStart(final File file, final java.awt.event.ActionEvent fEvt) {
         final WaitingDialog waitingD = new WaitingDialog(this);
         setTrkStudioState(false);
-//        editingPhase = false;
         SwingWorker<?, ?> worker = new SwingWorker<Void, Integer>() {
             @Override
             protected Void doInBackground() throws InterruptedException {
@@ -3772,7 +3772,7 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                     listenerTSTP.resetBtnStates(fEvt);
                     listenerOP.resetBtnStates(fEvt);
                     tabControls.removeAll();
-                    tabControls.repaint();
+//                    tabControls.repaint();
                     Tools.sleep(300);
                     videoDesktop.removeAll();
                     videoDesktop.repaint();
@@ -3883,7 +3883,6 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                     setTitle("TrucklistStudio " + Version.version + " (" + file.getName() + ")");
                 }
                 setTrkStudioState(true);
-//                editingPhase = true;
                 loadingFinish = true;
                 return null;
             }

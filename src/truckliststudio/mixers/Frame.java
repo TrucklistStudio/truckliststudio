@@ -17,8 +17,6 @@ import static truckliststudio.TrucklistStudio.audioFreq;
  * @author patrick
  */
 public class Frame {
-//    private BufferedImage image;
-
     private int x = 0;
     private int y = 0;
     private int w = 320;
