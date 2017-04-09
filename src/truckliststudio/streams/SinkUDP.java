@@ -25,6 +25,7 @@ public class SinkUDP extends Stream {
     public SinkUDP() {
         name = "UDP";
 //        System.out.println("SinkUDP outFMEbe= "+outFMEbe);
+//        System.out.println("Making UDP");
         if (outFMEbe == 0){
             this.setComm("FF");
         } else if (outFMEbe == 1) {

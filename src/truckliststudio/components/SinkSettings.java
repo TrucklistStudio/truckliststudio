@@ -14,6 +14,7 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import truckliststudio.TrucklistStudio;
 import truckliststudio.streams.SinkFile;
+import truckliststudio.streams.SinkHLS;
 import truckliststudio.streams.SinkUDP;
 import truckliststudio.streams.Stream;
 
@@ -24,12 +25,13 @@ import truckliststudio.streams.Stream;
 public class SinkSettings extends javax.swing.JFrame implements Stream.Listener {
     SinkFile thisSinkFile = null;
     SinkUDP thisSinkUDP = null;
+    SinkHLS thisSinkHLS = null;
     /**
      * Creates new form FMESettings
      * @param sFile
      * @param udp
      */
-    public SinkSettings(SinkFile sFile, SinkUDP udp) {
+    public SinkSettings(SinkFile sFile, SinkUDP udp, SinkHLS hls) {
         initComponents();
         // for now we keep this not visible
         lblOW.setVisible(false);
@@ -39,9 +41,11 @@ public class SinkSettings extends javax.swing.JFrame implements Stream.Listener 
         
         if (sFile != null) {
             chkHQMode.setEnabled(false);
+            lblrtmpURL.setEnabled(false);
             chkHQMode.setForeground(Color.gray);
             thisSinkFile = sFile;
             thisSinkUDP = null;
+            thisSinkHLS = null;
             lblName.setText(thisSinkFile.getName());
             this.setTitle(thisSinkFile.getName() + " Settings");
             if (thisSinkFile.getVbitrate().equals("")) {
@@ -68,9 +72,11 @@ public class SinkSettings extends javax.swing.JFrame implements Stream.Listener 
             } else {
                 spinAudioRate.setValue(Integer.parseInt(thisSinkFile.getAbitrate()));
             }
-        } else {
+        } else if (udp != null) {
             thisSinkUDP = udp;
             thisSinkFile = null;
+            thisSinkHLS = null;
+            lblrtmpURL.setEnabled(false);
             lblName.setText(thisSinkUDP.getName());
             this.setTitle(thisSinkUDP.getName() + " Settings");
             if (thisSinkUDP.getVbitrate().equals("")) {
@@ -98,6 +104,48 @@ public class SinkSettings extends javax.swing.JFrame implements Stream.Listener 
                 spinAudioRate.setValue(Integer.parseInt(thisSinkUDP.getAbitrate()));
             }
             chkHQMode.setSelected(thisSinkUDP.getStandard().equals("HQ"));
+        } else {
+            thisSinkUDP = null;
+            thisSinkFile = null;
+            thisSinkHLS = hls;
+            lblrtmpURL.setEnabled(true);
+            lblName.setText(thisSinkHLS.getName());
+            this.setTitle(thisSinkHLS.getName() + " Settings");
+            if (thisSinkHLS.getVbitrate().equals("")) {
+                spinVideoRate.setValue(0);
+                spinVideoRate.setEnabled(false);
+            } else {
+                spinVideoRate.setValue(Integer.parseInt(thisSinkHLS.getVbitrate()));
+            }
+            if (thisSinkHLS.getWidth() == 0) {
+                spinOutW.setValue(0);
+                spinOutW.setEnabled(false);
+            } else {
+                spinOutW.setValue(thisSinkHLS.getWidth());
+            }
+            if (thisSinkHLS.getHeight() == 0) {
+                spinOutH.setValue(0);
+                spinOutH.setEnabled(false);
+            } else {
+                spinOutH.setValue(thisSinkHLS.getHeight());
+            }
+            if (thisSinkHLS.getAbitrate().equals("")) {
+                spinAudioRate.setValue(0);
+                spinAudioRate.setEnabled(false);
+            } else {
+                spinAudioRate.setValue(Integer.parseInt(thisSinkHLS.getAbitrate()));
+            }
+            chkHQMode.setSelected(thisSinkHLS.getStandard().equals("HQ"));
+            
+            textMount.setText(thisSinkHLS.getMount());
+            System.out.println("SinkSettingsMount="+thisSinkHLS.getMount());
+            textMount.setEnabled(true);
+            lblMount.setText("M3U8 Location");
+            lblMount.setEnabled(true);
+            
+            textURL.setText(thisSinkHLS.getURL());
+            textURL.setEnabled(true);
+            lblURL.setEnabled(true);
         }
     }
 
@@ -152,7 +200,7 @@ public class SinkSettings extends javax.swing.JFrame implements Stream.Listener 
         lblAudioRate.setText("Audio Data Rate:");
 
         lblrtmpURL.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
-        lblrtmpURL.setText("RTMP Streaming Url:");
+        lblrtmpURL.setText("Streaming Url:");
 
         lblURL.setText("URL:");
         lblURL.setEnabled(false);
@@ -264,12 +312,12 @@ public class SinkSettings extends javax.swing.JFrame implements Stream.Listener 
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(spinAudioRate, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(lblEncode)
-                            .addComponent(lblrtmpURL)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblVideoRate)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(spinVideoRate, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(lblName, javax.swing.GroupLayout.PREFERRED_SIZE, 186, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(lblName, javax.swing.GroupLayout.PREFERRED_SIZE, 186, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblrtmpURL, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 14, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -353,7 +401,7 @@ public class SinkSettings extends javax.swing.JFrame implements Stream.Listener 
                 thisSinkFile.setAbitrate(Integer.toString(spinAudioRate.getValue().hashCode()));
             }
 
-        } else {
+        } else if (thisSinkUDP != null) {
             if (thisSinkUDP.getVbitrate().equals("")) {
 
             } else {
@@ -364,6 +412,19 @@ public class SinkSettings extends javax.swing.JFrame implements Stream.Listener 
             } else {
                 thisSinkUDP.setAbitrate(Integer.toString(spinAudioRate.getValue().hashCode()));
             }
+        } else {
+            if (thisSinkHLS.getVbitrate().equals("")) {
+
+            } else {
+                thisSinkHLS.setVbitrate(Integer.toString(spinVideoRate.getValue().hashCode()));
+            }
+            if (thisSinkHLS.getAbitrate().equals("")) {
+
+            } else {
+                thisSinkHLS.setAbitrate(Integer.toString(spinAudioRate.getValue().hashCode()));
+            }
+            thisSinkHLS.setMount(textMount.getText());
+            thisSinkHLS.setURL(textURL.getText());
         }
         if (thisSinkFile != null) {
             Preferences filePrefs = TrucklistStudio.prefs.node("filerec");
@@ -377,7 +438,7 @@ public class SinkSettings extends javax.swing.JFrame implements Stream.Listener 
             Preferences serviceF = filePrefs.node("frecordset");
             serviceF.put("abitrate", thisSinkFile.getAbitrate());
             serviceF.put("vbitrate", thisSinkFile.getVbitrate());
-        } else {
+        } else if (thisSinkUDP != null) {
             Preferences udpPrefs = TrucklistStudio.prefs.node("udp");
             try {
                 udpPrefs.removeNode();
@@ -390,6 +451,34 @@ public class SinkSettings extends javax.swing.JFrame implements Stream.Listener 
             serviceU.put("abitrate", thisSinkUDP.getAbitrate());
             serviceU.put("vbitrate", thisSinkUDP.getVbitrate());
             serviceU.put("standard", thisSinkUDP.getStandard());
+        } else {
+            Preferences hlsPrefs = TrucklistStudio.prefs.node("hls");
+            try {
+                hlsPrefs.removeNode();
+                hlsPrefs.flush();
+                hlsPrefs = TrucklistStudio.prefs.node("hls");
+            } catch (BackingStoreException ex) {
+                Logger.getLogger(OutputPanel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            Preferences serviceH = hlsPrefs.node("houtset");
+            serviceH.put("abitrate", thisSinkHLS.getAbitrate());
+            serviceH.put("vbitrate", thisSinkHLS.getVbitrate());
+            serviceH.put("standard", thisSinkHLS.getStandard());
+            serviceH.put("mount", thisSinkHLS.getMount());
+            serviceH.put("url", thisSinkHLS.getURL());
+        }
+        if (chkHQMode.isSelected()) {
+            if (thisSinkUDP != null) {
+                thisSinkUDP.setStandard("HQ");
+            } else {
+                thisSinkHLS.setStandard("HQ");
+            }
+        } else {
+            if (thisSinkUDP != null) {
+                thisSinkUDP.setStandard("STD");
+            } else {
+                thisSinkHLS.setStandard("STD");
+            }
         }
         this.dispose();
     }//GEN-LAST:event_btnOKActionPerformed
@@ -399,11 +488,7 @@ public class SinkSettings extends javax.swing.JFrame implements Stream.Listener 
     }//GEN-LAST:event_btnCancelActionPerformed
 
     private void chkHQModeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkHQModeActionPerformed
-        if (chkHQMode.isSelected()) {
-            thisSinkUDP.setStandard("HQ");
-        } else {
-            thisSinkUDP.setStandard("STD");
-        }
+        // NOTHING HERE
     }//GEN-LAST:event_chkHQModeActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -441,6 +526,8 @@ public class SinkSettings extends javax.swing.JFrame implements Stream.Listener 
 //        System.out.println("New Size: "+stream.getWidth()+" x "+stream.getHeight());
         spinOutW.setValue(stream.getWidth());
         spinOutH.setValue(stream.getHeight());
+        textMount.setText(stream.getMount());
+        textURL.setText(stream.getURL());
     }
 
     @Override

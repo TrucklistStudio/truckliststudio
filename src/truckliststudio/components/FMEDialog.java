@@ -91,6 +91,14 @@ public class FMEDialog extends javax.swing.JFrame implements Stream.Listener {
 
         lblStream.setText("Stream/Secret:");
 
+        textURL.setToolTipText("FME/IceCast");
+
+        textStream.setToolTipText("FME Only.");
+
+        spinVideoRate.setToolTipText("Kb/s");
+
+        spinAudioRate.setToolTipText("Kb/s");
+
         btnCancel.setText("Cancel");
         btnCancel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -113,6 +121,10 @@ public class FMEDialog extends javax.swing.JFrame implements Stream.Listener {
 
         lblKeyInt.setText("KeyInt:");
 
+        textMount.setToolTipText("IceCast only.");
+
+        textPsw.setToolTipText("IceCast only.");
+
         lblName.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
         lblName.setText("Name");
 
@@ -134,8 +146,6 @@ public class FMEDialog extends javax.swing.JFrame implements Stream.Listener {
                 chkHQModeActionPerformed(evt);
             }
         });
-
-        textName.setToolTipText("");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);

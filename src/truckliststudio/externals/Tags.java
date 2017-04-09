@@ -46,6 +46,7 @@ public enum Tags {
         DVBCH("@DVBCH"),
         WEBURL("@WEBURL"),
         MOUNT("@MOUNT"),
+        LOC("@LOC"),
         PASSWORD("@PASSWORD"),
         PORT("@PORT"),
         PAUDIOSRC ("@PAUDIOSRC"),

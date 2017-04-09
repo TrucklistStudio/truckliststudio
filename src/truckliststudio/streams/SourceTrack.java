@@ -183,6 +183,27 @@ public class SourceTrack {
     public SourceTrack() {
     }
 
+    public int getOpacity() {
+        return opacity;
+    }
+
+    public void setOpacity(int n) {
+        opacity = n;
+    }
+    
+    public float getVolume() {
+        return volume;
+    }
+
+    public void setVolume(float n) {
+        volume = n;
+    }
+    
+    @SuppressWarnings("unchecked")
+    public void addAllEffects(ArrayList fx) {
+        this.effects.addAll(fx);
+    }
+    
     public String getName() {
         return name;
     }
@@ -352,24 +373,14 @@ public class SourceTrack {
     }
 
     /**
-     * @return the opacity
-     */
-    public int getOpacity() {
-        return opacity;
-    }
-
-    /**
-     * @return the volume
-     */
-    public float getVolume() {
-        return volume;
-    }
-
-    /**
      * @return the zorder
      */
     public int getZorder() {
         return zorder;
+    }
+    
+    public void setZOrder(int n) {
+        zorder = n;
     }
 
     /**
@@ -425,6 +436,14 @@ public class SourceTrack {
         this.isPlaying = b;
     }
 
+    public boolean getIsPaused() {
+        return this.isPaused;
+    }
+
+    public void setIsPaused(boolean b) {
+        this.isPaused = b;
+    }
+    
     /**
      * @return the followMouse
      */

@@ -8,25 +8,24 @@ import java.awt.image.BufferedImage;
 import static truckliststudio.TrucklistStudio.os;
 import static truckliststudio.TrucklistStudio.outFMEbe;
 import static truckliststudio.TrucklistStudio.x64;
-import truckliststudio.externals.FME;
 import truckliststudio.externals.ProcessRenderer;
+import truckliststudio.mixers.Frame;
 import truckliststudio.mixers.MasterMixer;
 import truckliststudio.util.Tools;
 
 /**
  *
- * @author patrick (modified by karl)
+ * @author karl
  */
-public class SinkBroadcast extends Stream {
+public class SinkHLS extends Stream {
 
     private ProcessRenderer capture = null;
-    private FME fme = null;
-    private boolean isPlaying = false;
     private String standard = "STD";
-    public SinkBroadcast(FME fme) {
-        this.fme=fme;
-        name=fme.getName();
-        url = fme.getUrl()+"/"+fme.getStream();
+
+    public SinkHLS() {
+        name = "HLS";
+//        System.out.println("SinkUDP outFMEbe= "+outFMEbe);
+//        System.out.println("Making HLS");
         if (outFMEbe == 0){
             this.setComm("FF");
         } else if (outFMEbe == 1) {
@@ -34,60 +33,41 @@ public class SinkBroadcast extends Stream {
         } else if (outFMEbe == 2) {
             this.setComm("GS");
         }
+//        System.out.println("SinkUDP BE= "+this.getComm());
+//        System.out.println("SinkHLS Mount="+this.getMount());
     }
-    @Override
-    public String getName(){
-        return name;
-    }
+
     @Override
     public void read() {
-        isPlaying=true;
         rate = MasterMixer.getInstance().getRate();
         captureWidth = MasterMixer.getInstance().getWidth();
         captureHeight = MasterMixer.getInstance().getHeight();
-        if (!"".equals(this.fme.getMount())) {
-            String plugin = "iceCast";
-            String pluginHD = "iceCastHQ";
-            if (os == Tools.OS.WINDOWS){
-                if  (!x64){
-                    plugin = "iceCast86";
-                    pluginHD = "iceCastHQ86";
-                }
+        String plugin = "hls";
+        String pluginHD = "hlsHQ";
+        if (os == Tools.OS.WINDOWS){
+            if  (!x64){
+                plugin = "hls86";
+                pluginHD = "hlsHQ86";
             }
-            if (standard.equals("STD")) {
-                capture = new ProcessRenderer(this, fme, plugin);
-            } else {
-                capture = new ProcessRenderer(this, fme, pluginHD);
-            }
+        }
+        if (standard.equals("STD")) {
+            capture = new ProcessRenderer(this, ProcessRenderer.ACTION.OUTPUT, plugin, comm);
         } else {
-            String plugin = "broadcast";
-            String pluginHD = "broadcastHQ";
-            if (os == Tools.OS.WINDOWS){
-                if  (!x64){
-                    plugin = "broadcast86";
-                    pluginHD = "broadcastHQ86";
-                }
-            }
-            if (standard.equals("STD")) {
-                capture = new ProcessRenderer(this, fme, plugin);
-            } else {
-                capture = new ProcessRenderer(this, fme, pluginHD);
-            }
+            capture = new ProcessRenderer(this, ProcessRenderer.ACTION.OUTPUT, pluginHD, comm);
         }
         capture.writeCom();
     }
 
     @Override
     public void pause() {
-        // nothing here.
+//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
     @Override
     public void stop() {
-        isPlaying=false;
-        if  (capture!=null){
+        if (capture != null) {
             capture.stop();
-            capture=null;
+            capture = null;
         }
         if (this.getBackFF()){
             this.setComm("FF");
@@ -97,16 +77,20 @@ public class SinkBroadcast extends Stream {
     public boolean needSeek() {
             return needSeekCTRL=false;
     }
-
     @Override
     public boolean isPlaying() {
-        return isPlaying;
+        if (capture != null) {
+            return !capture.isStopped();
+        } else {
+            return false;
         }
+    }
 
     @Override
     public BufferedImage getPreview() {
         return null;
     }
+    
     public void setStandard(String gStandard) {
         standard = gStandard;
     }
@@ -115,6 +99,11 @@ public class SinkBroadcast extends Stream {
         return standard;
     }
     
+    @Override
+    public Frame getFrame() {
+        return null;
+    }
+
     @Override
     public boolean hasAudio() {
         return true;
@@ -127,12 +116,12 @@ public class SinkBroadcast extends Stream {
 
     @Override
     public void readNext() {
-        // nothing here.
+        
     }
 
     @Override
     public void play() {
-        // nothing here.
+//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override

@@ -5,6 +5,7 @@
 package truckliststudio.tracks;
 
 import java.util.ArrayList;
+import truckliststudio.streams.SourceMovie;
 import truckliststudio.streams.SourceTrack;
 import truckliststudio.streams.Stream;
 import truckliststudio.util.Tools;
@@ -14,9 +15,9 @@ import truckliststudio.util.Tools;
  * @author patrick (modified by karl)
  */
 public class MasterTracks {
-
+    
     static MasterTracks instance = null;
-
+    
     public static MasterTracks getInstance() {
         if (instance == null) {
             instance = new MasterTracks();
@@ -27,10 +28,10 @@ public class MasterTracks {
     ArrayList<Stream> streams = new ArrayList<>();
     int rmAddIndex = 0;
     ArrayList<SourceTrack> tempSC = null;
-
+    
     private MasterTracks() {
     }
-
+    
     public void register(Stream s) {
         String streamName = s.getClass().getName();
         streamName = streamName.replace("truckliststudio.streams.", "");
@@ -39,25 +40,25 @@ public class MasterTracks {
         }
         streams.add(s);
     }
-
+    
     public void unregister(Stream s) {
         if (!s.getClass().toString().contains("Sink")) {
 //            System.out.println(s.getName() + " unregistered.");
         }
         streams.remove(s);
     }
-
+    
     public void addTrack(String name) {
         trackNames.add(name);
         for (Stream s : streams) {
             s.addTrack(SourceTrack.getTrack(name, s));
         }
     }
-
+    
     public void addTrack2List(String name) {
         trackNames.add(name);
     }
-
+    
     public void addPlayTrack(String name, String playTrk) {
         trackNames.add(name);
         for (Stream s : streams) {
@@ -70,7 +71,7 @@ public class MasterTracks {
             }
         }
     }
-
+    
     public static SourceTrack getTrack(String trackName, Stream s) {
         SourceTrack track = null;
         for (SourceTrack tr : s.getTracks()) {
@@ -80,17 +81,17 @@ public class MasterTracks {
         }
         return track;
     }
-
+    
     public void addToTracks(String name) {
         trackNames.add(name);
-
+        
     }
-
+    
     public void addTrackAt(String name, int index) {
         trackNames.add(index, name);
-
+        
     }
-
+    
     public void updateTrack(String name) {
         for (Stream s : streams) {
             String streamName = s.getClass().getName();
@@ -113,7 +114,65 @@ public class MasterTracks {
             }
         }
     }
-
+    
+    public void updateTrackBtn(String name) {
+        for (Stream st : streams) {
+            if (st.getisATrack()) {
+                Stream upStream = null;
+                for (Stream s : streams) {
+                    if (s.getName().equals(name) || (name.contains(s.getName()) && name.contains("(") && name.endsWith(")"))) {
+                        upStream = s;
+//                        System.out.println("Up Stream=" + s.getName());
+                    }
+                }
+                
+                ArrayList<SourceTrack> sourceCh = upStream.getTracks();
+                int i = 0;
+                for (SourceTrack sTrk : sourceCh) {
+                    sTrk.setX(upStream.getX());
+                    sTrk.setY(upStream.getY());
+                    sTrk.setWidth(upStream.getWidth());
+                    sTrk.setHeight(upStream.getHeight());
+                    sTrk.setOpacity(upStream.getOpacity());
+                    sTrk.addAllEffects(upStream.getAllEffects());
+                    sTrk.setVolume(upStream.getVolume());
+                    sTrk.setZOrder(upStream.getZOrder());
+                    if (upStream.getName().equals(sTrk.getName())) {
+                        sTrk.setIsPlaying(upStream.isPlaying());
+                    }
+                    sTrk.setIsPaused(upStream.getisPaused());
+                    sTrk.setCapHeight(upStream.getCaptureHeight());
+                    sTrk.setCapWidth(upStream.getCaptureWidth());
+                    
+                    upStream.removeTrackAt(i);
+                    
+                    upStream.addTrackAt(sTrk, i);
+                    i++;
+                }
+            } else {
+                
+                String streamName = st.getClass().getName();
+                SourceTrack sc = null;
+                ArrayList<SourceTrack> sourceCh = st.getTracks();
+                int x = 0;
+                for (int i = 0; i < sourceCh.size(); i++) {
+                    if (sourceCh.get(i).getName().equals(name)) {
+                        sc = sourceCh.get(i);
+                        x = i;
+                        break;
+                    }
+                }
+                if (!streamName.contains("Sink")) {
+                    if (sc != null) {
+                        st.removeTrackAt(x);
+                    }
+                    st.addTrackAt(SourceTrack.getTrack(name, st), x);
+                    x = 0;
+                }
+            }
+        }
+    }
+    
     public void insertStudio(String name) {
         for (Stream s : streams) {
             int co = 0;
@@ -160,7 +219,7 @@ public class MasterTracks {
             }
         }
     }
-
+    
     public void removeTrack(String name) {
         trackNames.remove(name);
         for (Stream s : streams) {
@@ -175,31 +234,31 @@ public class MasterTracks {
             }
         }
     }
-
+    
     public void removeTrackAt(String name) {
         trackNames.remove(name);
-
+        
     }
-
+    
     public void removeTrackIndex(int index) {
         trackNames.remove(index);
     }
-
+    
     public void selectTrack(String name) {
         for (Stream stream : streams) {
             for (SourceTrack sc : stream.getTracks()) {
                 if (sc.getName().equals(name)) {
-                        sc.apply(stream);
+                    sc.apply(stream);
                     break;
                 }
             }
         }
     }
-
+    
     public ArrayList<String> getTracks() {
         return trackNames;
     }
-
+    
     public void stopAllStream() {
         for (Stream s : streams) {
             if (s.isPlaying()) {
@@ -215,7 +274,7 @@ public class MasterTracks {
             }
         }
     }
-
+    
     public void endAllStream() {
         for (Stream s : streams) {
             if (s.isPlaying()) {
@@ -230,7 +289,7 @@ public class MasterTracks {
             }
         }
     }
-
+    
     public void stopTextCDown() {
         for (Stream s : streams) {
             String streamName = s.getClass().getName();
@@ -244,7 +303,7 @@ public class MasterTracks {
             }
         }
     }
-
+    
     public void stopOnlyStream() {
         for (Stream s : streams) {
             String streamName = s.getClass().getName();
@@ -263,7 +322,7 @@ public class MasterTracks {
             }
         }
     }
-
+    
     public ArrayList<Stream> getStreams() {
         return streams;
     }

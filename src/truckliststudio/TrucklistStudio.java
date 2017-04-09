@@ -854,6 +854,7 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
         jSeparator2 = new javax.swing.JToolBar.Separator();
         btnRemoveSource = new javax.swing.JButton();
         btnMinimizeAll = new javax.swing.JButton();
+        btnHideVideo = new javax.swing.JButton();
         tabSources = new javax.swing.JTabbedPane();
         videoScroll = new javax.swing.JScrollPane();
         videoDesktop = new javax.swing.JTabbedPane();
@@ -1344,6 +1345,22 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
             }
         });
         toolbar.add(btnMinimizeAll);
+
+        btnHideVideo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/edit-delete-selected.png"))); // NOI18N
+        btnHideVideo.setToolTipText(bundle.getString("HIDE_VIDEO")); // NOI18N
+        btnHideVideo.setFocusable(false);
+        btnHideVideo.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnHideVideo.setMaximumSize(new java.awt.Dimension(29, 28));
+        btnHideVideo.setMinimumSize(new java.awt.Dimension(25, 25));
+        btnHideVideo.setName("btnHideVideo"); // NOI18N
+        btnHideVideo.setPreferredSize(new java.awt.Dimension(28, 28));
+        btnHideVideo.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnHideVideo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnHideVideoActionPerformed(evt);
+            }
+        });
+        toolbar.add(btnHideVideo);
 
         tabSources.setName("tabSources"); // NOI18N
         tabSources.addChangeListener(new javax.swing.event.ChangeListener() {
@@ -1915,6 +1932,7 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                         sV.setLoop(false);
                         PreviewFrameBuilder.unregister(sV);
                         MasterFrameBuilder.unregister(sV);
+//                        streamS.remove(sV);
                         sV.destroy();
                         sV = null;
                         tabControls.removeAll();
@@ -2378,7 +2396,6 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                         listenerOP.resetBtnStates(fEvt);
                         tabControls.removeAll();
                         lblSourceSelected.setText("");
-//                        tabControls.repaint();
                         Tools.sleep(300);
 
                         cleanDesktops();
@@ -3089,6 +3106,7 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                         ArrayList<String> allTrack = new ArrayList<>();
                         for (String scn : master.getInstance().getTracks()) {
                             allTrack.add(scn);
+//                            System.out.println("Track="+scn);
                         }
 
                         for (String track : allTrack) {
@@ -3557,6 +3575,15 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
         }
     }//GEN-LAST:event_btnApplyTitleActionPerformed
 
+    private void btnHideVideoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHideVideoActionPerformed
+        for (Stream s : master.getStreams()) {
+            if (s instanceof SourceMusic && !s.getClass().toString().contains("Sink")) {
+                s.setOnlyAudio(true);
+                s.updateStatus();
+            }
+        }
+    }//GEN-LAST:event_btnHideVideoActionPerformed
+
     /**
      *
      */
@@ -3649,6 +3676,7 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
     private javax.swing.JButton btnAddFolder;
     private javax.swing.JButton btnAddText;
     private javax.swing.JButton btnApplyTitle;
+    private javax.swing.JButton btnHideVideo;
     private javax.swing.JButton btnImportStudio;
     private final javax.swing.JButton btnLoadStudio = new javax.swing.JButton();
     private javax.swing.JButton btnMinimizeAll;

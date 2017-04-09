@@ -11,6 +11,7 @@ import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -71,6 +72,7 @@ import static truckliststudio.streams.SourceText.Shape.OVAL;
 import static truckliststudio.streams.SourceText.Shape.RECTANGLE;
 import static truckliststudio.streams.SourceText.Shape.ROUNDRECT;
 import truckliststudio.streams.Stream;
+import truckliststudio.util.Tools;
 
 /**
  *
@@ -92,8 +94,9 @@ public class Studio {
     public static ArrayList<SourceText> LText = new ArrayList<>();
     public static ArrayList<String> ImgMovMus = new ArrayList<>();
     public static ArrayList<String> aGifKeys = new ArrayList<>();
-    static boolean FirstChannel=false;
+    static boolean FirstChannel = false;
     static Listener listener = null;
+
     public static void setListener(Studio.Listener l) {
         listener = l;
     }
@@ -101,7 +104,7 @@ public class Studio {
     public static void load(File file, String loadType) throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
         Studio studio = new Studio();
         System.out.println("Loading Studio ...");
-        filename = file; 
+        filename = file;
         Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(file);
         XPath path = XPathFactory.newInstance().newXPath();
 
@@ -115,9 +118,9 @@ public class Studio {
             studio.tracks.add(name);
 //            System.out.println("StudioTrack="+name);
             studio.Durations.add(duration);
-            System.out.println("StudioTrack: " + name + " - Duration: " + duration);  
+            System.out.println("StudioTrack: " + name + " - Duration: " + duration);
         }
-        
+
         // Loading mixer settings
         if (loadType.equals("load")) {
             Node nodeMixer = (Node) path.evaluate("/TrucklistStudio/Mixer", doc.getDocumentElement(), XPathConstants.NODE);
@@ -133,7 +136,7 @@ public class Studio {
             System.out.println("Setting Mixer to: " + width + "X" + height + "@" + rate + "fps");
         }
     }
-    
+
     public static void save(File file) throws IOException, XMLStreamException, TransformerConfigurationException, TransformerException, IllegalArgumentException, IllegalAccessException {
         ArrayList<String> channels = MasterTracks.getInstance().getTracks();
         ArrayList<Stream> streams = MasterTracks.getInstance().getStreams();
@@ -150,20 +153,20 @@ public class Studio {
         for (String c : channels) {
             int index = channels.indexOf(c);
             xml.writeStartElement(ELEMENT_TRACK);
-            System.out.println("Saving Track: "+c);
+            System.out.println("Saving Track: " + c);
             xml.writeAttribute("name", c);
             xml.writeAttribute("duration", Durations.get(index) + "");
             xml.writeEndElement();
-            
+
         }
         xml.writeEndElement();
         xml.writeStartElement(ELEMENT_SOURCES);
         for (Stream s : streams) {
             String clazzSink = s.getClass().getCanonicalName();
-            if (clazzSink.contains("Sink")){
+            if (clazzSink.contains("Sink")) {
 //                System.out.println("Skipping Sink: "+clazzSink);
             } else {
-                System.out.println("Saving Stream: "+s.getName());
+                System.out.println("Saving Stream: " + s.getName());
                 xml.writeStartElement(ELEMENT_SOURCE);
                 writeObject(s, xml);
                 xml.writeEndElement(); // Save Source
@@ -191,7 +194,7 @@ public class Studio {
     }
 
     private static void writeObject(Object o, XMLStreamWriter xml) throws IllegalArgumentException, IllegalAccessException, XMLStreamException {
-        
+
         Field[] fields = o.getClass().getDeclaredFields();
         Field[] superFields = null;
         if (o instanceof Stream) {
@@ -205,7 +208,9 @@ public class Studio {
             for (Field f : superFields) {
                 f.setAccessible(true);
                 String name = f.getName();
+//                System.out.println("SuperFields: "+name);
                 Object value = f.get(o);
+//                System.out.println("Value: "+value);
                 if (value instanceof Integer) {
                     xml.writeAttribute(name, f.getInt(o) + "");
                 } else if (value instanceof Float) {
@@ -213,13 +218,15 @@ public class Studio {
                 } else if (value instanceof Boolean) {
                     xml.writeAttribute(name, f.getBoolean(o) + "");
                 }
-                
+
             }
         }
         for (Field f : fields) {
             f.setAccessible(true);
             String name = f.getName();
+//            System.out.println("Fields: "+name);
             Object value = f.get(o);
+//            System.out.println("Value: "+value);
             if (value instanceof Integer) {
                 xml.writeAttribute(name, f.getInt(o) + "");
             } else if (value instanceof Float) {
@@ -227,12 +234,14 @@ public class Studio {
             } else if (value instanceof Boolean) {
                 xml.writeAttribute(name, f.getBoolean(o) + "");
             }
-        }    
+        }
         if (superFields != null) {
             for (Field f : superFields) {
                 f.setAccessible(true);
                 String name = f.getName();
+//                System.out.println("SuperFields2: "+name);
                 Object value = f.get(o);
+//                System.out.println("Value: "+value);
                 if (value instanceof String) {
                     xml.writeStartElement(name);
                     xml.writeCData(value.toString());
@@ -247,10 +256,12 @@ public class Studio {
         for (Field f : fields) {
             f.setAccessible(true);
             String name = f.getName();
+//            System.out.println("Fields2: "+name);
             Object value = f.get(o);
+//            System.out.println("Value: "+value);
             if (value instanceof String) {
                 xml.writeStartElement(name);
-                xml.writeCData(value.toString());                
+                xml.writeCData(value.toString());
                 xml.writeEndElement();
             } else if (value instanceof File) {
                 xml.writeStartElement(name);
@@ -262,36 +273,39 @@ public class Studio {
             for (Field f : superFields) {
                 f.setAccessible(true);
                 String name = f.getName();
+//                System.out.println("SuperFields3: "+name);
                 Object value = f.get(o);
-                if (value instanceof List) { 
+//                System.out.println("Value: "+value);
+                if (value instanceof List) {
                     switch (name) {
                         case "tracks":
                             xml.writeStartElement(ELEMENT_TRACKS);
-                            for (Object subO : ((Iterable<? extends Object>) value)) {
-                                if (clazz != null){
+                            for (Iterator<? extends Object> it = ((Iterable<? extends Object>) value).iterator(); it.hasNext();) {
+                                Object subO = it.next();
+                                if (clazz != null) {
                                     xml.writeStartElement(name);
                                     writeObject(subO, xml);
-                                    xml.writeEndElement(); 
+                                    xml.writeEndElement();
                                 }
                             }
                             break;
                         case "effects":
                             xml.writeStartElement(ELEMENT_EFFECTS);
                             for (Object subO : ((Iterable<? extends Object>) value)) {
-                                if (clazz != null){
+                                if (clazz != null) {
                                     xml.writeStartElement(name);
                                     writeObject(subO, xml);
-                                    xml.writeEndElement(); 
+                                    xml.writeEndElement();
                                 }
                             }
                             break;
                         default:
                             xml.writeStartElement(name);
                             for (Object subO : ((Iterable<? extends Object>) value)) {
-                                if (clazz != null){
+                                if (clazz != null) {
                                     writeObject(subO, xml);
                                 }
-                            
+
                             }
                             break;
                     }
@@ -307,10 +321,10 @@ public class Studio {
                 if ("effects".equals(name)) {
                     xml.writeStartElement(ELEMENT_EFFECTS);
                     for (Object subO : ((Iterable<? extends Object>) value)) {
-                        if (clazz != null){
+                        if (clazz != null) {
                             xml.writeStartElement(name);
                             writeObject(subO, xml);
-                            xml.writeEndElement(); 
+                            xml.writeEndElement();
                         }
                     }
                 } else {
@@ -323,8 +337,9 @@ public class Studio {
             }
         }
     }
+
     private static void loadTrack(ArrayList<SourceTrack> SCL, Stream stream, ArrayList<String> SubChNames, ArrayList<String> SubText, ArrayList<String> SubFont) {
-        int op=0;
+        int op = 0;
         for (SourceTrack scs : SCL) {
             scs.setName(SubChNames.get(op));
             if (SubText != null) {
@@ -332,127 +347,127 @@ public class Studio {
                 scs.setFont(SubFont.get(op));
             }
             stream.addTrack(scs);
-            op+=1;
+            op += 1;
         }
         SCL.clear();
         SubChNames.clear();
     }
-    
-    private static Effect loadEffects(String sClazz, Node SuperChild){
+
+    private static Effect loadEffects(String sClazz, Node SuperChild) {
         Effect effeX = null;
         try {
             if (sClazz.endsWith("ChromaKey")) {
                 effeX = new ChromaKey();
                 readObjectFx(effeX, SuperChild);
-                
+
             } else if (sClazz.endsWith("Blink")) {
                 effeX = new Blink();
                 readObjectFx(effeX, SuperChild);
-                
+
             } else if (sClazz.endsWith("Contrast")) {
                 effeX = new Contrast();
                 readObjectFx(effeX, SuperChild);
-                
+
             } else if (sClazz.endsWith("FlipHorizontal")) {
                 effeX = new FlipHorizontal();
                 readObjectFx(effeX, SuperChild);
-                
+
             } else if (sClazz.endsWith("FlipVertical")) {
                 effeX = new FlipVertical();
                 readObjectFx(effeX, SuperChild);
-                
+
             } else if (sClazz.endsWith("Gain")) {
                 effeX = new Gain();
                 readObjectFx(effeX, SuperChild);
-                
+
             } else if (sClazz.endsWith("Gray")) {
                 effeX = new Gray();
                 readObjectFx(effeX, SuperChild);
-                
+
             } else if (sClazz.endsWith("HSB")) {
                 effeX = new HSB();
                 readObjectFx(effeX, SuperChild);
-                
+
             } else if (sClazz.endsWith("Sharpen")) {
                 effeX = new Sharpen();
                 readObjectFx(effeX, SuperChild);
-                
+
             } else if (sClazz.endsWith("Mirror1")) {
                 effeX = new Mirror1();
                 readObjectFx(effeX, SuperChild);
-                
+
             } else if (sClazz.endsWith("Mirror2")) {
                 effeX = new Mirror2();
                 readObjectFx(effeX, SuperChild);
-                
+
             } else if (sClazz.endsWith("Mirror3")) {
                 effeX = new Mirror3();
                 readObjectFx(effeX, SuperChild);
-                
+
             } else if (sClazz.endsWith("Mirror4")) {
                 effeX = new Mirror4();
                 readObjectFx(effeX, SuperChild);
-                
+
             } else if (sClazz.endsWith("Mosaic")) {
                 effeX = new Mosaic();
                 readObjectFx(effeX, SuperChild);
-                
+
             } else if (sClazz.endsWith("Crop")) {
                 effeX = new Crop();
                 readObjectFx(effeX, SuperChild);
-                
+
             } else if (sClazz.endsWith("Opacity")) {
                 effeX = new Opacity();
                 readObjectFx(effeX, SuperChild);
-                
+
             } else if (sClazz.endsWith("Perspective")) {
                 effeX = new Perspective();
                 readObjectFx(effeX, SuperChild);
-                
+
             } else if (sClazz.endsWith("RGB")) {
                 effeX = new RGB();
                 readObjectFx(effeX, SuperChild);
-                
+
             } else if (sClazz.endsWith("RevealRightNFade")) {
                 effeX = new RevealRightNFade();
                 readObjectFx(effeX, SuperChild);
-                
+
             } else if (sClazz.endsWith("RevealLeftNFade")) {
                 effeX = new RevealLeftNFade();
                 readObjectFx(effeX, SuperChild);
-                
+
             } else if (sClazz.endsWith("Stretch")) {
                 effeX = new Stretch();
                 readObjectFx(effeX, SuperChild);
-                
+
             } else if (sClazz.endsWith("Rotation")) {
                 effeX = new Rotation();
                 readObjectFx(effeX, SuperChild);
-                
+
             } else if (sClazz.endsWith("SwapRedBlue")) {
                 effeX = new SwapRedBlue();
                 readObjectFx(effeX, SuperChild);
-                
+
             } else if (sClazz.endsWith("Shapes")) {
                 effeX = new Shapes();
                 readObjectFx(effeX, SuperChild);
                 effeX.setShape(shapeImg);
-                
+
             }
         } catch (IllegalArgumentException | IllegalAccessException illegalArgumentException) {
         }
         return effeX;
     }
 
-    private static void readStreams (Document xml) throws IllegalArgumentException, IllegalAccessException, XPathExpressionException{
+    private static void readStreams(Document xml) throws IllegalArgumentException, IllegalAccessException, XPathExpressionException {
         XPath path = XPathFactory.newInstance().newXPath();
         NodeList sources = (NodeList) path.evaluate("/" + ELEMENT_ROOT + "/" + ELEMENT_SOURCES + "/" + ELEMENT_SOURCE, xml.getDocumentElement(), XPathConstants.NODESET);
-        String videoDev;      
-        ArrayList<String> videoDevs = new ArrayList<>();
-        ArrayList<Stream> extstreamBis = new ArrayList<>();
+//        String videoDev;
+//        ArrayList<String> videoDevs = new ArrayList<>();
+//        ArrayList<Stream> extstreamBis = new ArrayList<>();
         if (sources != null) {
             for (int i = 0; i < sources.getLength(); i++) {
-                Node source = sources.item(i);            
+                Node source = sources.item(i);
                 String clazz = source.getAttributes().getNamedItem("clazz").getTextContent();
                 String file = null;
                 String ObjText = null;
@@ -477,18 +492,18 @@ public class Studio {
                 SourceText text;
                 for (int j = 0; j < source.getChildNodes().getLength(); j++) {
                     Node child = source.getChildNodes().item(j);
-                    if (child.getNodeName().equals("file")) {                       
+                    if (child.getNodeName().equals("file")) {
                         file = child.getTextContent();
                         ImgMovMus.add(file);
                     }
-                    if (child.getNodeName().equals("name")) {                       
+                    if (child.getNodeName().equals("name")) {
                         sName = child.getTextContent();
                         sNames.add(sName);
                     }
-                    if (child.getNodeName().equals("isIntSrc")) {                       
+                    if (child.getNodeName().equals("isIntSrc")) {
                         isIntSrc = child.getTextContent();
                     }
-                    
+
                     if (child.getNodeName().equals("content")) {
                         ObjText = child.getTextContent();
                     }
@@ -501,10 +516,10 @@ public class Studio {
                     if (child.getNodeName().equals("trkName")) {
                         trackName = child.getTextContent();
                     }
-                    if (child.getNodeName().equals("comm")) {                       
+                    if (child.getNodeName().equals("comm")) {
                         comm = child.getTextContent();
                     }
-                    if (child.getNodeName().equals("streamTime")) {                       
+                    if (child.getNodeName().equals("streamTime")) {
                         streamTime = child.getTextContent();
                     }
 
@@ -516,13 +531,13 @@ public class Studio {
                             if (SuperChild.getNodeName().equals("effects")) {
                                 for (int ncc = 0; ncc < SuperChild.getChildNodes().getLength(); ncc++) {
                                     Node SSuperChild = SuperChild.getChildNodes().item(ncc);
-                                    if (SSuperChild.getNodeName().equals("shapeS")){
+                                    if (SSuperChild.getNodeName().equals("shapeS")) {
                                         shapeImg = SSuperChild.getTextContent();
 //                                        System.out.println("Ass ShapeImg: "+ shapeImg);
                                     }
                                 }
                                 String sClazz = SuperChild.getAttributes().getNamedItem("clazz").getTextContent();
-                                effeX = loadEffects (sClazz, SuperChild);
+                                effeX = loadEffects(sClazz, SuperChild);
                                 fXL.add(effeX);
 //                                System.out.println("effect clazz: "+ sClazz);
                             }
@@ -532,89 +547,72 @@ public class Studio {
                         for (int nc = 0; nc < child.getChildNodes().getLength(); nc++) {
                             Node SuperChild = child.getChildNodes().item(nc);
                             for (int ncc = 0; ncc < SuperChild.getChildNodes().getLength(); ncc++) {
-                                Node SSuperChild = SuperChild.getChildNodes().item(ncc);                        
+                                Node SSuperChild = SuperChild.getChildNodes().item(ncc);
                                 if (SSuperChild.getNodeName().equals("name")) {
                                     SubChNames.add(SSuperChild.getTextContent());
-                                    sc = new SourceTrack();                                    
+                                    sc = new SourceTrack();
                                     readObjectSC(sc, SuperChild);
-                                    SCL.add(sc);                                    
+                                    SCL.add(sc);
                                     trackLoad.add(sc);
-                                }  
+                                }
                                 if (SSuperChild.getNodeName().equals("Effects")) {
                                     for (int ncs = 0; ncs < SSuperChild.getChildNodes().getLength(); ncs++) {
-                                        Node SSSuperChild = SSuperChild.getChildNodes().item(ncs);            
+                                        Node SSSuperChild = SSuperChild.getChildNodes().item(ncs);
                                         if (SSSuperChild.getNodeName().equals("effects")) {
                                             for (int nccC = 0; nccC < SSSuperChild.getChildNodes().getLength(); nccC++) {
                                                 Node SSSSuperChildC = SSSuperChild.getChildNodes().item(nccC);
-                                                if (SSSSuperChildC.getNodeName().equals("shapeS")){
+                                                if (SSSSuperChildC.getNodeName().equals("shapeS")) {
                                                     shapeImg = SSSSuperChildC.getTextContent();
 //                                                System.out.println("Ass ShapeImg Chan: "+ shapeImg);
                                                 }
                                             }
                                             String sClazz = SSSuperChild.getAttributes().getNamedItem("clazz").getTextContent();
-                                            effeX = loadEffects (sClazz, SSSuperChild);
+                                            effeX = loadEffects(sClazz, SSSuperChild);
                                             sc.addEffects(effeX);
 //                                            System.out.println("channel effect clazz: "+ sClazz);
-                                        }     
+                                        }
                                     }
                                 }
-                                if (SSuperChild.getNodeName().equals("startTransitions")) {
-                                    if (SSuperChild.getAttributes().getLength()!= 0) {
-                                        String sClazz = SSuperChild.getAttributes().getNamedItem("clazz").getTextContent();
-                                        subSTrans.add(sClazz);
-                                    } else {
-                                        subSTrans.add("None");                                   
-                                    }
-                                }  
-                                if (SSuperChild.getNodeName().equals("endTransitions")) {
-                                    if (SSuperChild.getAttributes().getLength()!= 0) {
-                                        String sClazz = SSuperChild.getAttributes().getNamedItem("clazz").getTextContent();
-                                        subETrans.add(sClazz);
-                                    } else {
-                                        subETrans.add("None");                                   
-                                    }
-                                }  
                                 if (SSuperChild.getNodeName().equals("text") && SSuperChild.getTextContent() != null) {
                                     SubText.add(SSuperChild.getTextContent());
-                                }  
+                                }
                                 if (SSuperChild.getNodeName().equals("font") && SSuperChild.getTextContent() != null) {
                                     SubFont.add(SSuperChild.getTextContent());
                                 }
                             }
                         }
                     }
-                }              
+                }
                 if (file != null) {
                     File fileL = new File(file);
                     stream = Stream.getInstance(fileL);
-                    extstream.add(stream); 
-                    extstreamBis.add(stream);
+                    extstream.add(stream);
+//                    extstreamBis.add(stream);
                     readObject(stream, source);
                     stream.setComm(comm);
                     for (Effect fx : fXL) {
-                        if (fx.getName().endsWith("Shapes")){
+                        if (fx.getName().endsWith("Shapes")) {
                             fx.setDoOne(true);
                         }
                         stream.addEffect(fx);
                     }
-                    if (streamTime != null){
+                    if (streamTime != null) {
                         stream.setStreamTime(streamTime);
-                    } else {
-                        if (stream instanceof SourceMovie || stream instanceof SourceMusic) {
-                            TrucklistStudio.getStreamParams(stream, fileL, null);
-                        }
+                    } else if (stream instanceof SourceMovie || stream instanceof SourceMusic) {
+                        TrucklistStudio.getStreamParams(stream, fileL, null);
                     }
                     stream.setLoaded(true);
                     loadTrack(SCL, stream, SubChNames, null, null);
                     stream.setName(sName);
                     stream.setTrkName(trackName);
                     fXL.clear();
+//                    System.out.println("ReadDoc Stream="+stream.getName());
                 } else if (clazz.toLowerCase().endsWith("sourcetext")) {
                     text = new SourceText(ObjText);
                     LText.add(text);
                     readObject(text, source);
                     for (Effect fx : fXL) {
-                        if (fx.getName().endsWith("Shapes")){
+                        if (fx.getName().endsWith("Shapes")) {
                             fx.setDoOne(true);
                         }
                         text.addEffect(fx);
@@ -622,7 +620,7 @@ public class Studio {
                     if (strShapez != null) {
                         switch (strShapez) {
                             case "none":
-                                text.setBackground(NONE); 
+                                text.setBackground(NONE);
                                 text.setStrBackground("none");
                                 break;
                             case "rectangle":
@@ -648,46 +646,47 @@ public class Studio {
                     subSTrans.clear();
                     subETrans.clear();
                 } else if (clazz.toLowerCase().endsWith("sourceimagegif")) {
-                    for (int an=0;an < truckliststudio.TrucklistStudio.cboAnimations.getItemCount(); an++){
-                        for (String aKey : sNames){
+                    for (int an = 0; an < truckliststudio.TrucklistStudio.cboAnimations.getItemCount(); an++) {
+                        for (String aKey : sNames) {
 //                            System.out.println("aKey="+aKey);
                             String anim = truckliststudio.TrucklistStudio.cboAnimations.getItemAt(an).toString();
-                            if (aKey == null ? truckliststudio.TrucklistStudio.cboAnimations.getItemAt(an).toString() == null : aKey.contains(anim) && isIntSrc.equals("true") ){ 
+                            if (aKey == null ? truckliststudio.TrucklistStudio.cboAnimations.getItemAt(an).toString() == null : aKey.contains(anim) && isIntSrc.equals("true")) {
                                 String res = truckliststudio.TrucklistStudio.animations.getProperty(anim);
                                 URL url = TrucklistStudio.class.getResource("/truckliststudio/resources/animations/" + res);
                                 stream = new SourceImageGif(aKey, url);
                                 extstream.add(stream);
-                                extstreamBis.add(stream);
+//                                extstreamBis.add(stream);
                                 ImgMovMus.add("ImageGif");
-                                readObject(stream, source);  
+                                readObject(stream, source);
                                 loadTrack(SCL, stream, SubChNames, null, null);
                                 stream.setIntSrc("true");
                             }
-                        }                   
+                        }
                     }
                 } else {
                     System.err.println("Cannot handle " + clazz);
                 }
             }
-            for (Stream dST : extstreamBis) {
-                int multi=0;
-                String streamName = dST.getName();
-//                System.out.println("Found Stream Name: "+streamName);
-                for (String vDev : videoDevs){
-                    if (vDev.contains(streamName)){
-                        multi += 1; 
-                    }
-                }
-                if (multi>1) {
-                    extstream.remove(dST);
-                    ImgMovMus.remove("/dev/"+streamName);
-//                    System.out.println(dST+" Removed ...");
-//                    System.out.println(streamName+" Removed ...");
-                    multi=0;
-                }
-            }
-        }   
+//            for (Stream dST : extstreamBis) {
+//                int multi = 0;
+//                String streamName = dST.getName();
+////                System.out.println("Found Stream Name: "+streamName);
+//                for (String vDev : videoDevs) {
+//                    if (vDev.contains(streamName)) {
+//                        multi += 1;
+//                    }
+//                }
+//                if (multi > 1) {
+//                    extstream.remove(dST);
+//                    ImgMovMus.remove("/dev/" + streamName);
+////                    System.out.println(dST+" Removed ...");
+////                    System.out.println(streamName+" Removed ...");
+//                    multi = 0;
+//                }
+//            }
+        }
     }
+
     private static void readObject(Stream stream, Node source) throws IllegalArgumentException, IllegalAccessException {
         Field[] fields = stream.getClass().getDeclaredFields();
         Field[] superFields = stream.getClass().getSuperclass().getDeclaredFields();
@@ -714,8 +713,7 @@ public class Studio {
                 }
             }
         }
-        
-        
+
         for (Field field : fields) {
             field.setAccessible(true);
             String name = field.getName();
@@ -739,6 +737,8 @@ public class Studio {
 
             }
         }
+        fields = null;
+        superFields = null;
         // Read List
     }
 
@@ -768,7 +768,7 @@ public class Studio {
                 }
             }
         }
-        
+
         for (Field field : fields) {
             field.setAccessible(true);
             String name = field.getName();
@@ -792,9 +792,12 @@ public class Studio {
 
             }
         }
+        fields = null;
+        superFields = null;
         // Read List
     }
-    private static void readObjectSC (SourceTrack sc, Node source) throws IllegalArgumentException, IllegalAccessException {
+
+    private static void readObjectSC(SourceTrack sc, Node source) throws IllegalArgumentException, IllegalAccessException {
         Field[] fields = sc.getClass().getDeclaredFields();
         Field[] superFields = sc.getClass().getSuperclass().getDeclaredFields();
         // Read integer and floats
@@ -816,7 +819,7 @@ public class Studio {
                         if (node.getNodeName().equals(name)) {
                             field.set(sc, node.getTextContent());
                         }
-                    }                       
+                    }
                 }
             }
         }
@@ -843,29 +846,34 @@ public class Studio {
                 }
             }
         }
+        fields = null;
+        superFields = null;
         // Read List 
     }
+
     public static void main() { // removed (String[] args)
         try {
             try {
                 Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(Studio.filename);
                 readStreams(doc);
-            } catch (    IllegalArgumentException | IllegalAccessException | XPathExpressionException | SAXException | IOException ex) {
+            } catch (IllegalArgumentException | IllegalAccessException | XPathExpressionException | SAXException | IOException ex) {
                 Logger.getLogger(Studio.class.getName()).log(Level.SEVERE, null, ex);
             }
         } catch (ParserConfigurationException ex) {
             Logger.getLogger(Studio.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
     }
     private final ArrayList<String> tracks = MasterTracks.getInstance().getTracks();
     private final ArrayList<Integer> Durations = listener.getCHTimers();
     ArrayList<Stream> streams = MasterTracks.getInstance().getStreams();
     Stream streamC = null;
+
     protected Studio() {
     }
 
     public interface Listener {
-        public ArrayList<Integer> getCHTimers ();
+
+        public ArrayList<Integer> getCHTimers();
     }
 }

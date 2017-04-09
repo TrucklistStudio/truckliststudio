@@ -219,12 +219,24 @@
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="textURL">
+      <Properties>
+        <Property name="toolTipText" type="java.lang.String" value="FME/IceCast"/>
+      </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="textStream">
+      <Properties>
+        <Property name="toolTipText" type="java.lang.String" value="FME Only."/>
+      </Properties>
     </Component>
     <Component class="javax.swing.JSpinner" name="spinVideoRate">
+      <Properties>
+        <Property name="toolTipText" type="java.lang.String" value="Kb/s"/>
+      </Properties>
     </Component>
     <Component class="javax.swing.JSpinner" name="spinAudioRate">
+      <Properties>
+        <Property name="toolTipText" type="java.lang.String" value="Kb/s"/>
+      </Properties>
     </Component>
     <Component class="javax.swing.JButton" name="btnCancel">
       <Properties>
@@ -263,8 +275,14 @@
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="textMount">
+      <Properties>
+        <Property name="toolTipText" type="java.lang.String" value="IceCast only."/>
+      </Properties>
     </Component>
     <Component class="javax.swing.JPasswordField" name="textPsw">
+      <Properties>
+        <Property name="toolTipText" type="java.lang.String" value="IceCast only."/>
+      </Properties>
     </Component>
     <Component class="javax.swing.JSpinner" name="spinPort">
     </Component>
@@ -315,9 +333,6 @@
       </Events>
     </Component>
     <Component class="javax.swing.JTextField" name="textName">
-      <Properties>
-        <Property name="toolTipText" type="java.lang.String" value=""/>
-      </Properties>
     </Component>
   </SubComponents>
 </Form>

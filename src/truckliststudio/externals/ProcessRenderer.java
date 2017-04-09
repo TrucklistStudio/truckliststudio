@@ -30,6 +30,7 @@ import truckliststudio.streams.Stream;
 import truckliststudio.util.Tools;
 import truckliststudio.util.Tools.OS;
 import truckliststudio.media.renderer.Capturer;
+import truckliststudio.streams.SinkHLS;
 
 /**
  *
@@ -201,7 +202,7 @@ public class ProcessRenderer {
                     if (fme != null) {
                         command = command.replaceAll(Tags.VBITRATE.toString(), fme.getVbitrate());
                     }
-                    if (stream instanceof SinkFile || stream instanceof SinkUDP) {
+                    if (stream instanceof SinkFile || stream instanceof SinkUDP || stream instanceof SinkHLS) {
                         command = command.replaceAll(Tags.VBITRATE.toString(), stream.getVbitrate());
                     }
                     break;
@@ -209,7 +210,7 @@ public class ProcessRenderer {
                     if (fme != null) {
                         command = command.replaceAll(Tags.ABITRATE.toString(), fme.getAbitrate());
                     }
-                    if (stream instanceof SinkFile || stream instanceof SinkUDP) {
+                    if (stream instanceof SinkFile || stream instanceof SinkUDP || stream instanceof SinkHLS) {
                         command = command.replaceAll(Tags.ABITRATE.toString(), stream.getAbitrate());
                     }
                     break;
@@ -221,12 +222,46 @@ public class ProcessRenderer {
                             command = command.replaceAll(Tags.URL.toString(), "" + fmeURL + "/" + fme.getStream()); // "\""+fme.getUrl()+"/"+fme.getStream()+" live=1 flashver=FME/2.520(compatible;20FMSc201.0)"+"\""
                         }
                     } else if (stream.getURL() != null) {
-                        command = command.replaceAll(Tags.URL.toString(), "" + stream.getURL());
+                        String streamURL = stream.getURL();
+                        if (!streamURL.endsWith("/")) {
+                            streamURL = streamURL + "/";
+                        }
+                        command = command.replaceAll(Tags.URL.toString(), "" + streamURL);
                     }
                     break;
                 case MOUNT:
                     if (fme != null && fme.getMount() != "") {
                         command = command.replaceAll(Tags.MOUNT.toString(), "" + fme.getMount());
+                    } else {
+                        if (stream instanceof SinkHLS) {
+                            SinkHLS sinkhls = (SinkHLS) stream;
+                            if (Tools.getOS() == OS.LINUX) {
+                                command = command.replaceAll(Tags.MOUNT.toString(), "" + sinkhls.getMount());
+                            } else if (Tools.getOS() == OS.WINDOWS) {
+                                command = command.replaceAll(Tags.MOUNT.toString(), "" + sinkhls.getMount().replace("\\", "\\\\\\\\"));
+                            }
+                        }
+                    }
+                case LOC:
+                    if (stream instanceof SinkHLS) {
+                        SinkHLS sinkhls = (SinkHLS) stream;
+                        String location = "";
+                        if (Tools.getOS() == OS.LINUX) {
+                            String[] loc = sinkhls.getMount().split("/");
+                            for (int i=0; i< loc.length - 1 ; i++) {
+                                location = location + loc[i] + "/";
+                            }
+                            command = command.replaceAll(Tags.LOC.toString(), "" + location);
+                        } else if (Tools.getOS() == OS.WINDOWS) {
+//                                String rawLoc = sinkhls.getMount().replace("\\", "\\\\");
+//                                String[] loc = rawLoc.split("\\\\");
+                                String[] loc = sinkhls.getMount().split("\\\\");
+                                for (int i=0; i< loc.length - 1 ; i++) {
+                                    System.out.println("Location="+location);
+                                    location = location + loc[i] + "\\\\\\\\";
+                                }
+                                command = command.replaceAll(Tags.LOC.toString(), "" + location);
+                        }
                     }
                 case PASSWORD:
                     if (fme != null && fme.getPassword() != "") {
@@ -403,6 +438,7 @@ public class ProcessRenderer {
                 stopMe = false;
                 videoPort = exporter.getVideoPort();
                 audioPort = exporter.getAudioPort();
+                System.out.println("plugin="+plugin);
                 String command = plugins.getProperty(plugin).replaceAll("  ", " "); //Making sure there is no double spaces
                 command = setParameters(command);
                 System.out.println("Command Out: " + command);

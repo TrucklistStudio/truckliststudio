@@ -46,6 +46,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JToggleButton;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import org.apache.commons.io.FileUtils;
 import truckliststudio.TrucklistStudio;
 import static truckliststudio.TrucklistStudio.theme;
 import static truckliststudio.TrucklistStudio.wsDistroWatch;
@@ -57,6 +58,7 @@ import truckliststudio.mixers.MasterMixer;
 import truckliststudio.streams.SinkAudio;
 import truckliststudio.streams.SinkBroadcast;
 import truckliststudio.streams.SinkFile;
+import truckliststudio.streams.SinkHLS;
 import truckliststudio.streams.SinkUDP;
 import truckliststudio.streams.Stream;
 import truckliststudio.util.Tools;
@@ -71,6 +73,7 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
     TreeMap<String, SinkBroadcast> broadcasts = new TreeMap<>();
     ArrayList<String> broadcastsOut = new ArrayList<>();
     TreeMap<String, SinkUDP> udpOut = new TreeMap<>();
+    TreeMap<String, SinkHLS> hlsOut = new TreeMap<>();
     TreeMap<String, SinkAudio> audioOut = new TreeMap<>();
     TreeMap<String, FME> fmes = new TreeMap<>();
     private final static String userHomeDir = Tools.getUserHome();
@@ -81,14 +84,18 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
     JPopupMenu fmePopup = new JPopupMenu();
     JPopupMenu sinkFilePopup = new JPopupMenu();
     JPopupMenu sinkUDPPopup = new JPopupMenu();
+    JPopupMenu sinkHLSPopup = new JPopupMenu();
     File f;
     SinkFile fileStream;
     SinkUDP udpStream;
     SinkAudio audioStream;
+    SinkHLS hlsStream;
     private boolean audioOutState = false;
     private boolean udpOutState = false;
+    private boolean hlsOutState = false;
     private boolean audioOutSwitch = false;
     private boolean udpOutSwitch = false;
+    private boolean hlsOutSwitch = false;
     private boolean fmeOutState = false;
     private boolean fmeOutSwitch = false;
     
@@ -100,6 +107,8 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
         udpStream = new SinkUDP();
         fileStream = new SinkFile(f);
         audioStream = new SinkAudio();
+        hlsStream = new SinkHLS();
+        
 //        System.out.println("SinkAudio"+audioStream);
         
         tglRecordToFile.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -138,10 +147,29 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
             }
         });
         
+        tglHLS.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                JToggleButton button = ((JToggleButton) evt.getSource());
+                if (!button.isSelected()) {
+                    sinkHLSRightMousePressed(evt);
+                }
+            }
+            
+            @Override
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                JToggleButton button = ((JToggleButton) evt.getSource());
+                if (!button.isSelected()) {
+                    sinkHLSRightMousePressed(evt);
+                }
+            }
+        });
+        
         wDPanel = aPanel;
         fmeInitPopUp();
         sinkFileInitPopUp();
         sinkUDPInitPopUp();
+        sinkHLSInitPopUp();
         final OutputPanel instanceSinkOP = this;
         TrucklistStudio.setListenerOP(instanceSinkOP);
         TrackPanel.setListenerCPOPanel(instanceSinkOP);
@@ -154,6 +182,10 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
         udpStream.setWidth(MasterMixer.getInstance().getWidth());
         udpStream.setHeight(MasterMixer.getInstance().getHeight());
         udpStream.setRate(MasterMixer.getInstance().getRate());
+        
+        hlsStream.setWidth(MasterMixer.getInstance().getWidth());
+        hlsStream.setHeight(MasterMixer.getInstance().getHeight());
+        hlsStream.setRate(MasterMixer.getInstance().getRate());
         
         if (wsDistroWatch().toLowerCase().equals("windows")) {
             tglAudioOut.setEnabled(false);
@@ -226,11 +258,13 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
         Preferences fmePrefs = prefs.node("fme");
         Preferences filePrefs = prefs.node("filerec");
         Preferences udpPrefs = prefs.node("udp");
+        Preferences hlsPrefs = prefs.node("hls");
         try {
             String[] services = fmePrefs.childrenNames();          
             String[] servicesF = filePrefs.childrenNames();           
             String[] servicesU = udpPrefs.childrenNames();
-                      
+            String[] servicesH = hlsPrefs.childrenNames();
+            
             for (String s : servicesF){
                 Preferences serviceF = filePrefs.node(s);
                 fileStream.setVbitrate(serviceF.get("vbitrate", "1200"));
@@ -242,6 +276,17 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
                 udpStream.setVbitrate(serviceU.get("vbitrate", "1200"));
                 udpStream.setAbitrate(serviceU.get("abitrate", "128"));
                 udpStream.setStandard(serviceU.get("standard", "STD"));
+            }
+            
+            for (String s : servicesH){
+                Preferences serviceH = hlsPrefs.node(s);
+                hlsStream.setVbitrate(serviceH.get("vbitrate", "1200"));
+                hlsStream.setAbitrate(serviceH.get("abitrate", "128"));
+                hlsStream.setStandard(serviceH.get("standard", "STD"));
+                hlsStream.setMount(serviceH.get("mount", "/var/www/html/HLS/stream.m3u8"));
+                hlsStream.setURL(serviceH.get("url", "http://127.0.0.1/HLS"));
+//                System.out.println("HLS Mount loaded="+hlsStream.getMount());
+//                System.out.println("Service Name="+s);
             }
             
             for (String s : services) {
@@ -281,6 +326,7 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
         Preferences fmePrefs = prefs.node("fme");
         Preferences filePrefs = prefs.node("filerec");
         Preferences udpPrefs = prefs.node("udp");
+        Preferences hlsPrefs = prefs.node("hls");
         try {
             fmePrefs.removeNode();
             fmePrefs.flush();
@@ -291,6 +337,9 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
             udpPrefs.removeNode();
             udpPrefs.flush();
             udpPrefs = prefs.node("udp");
+            hlsPrefs.removeNode();
+            hlsPrefs.flush();
+            hlsPrefs = prefs.node("hls");
         } catch (BackingStoreException ex) {
             Logger.getLogger(OutputPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -318,6 +367,13 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
         serviceU.put("abitrate", udpStream.getAbitrate());
         serviceU.put("vbitrate", udpStream.getVbitrate());
         serviceU.put("standard", udpStream.getStandard());
+        Preferences serviceH = hlsPrefs.node("houtset");
+        serviceH.put("abitrate", hlsStream.getAbitrate());
+        serviceH.put("vbitrate", hlsStream.getVbitrate());
+        serviceH.put("standard", hlsStream.getStandard());
+        serviceH.put("mount", hlsStream.getMount());
+        serviceH.put("url", hlsStream.getURL());
+//        System.out.println("Saving Mount="+hlsStream.getMount());
     }
     
     private String checkDoubleBroad(String s) {
@@ -388,7 +444,7 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
                         labels.remove(fme.getName());
 //                        System.out.println("StopFMECount = "+fmeCount);
                         ResourceMonitor.getInstance().removeMessage(label);
-                        if (fmeCount == 0 && !udpOutState) {
+                        if (fmeCount == 0 && !udpOutState && !hlsOutState) {
                             if (theme.equals("Dark")) {
                                 lblOnAir.setForeground(Color.WHITE);
                             } else {
@@ -464,6 +520,12 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
         }
     }
     
+    private void sinkHLSRightMousePressed(java.awt.event.MouseEvent evt) {
+        if (evt.isPopupTrigger()) {
+            sinkHLSPopup.show(evt.getComponent(), evt.getX(), evt.getY());
+        }
+    }
+    
     private void fmeInitPopUp(){
         JMenuItem fmeSettings = new JMenuItem (new AbstractAction("FME Settings") {
             @Override
@@ -482,7 +544,7 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
         JMenuItem sinkSettings = new JMenuItem (new AbstractAction("Record Settings") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                SinkSettings sinkSet = new SinkSettings(fileStream, null);
+                SinkSettings sinkSet = new SinkSettings(fileStream, null, null);
                 sinkSet.setLocationRelativeTo(TrucklistStudio.cboAnimations);
                 sinkSet.setAlwaysOnTop(true);
                 sinkSet.setVisible(true);
@@ -496,7 +558,7 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
         JMenuItem sinkSettings = new JMenuItem (new AbstractAction("UDP Settings") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                SinkSettings sinkSet = new SinkSettings(null, udpStream);
+                SinkSettings sinkSet = new SinkSettings(null, udpStream, null);
                 sinkSet.setLocationRelativeTo(TrucklistStudio.cboAnimations);
                 sinkSet.setAlwaysOnTop(true);
                 sinkSet.setVisible(true);
@@ -504,6 +566,20 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
         });
         sinkSettings.setIcon(new ImageIcon(getClass().getResource("/truckliststudio/resources/tango/working-6.png"))); // NOI18N
         sinkUDPPopup.add(sinkSettings);
+    }
+    
+    private void sinkHLSInitPopUp(){
+        JMenuItem sinkSettings = new JMenuItem (new AbstractAction("HLS Settings") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SinkSettings sinkSet = new SinkSettings(null, null, hlsStream);
+                sinkSet.setLocationRelativeTo(TrucklistStudio.cboAnimations);
+                sinkSet.setAlwaysOnTop(true);
+                sinkSet.setVisible(true);
+            }
+        });
+        sinkSettings.setIcon(new ImageIcon(getClass().getResource("/truckliststudio/resources/tango/working-6.png"))); // NOI18N
+        sinkHLSPopup.add(sinkSettings);
     }
     
     /** This method is called from within the constructor to
@@ -519,6 +595,7 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
         tglAudioOut = new javax.swing.JToggleButton();
         tglRecordToFile = new javax.swing.JToggleButton();
         tglUDP = new javax.swing.JToggleButton();
+        tglHLS = new javax.swing.JToggleButton();
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 3), new java.awt.Dimension(0, 3), new java.awt.Dimension(32767, 3));
         sepFME = new javax.swing.JSeparator();
         filler2 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 3), new java.awt.Dimension(0, 3), new java.awt.Dimension(32767, 3));
@@ -556,6 +633,7 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
         tglRecordToFile.setMinimumSize(new java.awt.Dimension(87, 21));
         tglRecordToFile.setName("tglRecordToFile"); // NOI18N
         tglRecordToFile.setPreferredSize(new java.awt.Dimension(87, 22));
+        tglRecordToFile.setRolloverEnabled(false);
         tglRecordToFile.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/media-playback-stop.png"))); // NOI18N
         tglRecordToFile.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -570,6 +648,7 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
         tglUDP.setMinimumSize(new java.awt.Dimension(237, 21));
         tglUDP.setName("tglUDP"); // NOI18N
         tglUDP.setPreferredSize(new java.awt.Dimension(237, 22));
+        tglUDP.setRolloverEnabled(false);
         tglUDP.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/media-playback-stop.png"))); // NOI18N
         tglUDP.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -577,6 +656,21 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
             }
         });
         add(tglUDP);
+
+        tglHLS.setIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/media-record.png"))); // NOI18N
+        tglHLS.setText(bundle.getString("HLS")); // NOI18N
+        tglHLS.setToolTipText("HTTP Live Streaming - Right Click for Settings");
+        tglHLS.setMinimumSize(new java.awt.Dimension(237, 21));
+        tglHLS.setName("tglHLS"); // NOI18N
+        tglHLS.setPreferredSize(new java.awt.Dimension(237, 22));
+        tglHLS.setRolloverEnabled(false);
+        tglHLS.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/media-playback-stop.png"))); // NOI18N
+        tglHLS.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tglHLSActionPerformed(evt);
+            }
+        });
+        add(tglHLS);
 
         filler1.setName("filler1"); // NOI18N
         add(filler1);
@@ -743,13 +837,16 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
         f = new File(userHomeDir + "/.truckliststudio/Record To File");
         fileStream = new SinkFile(f);
         udpStream = new SinkUDP();
+        hlsStream = new SinkHLS();
         audioStream = new SinkAudio();
         Preferences filePrefs = TrucklistStudio.prefs.node("filerec");
         Preferences udpPrefs = TrucklistStudio.prefs.node("udp");
+        Preferences hlsPrefs = TrucklistStudio.prefs.node("hls");
         try {
             String[] servicesF = filePrefs.childrenNames();           
             String[] servicesU = udpPrefs.childrenNames();
-                      
+            String[] servicesH = hlsPrefs.childrenNames();
+            
             for (String s : servicesF){
                 Preferences serviceF = filePrefs.node(s);
                 fileStream.setVbitrate(serviceF.get("vbitrate", ""));
@@ -762,6 +859,17 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
                 udpStream.setAbitrate(serviceU.get("abitrate", ""));
                 udpStream.setStandard(serviceU.get("standard", ""));
             }
+            
+            for (String s : servicesH){
+                Preferences serviceH = hlsPrefs.node(s);
+                hlsStream.setVbitrate(serviceH.get("vbitrate", ""));
+                hlsStream.setAbitrate(serviceH.get("abitrate", ""));
+                hlsStream.setStandard(serviceH.get("standard", ""));
+                hlsStream.setMount(serviceH.get("mount", ""));
+                hlsStream.setURL(serviceH.get("url", ""));
+//                System.out.println("HLS Mount loaded="+hlsStream.getMount());
+//                System.out.println("Service Name="+s);
+            }
         } catch (BackingStoreException ex) {
             Logger.getLogger(OutputPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -771,6 +879,7 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
     public void requestReset() {
         audioOutSwitch = audioOutState;
         udpOutSwitch = udpOutState;
+        hlsOutSwitch = hlsOutState;
         if (fmeOutState) {
             fmeOutSwitch = true;
             fmeCount = 0;
@@ -788,6 +897,9 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
         }
         if (udpOutSwitch){
             tglUDP.doClick();
+        }
+        if (hlsOutSwitch){
+            tglHLS.doClick();
         }
         if (fmeOutSwitch){
             for (String bro : currentBroadcasts) {
@@ -808,6 +920,7 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
         audioOutSwitch = false;
         udpOutSwitch = false;
         fmeOutSwitch = false;
+        hlsOutSwitch = false;
     }
 
     @Override
@@ -871,6 +984,47 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
             addFME.setPriority(Thread.MIN_PRIORITY);
             addFME.start();
     }//GEN-LAST:event_btnAddFMEActionPerformed
+
+    private void tglHLSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tglHLSActionPerformed
+        if (tglHLS.isSelected()) {
+            hlsOutState = true;
+            hlsStream.setListener(instanceSink);
+            // Fix lost prefs
+            if ("".equals(hlsStream.getVbitrate())) {
+                hlsStream.setVbitrate("1200");
+            }
+            if ("".equals(hlsStream.getAbitrate())) {
+                hlsStream.setAbitrate("128");
+            }
+            if ("".equals(hlsStream.getStandard())) {
+                hlsStream.setStandard("STD");
+            }
+            
+            hlsStream.read();
+            hlsOut.put("HLSOut", hlsStream);
+            ResourceMonitorLabel label = new ResourceMonitorLabel(System.currentTimeMillis()+10000, "HTTP live streaming Started.");
+            labels.put("HLSOut", label);
+            ResourceMonitor.getInstance().addMessage(label);
+            lblOnAir.setForeground(Color.RED);
+        } else {
+            hlsOutState = false;
+            SinkHLS hlsStream = hlsOut.get("HLSOut");
+            if (hlsStream != null) {
+                hlsStream.stop();
+                hlsStream = null;
+                hlsOut.remove("HLSOut");
+                ResourceMonitorLabel label = labels.get("HLSOut");
+                ResourceMonitor.getInstance().removeMessage(label);
+            }
+            if (fmeCount == 0) {
+                if (theme.equals("Dark")) {
+                    lblOnAir.setForeground(Color.WHITE);
+                } else {
+                    lblOnAir.setForeground(Color.BLACK);
+                }
+            }
+        }
+    }//GEN-LAST:event_tglHLSActionPerformed
     
     public static void execPACTL(String command) throws IOException, InterruptedException {
 //        System.out.println(command);
@@ -892,6 +1046,7 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
     private javax.swing.JLabel jLabel2;
     private javax.swing.JSeparator sepFME;
     private javax.swing.JToggleButton tglAudioOut;
+    private javax.swing.JToggleButton tglHLS;
     private javax.swing.JToggleButton tglRecordToFile;
     final OutputPanel instanceSink = this;
     private javax.swing.JToggleButton tglUDP;
@@ -904,6 +1059,8 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
             tglRecordToFile.setSelected(stream.isPlaying());
         } else if (stream instanceof SinkUDP) {
             tglUDP.setSelected(stream.isPlaying());
+        } else if (stream instanceof SinkHLS) {
+            tglHLS.setSelected(stream.isPlaying());
         } else if (stream instanceof SinkAudio) {
             tglAudioOut.setSelected(stream.isPlaying());
         } else if (stream instanceof SinkBroadcast) {
@@ -919,7 +1076,7 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
             if (!stream.isPlaying()){
                 fmeCount --;
             }
-            if (fmeCount == 0 && !udpOutState) {
+            if (fmeCount == 0 && !udpOutState && !hlsOutState) {
                 if (theme.equals("Dark")) {
                     lblOnAir.setForeground(Color.WHITE);
                 } else {

@@ -395,7 +395,7 @@ public class MasterPanel extends javax.swing.JPanel implements MasterMixer.SinkL
             String streamName = s.getClass().getName();
 //            System.out.println("StreamName: "+streamName);
             s.setRate(mixer.getRate());
-            if (streamName.contains("SinkFile") || streamName.contains("SinkUDP")) {
+            if (streamName.contains("SinkFile") || streamName.contains("SinkUDP") || streamName.contains("SinkHLS")) {
 //                System.out.println("Sink New Size: "+w+"x"+h);
                 s.setWidth(w);
                 s.setHeight(h);

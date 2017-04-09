@@ -74,7 +74,8 @@ public abstract class Stream implements Callable<Frame>{
     protected int zorder = 0;
     protected File file = null;
     protected String name = "Default";
-    protected String url = null;
+    protected String url = ""; // was null
+    protected String mount = "Segment Path";
     protected int audioLevelLeft = 0;
     protected int audioLevelRight = 0;
     protected ArrayList<Effect> effects = new ArrayList<>();
@@ -125,6 +126,11 @@ public abstract class Stream implements Callable<Frame>{
         return comm;
     }
     
+    public ArrayList<Effect> getAllEffects() {
+        return effects;
+    }
+    
+     
     public void setComm(String sComm) {
         this.comm = sComm;
     }
@@ -755,6 +761,19 @@ public abstract class Stream implements Callable<Frame>{
     /**
      * @return the vbitrate
      */
+    
+    public String getMount() {
+        return mount;
+    }
+    
+    public void setMount(String sMount) {
+        mount = sMount;
+    }
+    
+    public void setURL(String sUrl) {
+        this.url = sUrl;
+    }
+    
     public String getVbitrate() {
         return vbitrate;
     }

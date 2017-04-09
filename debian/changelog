@@ -1,3 +1,18 @@
+truckliststudio (0.9.7) stable; urgency=low
+
+  * Fixes: Importing a source folder in a Studio can lead to loose custom source settings.
+  * New upstream version
+
+ -- Karl Ellis <soylent.tv@gmail.com>  Sun, 02 Apr 2017 10:25:49 +0200
+
+truckliststudio (0.9.6) stable; urgency=low
+
+  * Fixes: Small Fixes and Tweaks.
+  * Adds: HLS Default Output.
+  * New upstream version
+
+ -- Karl Ellis <soylent.tv@gmail.com>  Sun, 22 Jan 2017 11:45:24 +0100
+
 truckliststudio (0.9.5) stable; urgency=low
 
   * Removes: Removed Transitions feature.

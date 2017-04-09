@@ -43,6 +43,7 @@ public class FMESettings extends javax.swing.JFrame implements Stream.Listener {
         if (thisFME.getStream().isEmpty()) {
             textStream.setText("");
             textStream.setEnabled(false);
+            lblStream.setEnabled(false);
         } else {
             textStream.setText(thisFME.getStream());
         }
@@ -73,12 +74,14 @@ public class FMESettings extends javax.swing.JFrame implements Stream.Listener {
         if (thisFME.getMount().equals("")) {
             textMount.setText("");
             textMount.setEnabled(false);
+            lblMount.setEnabled(false);
         } else {
             textMount.setText(thisFME.getMount());
         }
         if (thisFME.getPassword().equals("")) {
             textPsw.setText("");
             textPsw.setEnabled(false);
+            lblPsw.setEnabled(false);
         } else {
             textPsw.setText(thisFME.getPassword());
 //            System.out.println("Password: "+thisFME.getPassword());
@@ -86,12 +89,14 @@ public class FMESettings extends javax.swing.JFrame implements Stream.Listener {
         if (thisFME.getPort().equals("")) {
             spinPort.setValue(0);
             spinPort.setEnabled(false);
+            lblPort.setEnabled(false);
         } else {
             spinPort.setValue(Integer.parseInt(thisFME.getPort()));
         }
         if (thisFME.getKeyInt().equals("")) {
             spinKeyInt.setValue(0);
             spinKeyInt.setEnabled(false);
+            lblKeyInt.setEnabled(false);
         } else {
             spinKeyInt.setValue(Integer.parseInt(thisFME.getKeyInt()));
         }
@@ -149,7 +154,7 @@ public class FMESettings extends javax.swing.JFrame implements Stream.Listener {
         lblAudioRate.setText("Audio Data Rate:");
 
         lblrtmpURL.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
-        lblrtmpURL.setText("RTMP Streaming Url:");
+        lblrtmpURL.setText("Streaming Url:");
 
         lblURL.setText("URL:");
 
@@ -247,9 +252,9 @@ public class FMESettings extends javax.swing.JFrame implements Stream.Listener {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(spinVideoRate, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(lblEncode)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                .addComponent(lblName, javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(lblrtmpURL)))
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(lblrtmpURL, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(lblName, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 14, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)

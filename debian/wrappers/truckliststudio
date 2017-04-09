@@ -11,7 +11,7 @@ INSTALLDIR=/usr/lib/truckliststudio
 . /usr/lib/java-wrappers/java-wrappers.sh
 
 JAVA_CLASSPATH="${INSTALLDIR}/*:${INSTALLDIR}/lib/*"
-JAVA_ARGS="-Djna.nosys=true -splash:start.gif"
+JAVA_ARGS="-Djna.nosys=true -splash:start.gif -Xms1000m"
 
 cd ${INSTALLDIR}
 

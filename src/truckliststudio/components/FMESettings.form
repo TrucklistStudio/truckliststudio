@@ -86,9 +86,9 @@
                               <Component id="spinVideoRate" min="-2" pref="74" max="-2" attributes="0"/>
                           </Group>
                           <Component id="lblEncode" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Group type="103" alignment="0" groupAlignment="1" attributes="0">
-                              <Component id="lblName" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="lblrtmpURL" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" alignment="0" groupAlignment="1" max="-2" attributes="0">
+                              <Component id="lblrtmpURL" alignment="0" max="32767" attributes="0"/>
+                              <Component id="lblName" alignment="0" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                       <EmptySpace pref="14" max="32767" attributes="0"/>
@@ -200,7 +200,7 @@
         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
           <Font name="Ubuntu" size="15" style="1"/>
         </Property>
-        <Property name="text" type="java.lang.String" value="RTMP Streaming Url:"/>
+        <Property name="text" type="java.lang.String" value="Streaming Url:"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="lblURL">
