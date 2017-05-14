@@ -1,5 +1,5 @@
 *********************************
-* TrucklistStudio for GNU/Linux *
+* TrucklistStudio *
 *********************************
 
 To compile from the command line simply run:
@@ -52,7 +52,7 @@ $ sudo ppa-purge ppa:soylent-tv/truckliststudiofx
 $ sudo apt-get install truckliststudio
 
 *************************************
-* TrucklistStudio 0.9 for GNU/Linux *
+* TrucklistStudio 0.9.x *
 *************************************
 
 Hello and welcome to TrucklistStudio by Karl Ellis.

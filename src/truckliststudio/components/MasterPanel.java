@@ -702,4 +702,9 @@ public class MasterPanel extends javax.swing.JPanel implements MasterMixer.SinkL
     public void requestStop() {
         // nothing here
     }
+    
+    @Override
+    public void requestSkip() {
+        // nothing here
+    }
 }

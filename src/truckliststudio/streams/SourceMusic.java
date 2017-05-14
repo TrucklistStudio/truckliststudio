@@ -6,7 +6,7 @@ package truckliststudio.streams;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import static truckliststudio.TrucklistStudio.gsNLE;
+//import static truckliststudio.TrucklistStudio.gsNLE;
 import static truckliststudio.TrucklistStudio.selColLbl2;
 import truckliststudio.components.ResourceMonitor;
 import truckliststudio.components.ResourceMonitorLabel;
@@ -52,11 +52,7 @@ public class SourceMusic extends Stream {
             MasterFrameBuilder.register(this);
         }
         lastPreview = new BufferedImage(captureWidth, captureHeight, BufferedImage.TYPE_INT_ARGB);
-        if (gsNLE) {
-            capture = new ProcessRenderer(this, ProcessRenderer.ACTION.CAPTURE, "nlemusic", comm);
-        } else {
-            capture = new ProcessRenderer(this, ProcessRenderer.ACTION.CAPTURE, "music", comm);
-        }
+        capture = new ProcessRenderer(this, ProcessRenderer.ACTION.CAPTURE, "music", comm);
         capture.read();
     }
 

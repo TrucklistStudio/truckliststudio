@@ -7,4 +7,4 @@ Categories=AudioVideo;
 Terminal=false
 Icon=/usr/share/pixmaps/truckliststudio.png
 Exec=/usr/bin/truckliststudio
-Comment=TrucklistStudio for GNU/Linux
+Comment=TrucklistStudio

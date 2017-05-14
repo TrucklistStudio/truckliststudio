@@ -89,6 +89,12 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
         tglStartTrack.doClick();
         listenerCPOP.requestStart();
     }
+    
+    @Override
+    public void requestSkip() {
+        btnSkipTrack.doClick();
+        listenerCPOP.requestSkip();
+    }
 
     @Override
     public void requestStop() {
@@ -119,10 +125,10 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
         String userPsw = loginSplit[1].replace("j_username=", "");
         userPsw = userPsw.replace("j_password=", "");
         userPsw = userPsw.replace(" HTTP/1.1", "");
-//        System.out.println("userPsw: "+userPsw);
+        System.out.println("userPsw: "+userPsw);
         if (!userPsw.equals("&")) {
             String[] userPswSplit = userPsw.split("&");
-            if (!userPsw.equals("&")) {
+            if (!userPsw.equals("&") && userPswSplit.length > 1) {
                 if (userPswSplit[0].equals(remUser) && userPswSplit[1].equals(remPsw)) {
                     boolean play = false;
                     for (Stream stream : streamS) {
@@ -140,6 +146,8 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
                 } else {
                     res = "/error";
                 }
+            } else {
+                res = "/error";
             }
         } else {
             res = "/login";
@@ -211,6 +219,8 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
         public void requestReset();
 
         public void requestStop();
+        
+        public void requestSkip();
 
         public void requestStart();
     }

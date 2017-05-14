@@ -1,3 +1,11 @@
+truckliststudio (0.9.8) stable; urgency=low
+
+  * Fixes: If only user name is given TS Remote hangs.
+  * Adds: "Skip Track" in TrucklistStudio Remote Control.
+  * New upstream version
+
+ -- Karl Ellis <soylent.tv@gmail.com>  Sun, 14 May 2017 08:21:21 +0200
+
 truckliststudio (0.9.7) stable; urgency=low
 
   * Fixes: Importing a source folder in a Studio can lead to loose custom source settings.

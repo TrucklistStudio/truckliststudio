@@ -32,7 +32,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
-import java.lang.reflect.InvocationTargetException;
+//import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -131,7 +131,7 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
     private File lastFolder = null;
     boolean ffmpeg = BackEnd.ffmpegDetected();
     boolean avconv = BackEnd.avconvDetected();
-    public static boolean gsNLE = BackEnd.nleDetected();
+//    public static boolean gsNLE = BackEnd.nleDetected();
     boolean firstRun = true;
     static boolean autoAR = false;
     public static OS os = Tools.getOS();
@@ -495,7 +495,7 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
             UIManager.put("nimbusGreen", new Color(91, 181, 0));
             UIManager.put("nimbusBlueGrey", Color.darkGray);
             UIManager.put("nimbusBase", Color.darkGray);
-            UIManager.put("nimbusLightBackground", new Color(134, 137, 143));
+            UIManager.put("nimbusLightBackground", Color.black);
             UIManager.put("info", new Color(195, 160, 0));
             UIManager.put("nimbusDisabledText", Color.black);
             UIManager.put("nimbusSelectionBackground", Color.yellow);
@@ -569,7 +569,6 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
             tglAVconv.setVisible(false);
             lblAVconv.setVisible(false);
         }
-        System.out.println("NLE=" + gsNLE);
         initAnimations();
         initAudioMainSW();
         initThemeMainSW();
@@ -2234,6 +2233,7 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                         int seconds = Integer.parseInt(temp[2]);
                         int totalTime = hours * 3600 + minutes * 60 + seconds;
                         String strDuration = Integer.toString(totalTime);
+                        System.out.println(strDuration + "s");
                         stream.setStreamTime(strDuration + "s");
                     }
 
@@ -2263,7 +2263,13 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                                     System.out.println("Number Format Exception! ...trying MS Way...");
                                     lineRParts = lineR.split(",");
                                     tempNativeSize = lineRParts[3].split(" ");
-                                    videoNativeSize = tempNativeSize[1].split("x");
+                                    if (tempNativeSize[1].contains("x")) {
+                                        System.out.println(tempNativeSize[1]);
+                                        videoNativeSize = tempNativeSize[1].split("x");
+                                    } else {
+                                        tempNativeSize = lineRParts[4].split(" ");
+                                        videoNativeSize = tempNativeSize[1].split("x");
+                                    }
                                     w = Integer.parseInt(videoNativeSize[0]);
                                     h = Integer.parseInt(videoNativeSize[1]);
                                 }

@@ -29,6 +29,8 @@ public interface Listener {
     
     public void requestReset();
     
+    public void requestSkip();
+    
     public String requestlogin(String login);
     
     public void listening(String localURL);

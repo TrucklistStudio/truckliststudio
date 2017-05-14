@@ -1,6 +1,6 @@
 /**
- *  truckliststudio for GNU/Linux
- *  Copyright (C) 2008  Patrick Balleux
+ *  TrucklistStudio
+ *  Copyright (C) 2015  Karl Ellis
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by

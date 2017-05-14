@@ -6,7 +6,7 @@ package truckliststudio.streams;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import static truckliststudio.TrucklistStudio.gsNLE;
+//import static truckliststudio.TrucklistStudio.gsNLE;
 import static truckliststudio.TrucklistStudio.selColLbl2;
 import truckliststudio.components.ResourceMonitor;
 import truckliststudio.components.ResourceMonitorLabel;
@@ -51,11 +51,7 @@ public class SourceMovie extends Stream {
         } else {
             MasterFrameBuilder.register(this);
         }
-        if (gsNLE && comm.equals("GS")) {
-            capture = new ProcessRenderer(this, ProcessRenderer.ACTION.CAPTURE, "nlemovie", comm);
-        } else {
-            capture = new ProcessRenderer(this, ProcessRenderer.ACTION.CAPTURE, "movie", comm);
-        }
+        capture = new ProcessRenderer(this, ProcessRenderer.ACTION.CAPTURE, "movie", comm);
         capture.read();
     }
 

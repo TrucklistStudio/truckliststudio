@@ -146,6 +146,9 @@ public class WebRemote implements Runnable {
                             } else if (req.equals("/reset" ) && auth){
                                 System.out.println("Requesting Remote Reset...");
                                 listener.requestReset();
+                            } else if (req.equals("/skip" ) && auth){
+                                System.out.println("Requesting Remote Skip...");
+                                listener.requestSkip();
                             } else if (req.equals("/logout") && auth) {
                                 auth = false;    
                             } else if (req.contains("/j_security_check")){

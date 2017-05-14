@@ -1,6 +1,6 @@
 /**
- *  TrucklistStudio for GNU/Linux
- *  Copyright (C) 2008  Patrick Balleux
+ *  TrucklistStudio
+ *  Copyright (C) 2015  Karl Ellis
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ public class About extends javax.swing.JDialog {
         lblVersion = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("TrucklistStudio for GNU/Linux : About...");
+        setTitle("TrucklistStudio : About...");
         setModal(true);
         setResizable(false);
 
@@ -63,6 +63,7 @@ public class About extends javax.swing.JDialog {
         });
 
         jLabel1.setFont(new java.awt.Font("DejaVu Sans", 1, 30)); // NOI18N
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/splash80x71.png"))); // NOI18N
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("truckliststudio/Languages"); // NOI18N
         jLabel1.setText(bundle.getString("TRUCKLISTSTUDIO_FOR_GNU/LINUX")); // NOI18N

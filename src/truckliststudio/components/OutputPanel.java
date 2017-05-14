@@ -922,6 +922,11 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
         fmeOutSwitch = false;
         hlsOutSwitch = false;
     }
+    
+    @Override
+    public void requestSkip() {
+        // Nothing here
+    }
 
     @Override
     public void resetAutoPLBtnState(ActionEvent evt) {
