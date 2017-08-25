@@ -2031,18 +2031,18 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
         try {
             File file;
             boolean overWrite = true;
-            ArrayList<Stream> streamzI = MasterTracks.getInstance().getStreams();
-            ArrayList<String> sourceChI = MasterTracks.getInstance().getTracks();
-            if (streamzI.size() > 0 || sourceChI.size() > 0) {
-                Object[] options = {"OK"};
-                JOptionPane.showOptionDialog(this,
-                        "All Streams will be Stopped !!!", "Attention",
-                        JOptionPane.PLAIN_MESSAGE,
-                        JOptionPane.INFORMATION_MESSAGE,
-                        null,
-                        options,
-                        options[0]);
-            }
+//            ArrayList<Stream> streamzI = MasterTracks.getInstance().getStreams();
+//            ArrayList<String> sourceChI = MasterTracks.getInstance().getTracks();
+//            if (streamzI.size() > 0 || sourceChI.size() > 0) {
+//                Object[] options = {"OK"};
+//                JOptionPane.showOptionDialog(this,
+//                        "All Streams will be Stopped !!!", "Attention",
+//                        JOptionPane.PLAIN_MESSAGE,
+//                        JOptionPane.INFORMATION_MESSAGE,
+//                        null,
+//                        options,
+//                        options[0]);
+//            }
             JFileChooser chooser = new JFileChooser(lastFolder);
             FileNameExtensionFilter studioFilter = new FileNameExtensionFilter("Studio files (*.studio)", "studio");
             chooser.setFileFilter(studioFilter);
@@ -2071,21 +2071,21 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
             if (retval == JFileChooser.APPROVE_OPTION && overWrite) {
                 final WaitingDialog waitingD = new WaitingDialog(this);
                 final File fileF = file;
-                lblSourceSelected.setText("");
+//                lblSourceSelected.setText("");
                 SwingWorker<?, ?> worker = new SwingWorker<Void, Integer>() {
                     @Override
                     protected Void doInBackground() throws InterruptedException {
                         if (fileF != null) {
                             File fileS = fileF;
                             lastFolder = fileS.getParentFile();
-                            PrePlayer.getPreInstance(null).stop();
-                            Tools.sleep(100);
-                            MasterTracks.getInstance().stopAllStream();
-                            Tools.sleep(100);
-                            listenerTSTP.stopChTime(sEvt);
-                            for (Stream s : MasterTracks.getInstance().getStreams()) {
-                                s.updateStatus();
-                            }
+//                            PrePlayer.getPreInstance(null).stop();
+//                            Tools.sleep(100);
+//                            MasterTracks.getInstance().stopAllStream();
+//                            Tools.sleep(100);
+//                            listenerTSTP.stopChTime(sEvt);
+//                            for (Stream s : MasterTracks.getInstance().getStreams()) {
+//                                s.updateStatus();
+//                            }
                             if (!fileS.getName().endsWith(".studio")) {
                                 fileS = new File(fileS.getParent(), fileS.getName() + ".studio");
                             }
@@ -2097,7 +2097,7 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                             ResourceMonitorLabel label = new ResourceMonitorLabel(System.currentTimeMillis() + 10000, "Studio is saved!");
                             ResourceMonitor.getInstance().addMessage(label);
                             setTitle("TrucklistStudio " + Version.version + " (" + fileS.getName() + ")");
-                            jProgressBar1.setValue(100);
+//                            jProgressBar1.setValue(100);
                         }
                         return null;
                     }

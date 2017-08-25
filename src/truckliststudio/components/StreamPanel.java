@@ -217,89 +217,104 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener {
             tglVideo.setEnabled(true);
         }
         if (stream.getLoaded()) {
-            if (ffmpeg && !avconv) {
-                switch (stream.getComm()) {
-                    case "AV":
-                        tglFFmpeg.setSelected(true);
-                        stream.setComm("FF");
-                        stream.setBackFF(true);
-                        tglAVconv.setEnabled(false);
-                        tglGst.setSelected(false);
-                        break;
-                    case "GS":
-                        tglGst.setSelected(true);
-                        stream.setComm("GS");
-                        tglAVconv.setEnabled(false);
-                        break;
-                    case "FF":
-                        tglFFmpeg.setSelected(true);
-                        stream.setComm("FF");
-                        stream.setBackFF(true);
-                        tglAVconv.setEnabled(false);
-                        tglGst.setSelected(false);
-                        break;
-                    default:
-                        tglFFmpeg.setSelected(true);
-                        stream.setComm("FF");
-                        stream.setBackFF(true);
-                        tglAVconv.setEnabled(false);
-                        tglGst.setSelected(false);
-                        break;
-                }
+            if (distro.toLowerCase().equals("ubuntu")) {
+                if (ffmpeg && !avconv) {
+                    switch (stream.getComm()) {
+                        case "AV":
+                            tglFFmpeg.setSelected(true);
+                            stream.setComm("FF");
+                            stream.setBackFF(true);
+                            tglAVconv.setEnabled(false);
+                            tglGst.setSelected(false);
+                            break;
+                        case "GS":
+                            tglGst.setSelected(true);
+                            stream.setComm("GS");
+                            tglAVconv.setEnabled(false);
+                            break;
+                        case "FF":
+                            tglFFmpeg.setSelected(true);
+                            stream.setComm("FF");
+                            stream.setBackFF(true);
+                            tglAVconv.setEnabled(false);
+                            tglGst.setSelected(false);
+                            break;
+                        default:
+                            tglFFmpeg.setSelected(true);
+                            stream.setComm("FF");
+                            stream.setBackFF(true);
+                            tglAVconv.setEnabled(false);
+                            tglGst.setSelected(false);
+                            break;
+                    }
 
-            } else if (ffmpeg && avconv) {
-                switch (stream.getComm()) {
-                    case "AV":
-                        tglAVconv.setSelected(true);
-                        stream.setComm("AV");
-                        tglGst.setSelected(false);
-                        break;
-                    case "GS":
-                        tglGst.setSelected(true);
-                        stream.setComm("GS");
-                        tglAVconv.setSelected(false);
-                        break;
-                    case "FF":
-                        tglFFmpeg.setSelected(true);
-                        stream.setComm("FF");
-                        stream.setBackFF(true);
-                        tglAVconv.setSelected(false);
-                        tglGst.setSelected(false);
-                        break;
-                    default:
-                        tglAVconv.setSelected(true);
-                        stream.setComm("AV");
-                        tglGst.setSelected(false);
-                        tglFFmpeg.setSelected(false);
-                        break;
+                } else if (ffmpeg && avconv) {
+                    switch (stream.getComm()) {
+                        case "AV":
+                            tglAVconv.setSelected(true);
+                            stream.setComm("AV");
+                            tglGst.setSelected(false);
+                            break;
+                        case "GS":
+                            tglGst.setSelected(true);
+                            stream.setComm("GS");
+                            tglAVconv.setSelected(false);
+                            break;
+                        case "FF":
+                            tglFFmpeg.setSelected(true);
+                            stream.setComm("FF");
+                            stream.setBackFF(true);
+                            tglAVconv.setSelected(false);
+                            tglGst.setSelected(false);
+                            break;
+                        default:
+                            tglAVconv.setSelected(true);
+                            stream.setComm("AV");
+                            tglGst.setSelected(false);
+                            tglFFmpeg.setSelected(false);
+                            break;
+                    }
+                } else if (!ffmpeg && avconv) {
+                    switch (stream.getComm()) {
+                        case "AV":
+                            tglAVconv.setSelected(true);
+                            stream.setComm("AV");
+                            tglGst.setSelected(false);
+                            tglFFmpeg.setEnabled(false);
+                            break;
+                        case "GS":
+                            tglGst.setSelected(true);
+                            stream.setComm("GS");
+                            tglAVconv.setSelected(false);
+                            tglFFmpeg.setEnabled(false);
+                            break;
+                        case "FF":
+                            tglAVconv.setSelected(true);
+                            stream.setComm("AV");
+                            tglGst.setSelected(false);
+                            tglFFmpeg.setEnabled(false);
+                            break;
+                        default:
+                            tglAVconv.setSelected(true);
+                            stream.setComm("AV");
+                            tglGst.setSelected(false);
+                            tglFFmpeg.setEnabled(false);
+                            break;
+                    }
                 }
-            } else if (!ffmpeg && avconv) {
-                switch (stream.getComm()) {
-                    case "AV":
-                        tglAVconv.setSelected(true);
-                        stream.setComm("AV");
-                        tglGst.setSelected(false);
-                        tglFFmpeg.setEnabled(false);
-                        break;
-                    case "GS":
-                        tglGst.setSelected(true);
-                        stream.setComm("GS");
-                        tglAVconv.setSelected(false);
-                        tglFFmpeg.setEnabled(false);
-                        break;
-                    case "FF":
-                        tglAVconv.setSelected(true);
-                        stream.setComm("AV");
-                        tglGst.setSelected(false);
-                        tglFFmpeg.setEnabled(false);
-                        break;
-                    default:
-                        tglAVconv.setSelected(true);
-                        stream.setComm("AV");
-                        tglGst.setSelected(false);
-                        tglFFmpeg.setEnabled(false);
-                        break;
-                }
+            } else if (distro.toLowerCase().equals("windows")) {
+                stream.setComm("FF");
+                stream.setBackFF(true);
+                tglFFmpeg.setSelected(true);
+                tglFFmpeg.setEnabled(false);
+                tglAVconv.setVisible(false);
+                tglGst.setVisible(false);
+            } else {
+                tglAVconv.setEnabled(false);
+                stream.setComm("FF");
+                stream.setBackFF(true);
+                tglGst.setSelected(false);
+                tglFFmpeg.setSelected(true);
             }
             this.revalidate();
         } else if (distro.toLowerCase().equals("ubuntu")) {
@@ -1282,9 +1297,18 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener {
     }//GEN-LAST:event_spinYStateChanged
 
     private void spinVolumeStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spinVolumeStateChanged
-        String jSVol = spinVolume.getValue().toString().replace(".0", "");
-        int jVol = Integer.parseInt(jSVol);
+        String jSVol = spinVolume.getValue().toString();
+        String volPar = jSVol.replace(".0", "");
+        System.out.println("String Volume="+jSVol);
+        
+        int jVol = Integer.parseInt(volPar);
+        if (jVol == 1500001) {
+            jVol = 15;
+        }
         jSlSpinV.setValue(jVol);
+        
+        System.out.println("Number Volume="+jVol);
+        
         Object value = spinVolume.getValue();
         float v = 0;
         if (value instanceof Float) {
@@ -1292,6 +1316,9 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener {
         } else if (value instanceof Integer) {
             v = ((Number) value).floatValue();
         }
+        
+        System.out.println("Float Volume="+v/100f);
+        
         if (stream.getisPaused()) {
             if (v / 100f != 0) {
                 vol = v / 100f;

@@ -14,7 +14,7 @@ import java.util.logging.Logger;
  * @author pballeux
  */
 public class Version {
-    public final static String version = "0.9.8";
+    public final static String version = "0.9.9";
     private String build = "";
     public Version(){
         java.io.DataInput di = new java.io.DataInputStream(getClass().getResourceAsStream("build.txt"));

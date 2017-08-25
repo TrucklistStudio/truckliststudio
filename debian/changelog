@@ -1,3 +1,12 @@
+truckliststudio (0.9.9) stable; urgency=low
+
+  * Fixes: In some cases setting volume to some values and updating the stream have no effect.
+  * Fixes: In windows loading a studio streams show GStreamer Backend.
+  * Adds: "Save Studio" operation don't need to stop the streaming anymore.
+  * New upstream version
+
+ -- Karl Ellis <soylent.tv@gmail.com>  Sun, 02 Jul 2017 15:57:18 +0200
+
 truckliststudio (0.9.8) stable; urgency=low
 
   * Fixes: If only user name is given TS Remote hangs.

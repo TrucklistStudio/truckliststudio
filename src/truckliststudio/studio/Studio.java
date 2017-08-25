@@ -72,7 +72,7 @@ import static truckliststudio.streams.SourceText.Shape.OVAL;
 import static truckliststudio.streams.SourceText.Shape.RECTANGLE;
 import static truckliststudio.streams.SourceText.Shape.ROUNDRECT;
 import truckliststudio.streams.Stream;
-import truckliststudio.util.Tools;
+//import truckliststudio.util.Tools;
 
 /**
  *
@@ -166,10 +166,13 @@ public class Studio {
             if (clazzSink.contains("Sink")) {
 //                System.out.println("Skipping Sink: "+clazzSink);
             } else {
+                boolean isPl = s.isPlaying();
+                s.setIsPlaying(false);
                 System.out.println("Saving Stream: " + s.getName());
                 xml.writeStartElement(ELEMENT_SOURCE);
                 writeObject(s, xml);
                 xml.writeEndElement(); // Save Source
+                s.setIsPlaying(isPl);
             }
         }
         xml.writeEndElement();  //Save Sources

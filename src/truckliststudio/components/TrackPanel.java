@@ -1034,11 +1034,11 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
         trkProgressTime.setValue(0);
         trkProgressTime.setString("0");
         tglStartTrack.setSelected(false);
-        if (theme.equals("Dark")) {
-            lblOnAir.setForeground(Color.WHITE);
-        } else {
-            lblOnAir.setForeground(Color.BLACK);
-        }
+//        if (theme.equals("Dark")) {
+//            lblOnAir.setForeground(Color.WHITE);
+//        } else {
+//            lblOnAir.setForeground(Color.BLACK);
+//        }
     }
 
     public void RemoteStopCHTimerOnlyActionPerformed() {
