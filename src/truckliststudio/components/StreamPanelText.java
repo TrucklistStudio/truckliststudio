@@ -899,19 +899,19 @@ public class StreamPanelText extends javax.swing.JPanel implements Stream.Listen
             } else {
                 this.setBorder(BorderFactory.createEtchedBorder());
                 JTabbedPane JTp = (JTabbedPane) this.getParent();
-                int index = 0;
-                int totalTabs = JTp.getTabCount();
+//                int index = 0;
+//                int totalTabs = JTp.getTabCount();
                 String sName = stream.getName();
                 if (sName.length() > 20) {
                     sName = stream.getName().substring(0, 20) + "...";
                 }
-                for (int i = 0; i < totalTabs; i++) {
-                    String titleAt = JTp.getTitleAt(i);
-                    if (sName.equals(titleAt)) {
-                        index = i;
-                        break;
-                    }
-                }
+//                for (int i = 0; i < totalTabs; i++) {
+//                    String titleAt = JTp.getTitleAt(i);
+//                    if (sName.equals(titleAt)) {
+//                        index = i;
+//                        break;
+//                    }
+//                }
                 titleLabel.setForeground(sStopLblCol);
                 tglPreview.setEnabled(true);
                 tglClock.setEnabled(true);
@@ -935,19 +935,19 @@ public class StreamPanelText extends javax.swing.JPanel implements Stream.Listen
                     stream.read();
                     this.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, sActiveLblCol));
                     JTabbedPane JTp = (JTabbedPane) this.getParent();
-                    int index = 0;
-                    int totalTabs = JTp.getTabCount();
+//                    int index = 0;
+//                    int totalTabs = JTp.getTabCount();
                     String sName = stream.getName();
                     if (sName.length() > 20) {
                         sName = stream.getName().substring(0, 20) + "...";
                     }
-                    for (int i = 0; i < totalTabs; i++) {
-                        String titleAt = JTp.getTitleAt(i);
-                        if (sName.equals(titleAt)) {
-                            index = i;
-                            break;
-                        }
-                    }
+//                    for (int i = 0; i < totalTabs; i++) {
+//                        String titleAt = JTp.getTitleAt(i);
+//                        if (sName.equals(titleAt)) {
+//                            index = i;
+//                            break;
+//                        }
+//                    }
                     titleLabel.setForeground(sActiveLblCol);
                     tglClock.setEnabled(false);
                     tglQRCode.setEnabled(false);

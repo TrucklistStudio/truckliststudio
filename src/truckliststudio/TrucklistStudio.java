@@ -32,7 +32,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
-//import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -103,7 +102,6 @@ import truckliststudio.streams.SourceMusic;
 import truckliststudio.streams.SourceText;
 import truckliststudio.streams.Stream;
 import truckliststudio.studio.Studio;
-import truckliststudio.util.BackEnd;
 import truckliststudio.util.Tools;
 import truckliststudio.util.Tools.OS;
 
@@ -115,8 +113,6 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
 
     public static Preferences prefs = null;
     public static Properties animations = new Properties();
-    // FF = 0 ; AV = 1 ; GS = 2
-    public static int outFMEbe = 1;
     private final static String userHomeDir = Tools.getUserHome();
     BottomPanel bottomPanel = new BottomPanel();
     OutputPanel recorder = new OutputPanel(bottomPanel);
@@ -129,9 +125,6 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
     public static String theme = "Classic";
     ArrayList<Stream> streamS = MasterTracks.getInstance().getStreams();
     private File lastFolder = null;
-    boolean ffmpeg = BackEnd.ffmpegDetected();
-    boolean avconv = BackEnd.avconvDetected();
-//    public static boolean gsNLE = BackEnd.nleDetected();
     boolean firstRun = true;
     static boolean autoAR = false;
     public static OS os = Tools.getOS();
@@ -151,8 +144,6 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
     private String selColLbl = "black";
     public static String selColLbl2 = "green";
     ArrayList<JTabbedPane> tabs = new ArrayList<>();
-    public static boolean x64 = false;
-    public static boolean winGS = false;
     private boolean editingPhase = true;
     private boolean mooving = false;
     private int prevIndex = 0;
@@ -268,7 +259,6 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
         tabs.add(pictureDesktop);
         tabs.add(textDesktop);
         btnMinimizeAll.setVisible(false);
-
         setListenerTS(this);
         setListenerTextTS(this);
 
@@ -519,8 +509,6 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
             dialogTheme.put("TabbedPane:TabbedPaneTabArea[Enabled+MouseOver].backgroundPainter", new AreaPainter(AreaPainter.BACKGROUND_ENABLED_MOUSEOVER));
             dialogTheme.put("TabbedPane:TabbedPaneTabArea[Enabled+Pressed].backgroundPainter", new AreaPainter(AreaPainter.BACKGROUND_ENABLED_PRESSED));
             dialogTheme.put("TabbedPane:TabbedPaneTabArea[Enabled].backgroundPainter", new AreaPainter(AreaPainter.BACKGROUND_ENABLED));
-//            tabSources.putClientProperty("Nimbus.Overrides.InheritDefaults", Boolean.TRUE);
-//            tabSources.putClientProperty("Nimbus.Overrides", dialogTheme);
             videoDesktop.putClientProperty("Nimbus.Overrides.InheritDefaults", Boolean.TRUE);
             videoDesktop.putClientProperty("Nimbus.Overrides", dialogTheme);
             musicDesktop.putClientProperty("Nimbus.Overrides.InheritDefaults", Boolean.TRUE);
@@ -563,16 +551,9 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
         mainVerticalSplit.setBottomComponent(bottomPanel);
         masterPanelSplit.setEnabled(false);
 
-        if (os == OS.WINDOWS) {
-            checkWinBits();
-            checkWinGS();
-            tglAVconv.setVisible(false);
-            lblAVconv.setVisible(false);
-        }
         initAnimations();
         initAudioMainSW();
         initThemeMainSW();
-        initMainOutBE();
         tglAutoAR.setSelected(autoAR);
         tglAutoTrack.setSelected(autoTrack);
         tglAutoTitle.setSelected(autoTitle);
@@ -597,38 +578,6 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
             listenerTSTP.setRemoteOn();
         }
         firstRun = false;
-    }
-
-    private boolean checkWinBits() {
-        File prgSystemDir = new File("C:\\");
-        File[] listFile = prgSystemDir.listFiles();
-        for (File f : listFile) {
-//            System.out.println("File Name: " + f.getName());
-            if (f.getName().equals("Program Files (x86)")) {
-                x64 = true;
-                break;
-            } else {
-                x64 = false;
-            }
-        }
-        System.out.println("bit64: " + x64);
-        return x64;
-    }
-
-    private boolean checkWinGS() {
-        File prgSystemDir = new File("C:\\");
-        File[] listFile = prgSystemDir.listFiles();
-        for (File f : listFile) {
-//            System.out.println("File Name: " + f.getName());
-            if (f.getName().equals("gstreamer")) {
-                winGS = true;
-                break;
-            } else {
-                winGS = false;
-            }
-        }
-        System.out.println("winGS: " + winGS);
-        return winGS;
     }
 
     @SuppressWarnings("unchecked")
@@ -671,71 +620,6 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
         }
     }
 
-    private void initMainOutBE() {
-        // FF = 0 ; AV = 1 ; GS = 2
-        if (wsDistroWatch().toLowerCase().equals("windows")) {
-            if (winGS) {
-                tglGst.setEnabled(true);
-            } else {
-                tglGst.setEnabled(false);
-            }
-            if (outFMEbe == 0) {
-                outFMEbe = 0;
-                tglFFmpeg.setSelected(true);
-            } else if (outFMEbe == 2) {
-                if (tglGst.isEnabled()) {
-                    tglFFmpeg.setSelected(false);
-                    tglGst.setSelected(true);
-                } else {
-                    outFMEbe = 0;
-                    tglFFmpeg.setSelected(true);
-                }
-            }
-        } else if (ffmpeg && !avconv) {
-            if (outFMEbe == 0 || outFMEbe == 1) {
-                outFMEbe = 0;
-                tglFFmpeg.setSelected(true);
-                tglAVconv.setEnabled(false);
-                tglGst.setEnabled(true);
-            } else if (outFMEbe == 2) {
-                tglFFmpeg.setSelected(false);
-                tglFFmpeg.setEnabled(true);
-                tglAVconv.setEnabled(false);
-                tglGst.setSelected(true);
-            }
-        } else if (ffmpeg && avconv) {
-            switch (outFMEbe) {
-                case 0:
-                    tglFFmpeg.setSelected(true);
-                    tglAVconv.setEnabled(true);
-                    tglGst.setEnabled(true);
-                    break;
-                case 1:
-                    tglFFmpeg.setEnabled(true);
-                    tglAVconv.setSelected(true);
-                    tglGst.setEnabled(true);
-                    break;
-                case 2:
-                    tglFFmpeg.setEnabled(true);
-                    tglAVconv.setEnabled(true);
-                    tglGst.setSelected(true);
-                    break;
-            }
-        } else if (!ffmpeg && avconv) {
-            if (outFMEbe == 1 || outFMEbe == 0) {
-                outFMEbe = 1;
-                tglAVconv.setSelected(true);
-                tglFFmpeg.setEnabled(false);
-                tglGst.setEnabled(true);
-            } else if (outFMEbe == 2) {
-                tglFFmpeg.setEnabled(false);
-                tglAVconv.setEnabled(true);
-                tglGst.setSelected(true);
-            }
-        }
-//        System.out.println("OutFMEbe: "+outFMEbe);
-    }
-
     private void loadPrefs() {
         int x = prefs.getInt("main-x", 100);
         int y = prefs.getInt("main-y", 100);
@@ -756,7 +640,6 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
         lastFolder = new File(prefs.get("lastfolder", "."));
         audioFreq = prefs.getInt("audio-freq", audioFreq);
         theme = prefs.get("theme", theme);
-        outFMEbe = prefs.getInt("out-FME", outFMEbe);
         autoAR = prefs.getBoolean("autoar", autoAR);
         autoTrack = prefs.getBoolean("autotrack", autoTrack);
         autoTitle = prefs.getBoolean("autotitle", autoTitle);
@@ -784,7 +667,6 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
         }
         prefs.putInt("audio-freq", audioFreq);
         prefs.put("theme", theme);
-        prefs.putInt("out-FME", outFMEbe);
         prefs.putBoolean("autoar", autoAR);
         prefs.putBoolean("autotrack", autoTrack);
         prefs.putBoolean("autotitle", autoTitle);
@@ -827,13 +709,10 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
         filler4 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(3, 0), new java.awt.Dimension(0, 0));
         filler7 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 0));
         lblFFmpeg3 = new javax.swing.JLabel();
-        tglFFmpeg = new javax.swing.JToggleButton();
+        jLabel1 = new javax.swing.JLabel();
         lblFFmpeg = new javax.swing.JLabel();
-        tglAVconv = new javax.swing.JToggleButton();
-        lblAVconv = new javax.swing.JLabel();
-        tglGst = new javax.swing.JToggleButton();
-        lblGst = new javax.swing.JLabel();
         filler6 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(3, 0), new java.awt.Dimension(0, 0));
+        btnExit = new javax.swing.JButton();
         mainVerticalSplit = new javax.swing.JSplitPane();
         masterPanelSplit = new javax.swing.JSplitPane();
         panMaster = new javax.swing.JPanel();
@@ -1061,83 +940,40 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
 
         lblFFmpeg3.setBackground(new java.awt.Color(102, 102, 102));
         lblFFmpeg3.setFont(new java.awt.Font("Ubuntu Condensed", 1, 14)); // NOI18N
-        lblFFmpeg3.setText("OUT Back.end: ");
-        lblFFmpeg3.setToolTipText("Select Available Outputs Back-Ends");
+        lblFFmpeg3.setText("TS Back.end: ");
         lblFFmpeg3.setName("lblFFmpeg3"); // NOI18N
         mainToolbar.add(lblFFmpeg3);
 
-        tglFFmpeg.setIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/FFmpeg.png"))); // NOI18N
-        tglFFmpeg.setToolTipText("Use FFmpeg Output Backend.");
-        tglFFmpeg.setFocusable(false);
-        tglFFmpeg.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        tglFFmpeg.setMaximumSize(new java.awt.Dimension(29, 28));
-        tglFFmpeg.setMinimumSize(new java.awt.Dimension(25, 25));
-        tglFFmpeg.setName("tglFFmpeg"); // NOI18N
-        tglFFmpeg.setPreferredSize(new java.awt.Dimension(28, 29));
-        tglFFmpeg.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/FFmpeg.png"))); // NOI18N
-        tglFFmpeg.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/FFmpegSelected.png"))); // NOI18N
-        tglFFmpeg.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        tglFFmpeg.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                tglFFmpegActionPerformed(evt);
-            }
-        });
-        mainToolbar.add(tglFFmpeg);
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/FFmpeg.png"))); // NOI18N
+        jLabel1.setToolTipText("FFmpeg");
+        jLabel1.setIconTextGap(0);
+        jLabel1.setMaximumSize(new java.awt.Dimension(29, 28));
+        jLabel1.setMinimumSize(new java.awt.Dimension(25, 25));
+        jLabel1.setName("lblFFmpeg"); // NOI18N
+        jLabel1.setPreferredSize(new java.awt.Dimension(29, 28));
+        mainToolbar.add(jLabel1);
 
         lblFFmpeg.setFont(new java.awt.Font("Ubuntu Condensed", 0, 12)); // NOI18N
         lblFFmpeg.setText("FFmpeg  ");
         lblFFmpeg.setName("lblFFmpeg"); // NOI18N
         mainToolbar.add(lblFFmpeg);
 
-        tglAVconv.setIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/FFmpeg.png"))); // NOI18N
-        tglAVconv.setToolTipText("Use Libav Output Backend.");
-        tglAVconv.setFocusable(false);
-        tglAVconv.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        tglAVconv.setMaximumSize(new java.awt.Dimension(29, 28));
-        tglAVconv.setMinimumSize(new java.awt.Dimension(25, 25));
-        tglAVconv.setName("tglAVconv"); // NOI18N
-        tglAVconv.setPreferredSize(new java.awt.Dimension(28, 29));
-        tglAVconv.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/FFmpeg.png"))); // NOI18N
-        tglAVconv.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/FFmpegSelected.png"))); // NOI18N
-        tglAVconv.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        tglAVconv.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                tglAVconvActionPerformed(evt);
-            }
-        });
-        mainToolbar.add(tglAVconv);
-
-        lblAVconv.setFont(new java.awt.Font("Ubuntu Condensed", 0, 12)); // NOI18N
-        lblAVconv.setText("Libav ");
-        lblAVconv.setName("lblAVconv"); // NOI18N
-        mainToolbar.add(lblAVconv);
-
-        tglGst.setIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/gstreamer.png"))); // NOI18N
-        tglGst.setToolTipText("Use GStreamer Output Backend.");
-        tglGst.setFocusable(false);
-        tglGst.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        tglGst.setMaximumSize(new java.awt.Dimension(29, 28));
-        tglGst.setMinimumSize(new java.awt.Dimension(25, 25));
-        tglGst.setName("tglGst"); // NOI18N
-        tglGst.setPreferredSize(new java.awt.Dimension(28, 29));
-        tglGst.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/gstreamer.png"))); // NOI18N
-        tglGst.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/gstreamerSelected.png"))); // NOI18N
-        tglGst.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        tglGst.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                tglGstActionPerformed(evt);
-            }
-        });
-        mainToolbar.add(tglGst);
-
-        lblGst.setFont(new java.awt.Font("Ubuntu Condensed", 0, 12)); // NOI18N
-        lblGst.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        lblGst.setText("GStreamer");
-        lblGst.setName("lblGst"); // NOI18N
-        mainToolbar.add(lblGst);
-
         filler6.setName("filler6"); // NOI18N
         mainToolbar.add(filler6);
+
+        btnExit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/exit.png"))); // NOI18N
+        btnExit.setToolTipText("Quit TrucklistStudio");
+        btnExit.setFocusable(false);
+        btnExit.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnExit.setName("btnExit"); // NOI18N
+        btnExit.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnExit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExitActionPerformed(evt);
+            }
+        });
+        mainToolbar.add(btnExit);
 
         getContentPane().add(mainToolbar, java.awt.BorderLayout.PAGE_START);
 
@@ -1529,7 +1365,6 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                 listenerOP.resetBtnStates(null);
                 listenerOP.resetSinks(null);
                 tabControls.removeAll();
-//                tabControls.repaint();
                 Tools.sleep(300);
 
                 cleanDesktops();
@@ -1800,7 +1635,6 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
             int count = 0;
             count = streamS.stream().filter((s) -> (s.getName().contains(key))).map((_item) -> 1).reduce(count, Integer::sum);
             String duplicatedTrkName = key + "(" + count + ")";
-//            boolean found = false;
             boolean nodup = false;
             ArrayList<String> temp = new ArrayList<>();
             for (Stream c : streamS) {
@@ -1931,11 +1765,9 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                         sV.setLoop(false);
                         PreviewFrameBuilder.unregister(sV);
                         MasterFrameBuilder.unregister(sV);
-//                        streamS.remove(sV);
                         sV.destroy();
                         sV = null;
                         tabControls.removeAll();
-//                        tabControls.repaint();
                         break;
                     case 1:
                         numMusics -= 1;
@@ -1963,7 +1795,6 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                         sA.destroy();
                         sA = null;
                         tabControls.removeAll();
-//                        tabControls.repaint();
                         break;
                     case 2:
                         numPictures -= 1;
@@ -1986,7 +1817,6 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                         sP.destroy();
                         sP = null;
                         tabControls.removeAll();
-//                        tabControls.repaint();
                         break;
                     case 3:
                         numTexts -= 1;
@@ -2008,7 +1838,6 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                         sT.destroy();
                         sT = null;
                         tabControls.removeAll();
-//                        tabControls.repaint();
                         break;
                     default:
                         break;
@@ -2031,18 +1860,6 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
         try {
             File file;
             boolean overWrite = true;
-//            ArrayList<Stream> streamzI = MasterTracks.getInstance().getStreams();
-//            ArrayList<String> sourceChI = MasterTracks.getInstance().getTracks();
-//            if (streamzI.size() > 0 || sourceChI.size() > 0) {
-//                Object[] options = {"OK"};
-//                JOptionPane.showOptionDialog(this,
-//                        "All Streams will be Stopped !!!", "Attention",
-//                        JOptionPane.PLAIN_MESSAGE,
-//                        JOptionPane.INFORMATION_MESSAGE,
-//                        null,
-//                        options,
-//                        options[0]);
-//            }
             JFileChooser chooser = new JFileChooser(lastFolder);
             FileNameExtensionFilter studioFilter = new FileNameExtensionFilter("Studio files (*.studio)", "studio");
             chooser.setFileFilter(studioFilter);
@@ -2071,21 +1888,12 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
             if (retval == JFileChooser.APPROVE_OPTION && overWrite) {
                 final WaitingDialog waitingD = new WaitingDialog(this);
                 final File fileF = file;
-//                lblSourceSelected.setText("");
                 SwingWorker<?, ?> worker = new SwingWorker<Void, Integer>() {
                     @Override
                     protected Void doInBackground() throws InterruptedException {
                         if (fileF != null) {
                             File fileS = fileF;
                             lastFolder = fileS.getParentFile();
-//                            PrePlayer.getPreInstance(null).stop();
-//                            Tools.sleep(100);
-//                            MasterTracks.getInstance().stopAllStream();
-//                            Tools.sleep(100);
-//                            listenerTSTP.stopChTime(sEvt);
-//                            for (Stream s : MasterTracks.getInstance().getStreams()) {
-//                                s.updateStatus();
-//                            }
                             if (!fileS.getName().endsWith(".studio")) {
                                 fileS = new File(fileS.getParent(), fileS.getName() + ".studio");
                             }
@@ -2097,7 +1905,6 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                             ResourceMonitorLabel label = new ResourceMonitorLabel(System.currentTimeMillis() + 10000, "Studio is saved!");
                             ResourceMonitor.getInstance().addMessage(label);
                             setTitle("TrucklistStudio " + Version.version + " (" + fileS.getName() + ")");
-//                            jProgressBar1.setValue(100);
                         }
                         return null;
                     }
@@ -2184,11 +1991,7 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                 fileD.setExecutable(true);
                 batchDurationComm = userHomeDir + "/.truckliststudio/" + "DCalc.bat";
             } else {
-                if (BackEnd.avconvDetected()) {
-                    infoCmd = "avconv -i " + "\"" + file.getAbsolutePath() + "\"";
-                } else {
-                    infoCmd = "ffmpeg -i " + "\"" + file.getAbsolutePath() + "\"";
-                }
+                infoCmd = "ffmpeg -i " + "\"" + file.getAbsolutePath() + "\"";
                 fileD = new File(userHomeDir + "/.truckliststudio/" + "DCalc.sh");
                 FileOutputStream fosD;
                 Writer dosD = null;
@@ -2602,7 +2405,6 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
             listenerOP.resetSinks(evt);
             tabControls.removeAll();
             lblSourceSelected.setText("");
-//            tabControls.repaint();
             Tools.sleep(300);
 
             cleanDesktops();
@@ -2895,25 +2697,6 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
         }
     }//GEN-LAST:event_btnImportStudioActionPerformed
 
-    private void tglFFmpegActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tglFFmpegActionPerformed
-        if (tglFFmpeg.isSelected()) {
-            tglAVconv.setSelected(false);
-            tglGst.setSelected(false);
-            outFMEbe = 0;
-            listenerOP.resetSinks(evt);
-            ResourceMonitorLabel label = new ResourceMonitorLabel(System.currentTimeMillis() + 10000, "Outputs switched to FFmpeg.");
-            ResourceMonitor.getInstance().addMessage(label);
-        } else {
-            outFMEbe = 2;
-            tglAVconv.setEnabled(avconv);
-            tglGst.setEnabled(true);
-            tglGst.setSelected(true);
-            listenerOP.resetSinks(evt);
-            ResourceMonitorLabel label = new ResourceMonitorLabel(System.currentTimeMillis() + 10000, "Outputs switched to GStreamer.");
-            ResourceMonitor.getInstance().addMessage(label);
-        }
-    }//GEN-LAST:event_tglFFmpegActionPerformed
-
     public void setTrkStudioState(boolean state) {
         this.setEnabled(state);
     }
@@ -2942,7 +2725,6 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
 //            System.out.println("Dir: "+dir);
             final WaitingDialog waitingD = new WaitingDialog(this);
             setTrkStudioState(false);
-//            editingPhase = false;
             SwingWorker<?, ?> worker = new SwingWorker<Void, Integer>() {
                 @Override
                 protected Void doInBackground() throws InterruptedException {
@@ -3174,63 +2956,6 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
             ResourceMonitor.getInstance().addMessage(label);
         }
     }//GEN-LAST:event_btnAddFolderActionPerformed
-
-    private void tglAVconvActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tglAVconvActionPerformed
-        if (tglAVconv.isSelected()) {
-            tglFFmpeg.setSelected(false);
-            tglGst.setSelected(false);
-            outFMEbe = 1;
-            listenerOP.resetSinks(evt);
-            ResourceMonitorLabel label = new ResourceMonitorLabel(System.currentTimeMillis() + 10000, "Outputs switched to Libav.");
-            ResourceMonitor.getInstance().addMessage(label);
-        } else {
-            outFMEbe = 2;
-            tglFFmpeg.setEnabled(ffmpeg);
-            tglGst.setEnabled(true);
-            tglGst.setSelected(true);
-            listenerOP.resetSinks(evt);
-            ResourceMonitorLabel label = new ResourceMonitorLabel(System.currentTimeMillis() + 10000, "Outputs switched to Gstreamer.");
-            ResourceMonitor.getInstance().addMessage(label);
-        }
-    }//GEN-LAST:event_tglAVconvActionPerformed
-
-    private void tglGstActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tglGstActionPerformed
-        if (tglGst.isSelected()) {
-            tglFFmpeg.setSelected(false);
-            tglAVconv.setSelected(false);
-            outFMEbe = 2;
-            listenerOP.resetSinks(evt);
-            ResourceMonitorLabel label = new ResourceMonitorLabel(System.currentTimeMillis() + 10000, "Outputs switched to GStreamer.");
-            ResourceMonitor.getInstance().addMessage(label);
-        } else {
-            if (ffmpeg && !avconv) {
-                outFMEbe = 0;
-                tglFFmpeg.setSelected(true);
-                tglAVconv.setEnabled(false);
-                tglGst.setEnabled(true);
-            } else if (ffmpeg && avconv) {
-                outFMEbe = 1;
-                tglFFmpeg.setEnabled(true);
-                tglAVconv.setSelected(true);
-                tglGst.setEnabled(true);
-
-            } else {
-                outFMEbe = 1;
-                tglFFmpeg.setEnabled(false);
-                tglAVconv.setSelected(true);
-                tglGst.setEnabled(true);
-            }
-
-            listenerOP.resetSinks(evt);
-            if (outFMEbe == 1) {
-                ResourceMonitorLabel label = new ResourceMonitorLabel(System.currentTimeMillis() + 10000, "Outputs switched to Libav.");
-                ResourceMonitor.getInstance().addMessage(label);
-            } else {
-                ResourceMonitorLabel label = new ResourceMonitorLabel(System.currentTimeMillis() + 10000, "Outputs switched to FFmpeg.");
-                ResourceMonitor.getInstance().addMessage(label);
-            }
-        }
-    }//GEN-LAST:event_tglGstActionPerformed
 
     private void btnSysGCActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSysGCActionPerformed
         System.gc();
@@ -3590,6 +3315,10 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
         }
     }//GEN-LAST:event_btnHideVideoActionPerformed
 
+    private void btnExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExitActionPerformed
+        formWindowClosing(null);
+    }//GEN-LAST:event_btnExitActionPerformed
+
     /**
      *
      */
@@ -3682,6 +3411,7 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
     private javax.swing.JButton btnAddFolder;
     private javax.swing.JButton btnAddText;
     private javax.swing.JButton btnApplyTitle;
+    private javax.swing.JButton btnExit;
     private javax.swing.JButton btnHideVideo;
     private javax.swing.JButton btnImportStudio;
     private final javax.swing.JButton btnLoadStudio = new javax.swing.JButton();
@@ -3700,17 +3430,16 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
     private javax.swing.Box.Filler filler5;
     private javax.swing.Box.Filler filler6;
     private javax.swing.Box.Filler filler7;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JToolBar.Separator jSeparator10;
     private javax.swing.JToolBar.Separator jSeparator12;
     private javax.swing.JToolBar.Separator jSeparator16;
     private javax.swing.JToolBar.Separator jSeparator2;
     private javax.swing.JToolBar.Separator jSeparator4;
     private javax.swing.JToolBar.Separator jSeparator7;
-    private javax.swing.JLabel lblAVconv;
     private javax.swing.JLabel lblAudioFreq;
     private javax.swing.JLabel lblFFmpeg;
     private javax.swing.JLabel lblFFmpeg3;
-    private javax.swing.JLabel lblGst;
     private javax.swing.JLabel lblSourceSelected;
     private javax.swing.JLabel lblSysGC;
     private javax.swing.JLabel lblThemeSwitch;
@@ -3729,12 +3458,9 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
     private javax.swing.JTabbedPane tabSources;
     public static javax.swing.JTabbedPane textDesktop;
     private javax.swing.JScrollPane textScroll;
-    private javax.swing.JToggleButton tglAVconv;
     private javax.swing.JToggleButton tglAutoAR;
     private javax.swing.JToggleButton tglAutoTitle;
     private javax.swing.JToggleButton tglAutoTrack;
-    private javax.swing.JToggleButton tglFFmpeg;
-    private javax.swing.JToggleButton tglGst;
     private javax.swing.JToolBar toolbar;
     private javax.swing.JTabbedPane videoDesktop;
     private javax.swing.JScrollPane videoScroll;
@@ -3760,12 +3486,8 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                 }
             }
         };
-
         tabControls.removeAll();
-//        tabControls.repaint();
-
         SwingUtilities.invokeLater(addComps);
-
         lblSourceSelected.setText("<html>&nbsp;&nbsp;<font color=" + selColLbl + ">Selected:</font><font color=" + selColLbl2 + "> \"" + shortName + "\"</font></html>");
     }
 
@@ -3806,7 +3528,6 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                     listenerTSTP.resetBtnStates(fEvt);
                     listenerOP.resetBtnStates(fEvt);
                     tabControls.removeAll();
-//                    tabControls.repaint();
                     Tools.sleep(300);
                     videoDesktop.removeAll();
                     videoDesktop.repaint();

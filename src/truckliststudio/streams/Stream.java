@@ -99,7 +99,6 @@ public abstract class Stream implements Callable<Frame>{
     protected boolean isPlayList = false;
     protected boolean isQRCode = false;
     protected String comm = "AV";
-    protected boolean backFF = false;
     protected String content = "";
     protected String fontName = "";
     protected boolean isOAudio = false;
@@ -121,20 +120,11 @@ public abstract class Stream implements Callable<Frame>{
     protected Stream() {
         MasterTracks.getInstance().register(this);
     }
-
-    public String getComm() {
-        return comm;
-    }
     
     public ArrayList<Effect> getAllEffects() {
         return effects;
     }
-    
-     
-    public void setComm(String sComm) {
-        this.comm = sComm;
-    }
-    
+
     public boolean getisPaused() {
         return isPaused;
     }
@@ -197,14 +187,6 @@ public abstract class Stream implements Callable<Frame>{
     
     public void setIsQRCode(boolean tQRCode) {
         this.isQRCode = tQRCode;
-    }
-    
-    public void setBackFF(boolean wasFF) {
-        this.backFF = wasFF;
-    }
-    
-    public boolean getBackFF() {
-        return this.backFF;
     }
 
     public void setOnlyVideo(boolean setOVideo) {
@@ -315,10 +297,6 @@ public abstract class Stream implements Callable<Frame>{
     public abstract void pause();
     
     public abstract void play();
-    
-    public abstract boolean needSeek();
-    
-    public abstract void setNeedSeek(boolean seek);
 
     public abstract boolean isPlaying();
  
@@ -399,11 +377,6 @@ public abstract class Stream implements Callable<Frame>{
     
     public String getGuid(){
         return guid;
-    }
-    
-    public boolean needSeekCTRL(){
-        needSeekCTRL = needSeek();
-        return needSeekCTRL;
     }
     
     public boolean hasFakeVideo(){
@@ -757,10 +730,6 @@ public abstract class Stream implements Callable<Frame>{
     public void setAbitrate(String sAbitRate) {
         abitrate = sAbitRate;
     }
-    
-    /**
-     * @return the vbitrate
-     */
     
     public String getMount() {
         return mount;

@@ -37,7 +37,7 @@ import truckliststudio.streams.SourceImageGif;
 import truckliststudio.streams.SourceMovie;
 import truckliststudio.streams.SourceMusic;
 import truckliststudio.streams.Stream;
-import truckliststudio.util.BackEnd;
+//import truckliststudio.util.BackEnd;
 
 /**
  *
@@ -54,8 +54,8 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener {
     int oldW;
     int oldH;
     String distro = wsDistroWatch();
-    boolean ffmpeg = BackEnd.ffmpegDetected();
-    boolean avconv = BackEnd.avconvDetected();
+//    boolean ffmpeg = BackEnd.ffmpegDetected();
+//    boolean avconv = BackEnd.avconvDetected();
     JLabel titleLabel = new JLabel();
     JTabbedPane JTp;
     Color sActiveLblCol = Color.GREEN;
@@ -98,7 +98,11 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener {
         oldH = stream.getHeight();
         volume = stream.getVolume();
         vol = stream.getVolume();
-
+        tglAVconv.setVisible(false);
+        tglGst.setVisible(false);
+        lblBE.setVisible(false);
+        tglFFmpeg.setVisible(false);
+        
         if (theme.equals("Dark")) {
             sStopLblCol = Color.WHITE;
             sActiveLblCol = Color.GREEN;
@@ -164,10 +168,6 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener {
         jSlSpinVD.setEnabled(stream.hasVideo());
         spinADelay.setEnabled(stream.hasAudio());
         jSlSpinAD.setEnabled(stream.hasAudio());
-        spinSeek.setValue(stream.getSeek());
-        spinSeek.setVisible(stream.needSeekCTRL());
-        jSlSpinSeek.setVisible(stream.needSeekCTRL());
-        labelSeek.setVisible(stream.needSeekCTRL());
         jlbDuration.setText("Play Time " + stream.getStreamTime());
 
         stream.setListener(this);
@@ -216,139 +216,139 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener {
             tglAudio.setEnabled(true);
             tglVideo.setEnabled(true);
         }
-        if (stream.getLoaded()) {
-            if (distro.toLowerCase().equals("ubuntu")) {
-                if (ffmpeg && !avconv) {
-                    switch (stream.getComm()) {
-                        case "AV":
-                            tglFFmpeg.setSelected(true);
-                            stream.setComm("FF");
-                            stream.setBackFF(true);
-                            tglAVconv.setEnabled(false);
-                            tglGst.setSelected(false);
-                            break;
-                        case "GS":
-                            tglGst.setSelected(true);
-                            stream.setComm("GS");
-                            tglAVconv.setEnabled(false);
-                            break;
-                        case "FF":
-                            tglFFmpeg.setSelected(true);
-                            stream.setComm("FF");
-                            stream.setBackFF(true);
-                            tglAVconv.setEnabled(false);
-                            tglGst.setSelected(false);
-                            break;
-                        default:
-                            tglFFmpeg.setSelected(true);
-                            stream.setComm("FF");
-                            stream.setBackFF(true);
-                            tglAVconv.setEnabled(false);
-                            tglGst.setSelected(false);
-                            break;
-                    }
-
-                } else if (ffmpeg && avconv) {
-                    switch (stream.getComm()) {
-                        case "AV":
-                            tglAVconv.setSelected(true);
-                            stream.setComm("AV");
-                            tglGst.setSelected(false);
-                            break;
-                        case "GS":
-                            tglGst.setSelected(true);
-                            stream.setComm("GS");
-                            tglAVconv.setSelected(false);
-                            break;
-                        case "FF":
-                            tglFFmpeg.setSelected(true);
-                            stream.setComm("FF");
-                            stream.setBackFF(true);
-                            tglAVconv.setSelected(false);
-                            tglGst.setSelected(false);
-                            break;
-                        default:
-                            tglAVconv.setSelected(true);
-                            stream.setComm("AV");
-                            tglGst.setSelected(false);
-                            tglFFmpeg.setSelected(false);
-                            break;
-                    }
-                } else if (!ffmpeg && avconv) {
-                    switch (stream.getComm()) {
-                        case "AV":
-                            tglAVconv.setSelected(true);
-                            stream.setComm("AV");
-                            tglGst.setSelected(false);
-                            tglFFmpeg.setEnabled(false);
-                            break;
-                        case "GS":
-                            tglGst.setSelected(true);
-                            stream.setComm("GS");
-                            tglAVconv.setSelected(false);
-                            tglFFmpeg.setEnabled(false);
-                            break;
-                        case "FF":
-                            tglAVconv.setSelected(true);
-                            stream.setComm("AV");
-                            tglGst.setSelected(false);
-                            tglFFmpeg.setEnabled(false);
-                            break;
-                        default:
-                            tglAVconv.setSelected(true);
-                            stream.setComm("AV");
-                            tglGst.setSelected(false);
-                            tglFFmpeg.setEnabled(false);
-                            break;
-                    }
-                }
-            } else if (distro.toLowerCase().equals("windows")) {
-                stream.setComm("FF");
-                stream.setBackFF(true);
-                tglFFmpeg.setSelected(true);
-                tglFFmpeg.setEnabled(false);
-                tglAVconv.setVisible(false);
-                tglGst.setVisible(false);
-            } else {
-                tglAVconv.setEnabled(false);
-                stream.setComm("FF");
-                stream.setBackFF(true);
-                tglGst.setSelected(false);
-                tglFFmpeg.setSelected(true);
-            }
-            this.revalidate();
-        } else if (distro.toLowerCase().equals("ubuntu")) {
-            if (ffmpeg && !avconv) {
-                tglFFmpeg.setSelected(true);
-                stream.setComm("FF");
-                stream.setBackFF(true);
-                tglAVconv.setEnabled(false);
-                tglGst.setSelected(false);
-            } else if (ffmpeg && avconv) {
-                tglAVconv.setSelected(true);
-                stream.setComm("AV");
-                tglGst.setSelected(false);
-                tglFFmpeg.setSelected(false);
-            } else if (!ffmpeg && avconv) {
-                tglAVconv.setSelected(true);
-                stream.setComm("AV");
-                tglGst.setSelected(false);
-                tglFFmpeg.setEnabled(false);
-            }
-        } else if (distro.toLowerCase().equals("windows")) {
-            stream.setComm("FF");
-            stream.setBackFF(true);
-            tglFFmpeg.setSelected(true);
-            tglFFmpeg.setEnabled(false);
-            tglAVconv.setVisible(false);
-            tglGst.setVisible(false);
-        } else {
-            tglAVconv.setEnabled(false);
-            stream.setComm("FF");
-            stream.setBackFF(true);
-            tglGst.setSelected(false);
-            tglFFmpeg.setSelected(true);
-        } //                tglLoop.setVisible(false);
+//        if (stream.getLoaded()) {
+//            if (distro.toLowerCase().equals("ubuntu")) {
+//                if (ffmpeg && !avconv) {
+//                    switch (stream.getComm()) {
+//                        case "AV":
+//                            tglFFmpeg.setSelected(true);
+//                            stream.setComm("FF");
+//                            stream.setBackFF(true);
+//                            tglAVconv.setEnabled(false);
+//                            tglGst.setSelected(false);
+//                            break;
+//                        case "GS":
+//                            tglGst.setSelected(true);
+//                            stream.setComm("GS");
+//                            tglAVconv.setEnabled(false);
+//                            break;
+//                        case "FF":
+//                            tglFFmpeg.setSelected(true);
+//                            stream.setComm("FF");
+//                            stream.setBackFF(true);
+//                            tglAVconv.setEnabled(false);
+//                            tglGst.setSelected(false);
+//                            break;
+//                        default:
+//                            tglFFmpeg.setSelected(true);
+//                            stream.setComm("FF");
+//                            stream.setBackFF(true);
+//                            tglAVconv.setEnabled(false);
+//                            tglGst.setSelected(false);
+//                            break;
+//                    }
+//
+//                } else if (ffmpeg && avconv) {
+//                    switch (stream.getComm()) {
+//                        case "AV":
+//                            tglAVconv.setSelected(true);
+//                            stream.setComm("AV");
+//                            tglGst.setSelected(false);
+//                            break;
+//                        case "GS":
+//                            tglGst.setSelected(true);
+//                            stream.setComm("GS");
+//                            tglAVconv.setSelected(false);
+//                            break;
+//                        case "FF":
+//                            tglFFmpeg.setSelected(true);
+//                            stream.setComm("FF");
+//                            stream.setBackFF(true);
+//                            tglAVconv.setSelected(false);
+//                            tglGst.setSelected(false);
+//                            break;
+//                        default:
+//                            tglAVconv.setSelected(true);
+//                            stream.setComm("AV");
+//                            tglGst.setSelected(false);
+//                            tglFFmpeg.setSelected(false);
+//                            break;
+//                    }
+//                } else if (!ffmpeg && avconv) {
+//                    switch (stream.getComm()) {
+//                        case "AV":
+//                            tglAVconv.setSelected(true);
+//                            stream.setComm("AV");
+//                            tglGst.setSelected(false);
+//                            tglFFmpeg.setEnabled(false);
+//                            break;
+//                        case "GS":
+//                            tglGst.setSelected(true);
+//                            stream.setComm("GS");
+//                            tglAVconv.setSelected(false);
+//                            tglFFmpeg.setEnabled(false);
+//                            break;
+//                        case "FF":
+//                            tglAVconv.setSelected(true);
+//                            stream.setComm("AV");
+//                            tglGst.setSelected(false);
+//                            tglFFmpeg.setEnabled(false);
+//                            break;
+//                        default:
+//                            tglAVconv.setSelected(true);
+//                            stream.setComm("AV");
+//                            tglGst.setSelected(false);
+//                            tglFFmpeg.setEnabled(false);
+//                            break;
+//                    }
+//                }
+//            } else if (distro.toLowerCase().equals("windows")) {
+//                stream.setComm("FF");
+//                stream.setBackFF(true);
+//                tglFFmpeg.setSelected(true);
+//                tglFFmpeg.setEnabled(false);
+//                tglAVconv.setVisible(false);
+//                tglGst.setVisible(false);
+//            } else {
+//                tglAVconv.setEnabled(false);
+//                stream.setComm("FF");
+//                stream.setBackFF(true);
+//                tglGst.setSelected(false);
+//                tglFFmpeg.setSelected(true);
+//            }
+//            this.revalidate();
+//        } else if (distro.toLowerCase().equals("ubuntu")) {
+//            if (ffmpeg && !avconv) {
+//                tglFFmpeg.setSelected(true);
+//                stream.setComm("FF");
+//                stream.setBackFF(true);
+//                tglAVconv.setEnabled(false);
+//                tglGst.setSelected(false);
+//            } else if (ffmpeg && avconv) {
+//                tglAVconv.setSelected(true);
+//                stream.setComm("AV");
+//                tglGst.setSelected(false);
+//                tglFFmpeg.setSelected(false);
+//            } else if (!ffmpeg && avconv) {
+//                tglAVconv.setSelected(true);
+//                stream.setComm("AV");
+//                tglGst.setSelected(false);
+//                tglFFmpeg.setEnabled(false);
+//            }
+//        } else if (distro.toLowerCase().equals("windows")) {
+//            stream.setComm("FF");
+//            stream.setBackFF(true);
+//            tglFFmpeg.setSelected(true);
+//            tglFFmpeg.setEnabled(false);
+//            tglAVconv.setVisible(false);
+//            tglGst.setVisible(false);
+//        } else {
+//            tglAVconv.setEnabled(false);
+//            stream.setComm("FF");
+//            stream.setBackFF(true);
+//            tglGst.setSelected(false);
+//            tglFFmpeg.setSelected(true);
+//        } //                tglLoop.setVisible(false);
         if (stream instanceof SourceImageGif || stream instanceof SourceImage) {
             tglAVconv.setVisible(false);
             tglFFmpeg.setVisible(false);
@@ -450,10 +450,10 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener {
         tglVideo.setSelected(stream.isOnlyAudio());
         //boolean seek = stream.needSeekCTRL();
         // Workaround to Wait until use of ges-launch-1.0
-        boolean seek = false;
-        labelSeek.setVisible(seek);
-        spinSeek.setVisible(seek);
-        jSlSpinSeek.setVisible(seek);
+//        boolean seek = false;
+//        labelSeek.setVisible(seek);
+//        spinSeek.setVisible(seek);
+//        jSlSpinSeek.setVisible(seek);
         if (stream.isPlaying()) {
 
             tglPause.setSelected(stream.getisPaused());
@@ -462,8 +462,8 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener {
             jSlSpinVD.setEnabled(false);
             spinADelay.setEnabled(false);
             jSlSpinAD.setEnabled(false);
-            spinSeek.setEnabled(false);
-            jSlSpinSeek.setEnabled(false);
+//            spinSeek.setEnabled(false);
+//            jSlSpinSeek.setEnabled(false);
             tglAudio.setEnabled(false);
             tglPreview.setEnabled(false);
             tglVideo.setEnabled(false);
@@ -494,8 +494,8 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener {
             jSlSpinVD.setEnabled(stream.hasVideo());
             spinADelay.setEnabled(stream.hasAudio());
             jSlSpinAD.setEnabled(stream.hasAudio());
-            spinSeek.setEnabled(seek);
-            jSlSpinSeek.setEnabled(seek);
+//            spinSeek.setEnabled(seek);
+//            jSlSpinSeek.setEnabled(seek);
             tglPreview.setEnabled(true);
             if (tglAudio.isSelected()) {
                 tglAudio.setEnabled(true);
@@ -539,8 +539,6 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener {
         labelZ = new javax.swing.JLabel();
         spinVDelay = new javax.swing.JSpinner();
         spinADelay = new javax.swing.JSpinner();
-        spinSeek = new javax.swing.JSpinner();
-        labelSeek = new javax.swing.JLabel();
         jSlSpinX = new javax.swing.JSlider();
         jSlSpinY = new javax.swing.JSlider();
         jSlSpinW = new javax.swing.JSlider();
@@ -548,7 +546,6 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener {
         jSlSpinO = new javax.swing.JSlider();
         jSlSpinVD = new javax.swing.JSlider();
         jSlSpinAD = new javax.swing.JSlider();
-        jSlSpinSeek = new javax.swing.JSlider();
         jSlSpinZOrder = new javax.swing.JSlider();
         labelVD = new javax.swing.JLabel();
         labelAD = new javax.swing.JLabel();
@@ -632,7 +629,7 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener {
 
         tglActiveStream.setIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/media-playback-start.png"))); // NOI18N
         tglActiveStream.setName("tglActiveStream"); // NOI18N
-        tglActiveStream.setRolloverEnabled(false);
+        tglActiveStream.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/media-playback-start.png"))); // NOI18N
         tglActiveStream.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/media-playback-stop.png"))); // NOI18N
         tglActiveStream.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -695,22 +692,6 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener {
                 spinADelayStateChanged(evt);
             }
         });
-
-        spinSeek.setFont(new java.awt.Font("Tahoma", 0, 8)); // NOI18N
-        spinSeek.setModel(new javax.swing.SpinnerNumberModel(0, 0, null, 1));
-        spinSeek.setName("spinSeek"); // NOI18N
-        spinSeek.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                spinSeekStateChanged(evt);
-            }
-        });
-
-        labelSeek.setFont(new java.awt.Font("Tahoma", 0, 8)); // NOI18N
-        labelSeek.setText(bundle.getString("SEEK")); // NOI18N
-        labelSeek.setMaximumSize(new java.awt.Dimension(30, 10));
-        labelSeek.setMinimumSize(new java.awt.Dimension(30, 10));
-        labelSeek.setName("labelSeek"); // NOI18N
-        labelSeek.setPreferredSize(new java.awt.Dimension(30, 10));
 
         jSlSpinX.setMaximum(MasterMixer.getInstance().getWidth());
         jSlSpinX.setMinimum(- MasterMixer.getInstance().getWidth());
@@ -787,17 +768,6 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener {
         jSlSpinAD.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 jSlSpinADStateChanged(evt);
-            }
-        });
-
-        jSlSpinSeek.setMaximum(10000);
-        jSlSpinSeek.setPaintLabels(true);
-        jSlSpinSeek.setValue(0);
-        jSlSpinSeek.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        jSlSpinSeek.setName("jSlSpinSeek"); // NOI18N
-        jSlSpinSeek.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                jSlSpinSeekStateChanged(evt);
             }
         });
 
@@ -1035,14 +1005,9 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener {
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                                     .addComponent(labelAD, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(labelZ, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(labelVD, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(labelSeek, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(labelVD, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(spinSeek, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(jSlSpinSeek, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                                     .addGroup(layout.createSequentialGroup()
                                         .addComponent(spinADelay, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1083,15 +1048,15 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener {
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 65, Short.MAX_VALUE)))))
                         .addGap(13, 13, 13))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(tglActiveStream, javax.swing.GroupLayout.DEFAULT_SIZE, 38, Short.MAX_VALUE)
+                        .addComponent(tglActiveStream, javax.swing.GroupLayout.PREFERRED_SIZE, 38, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(tglPause, javax.swing.GroupLayout.DEFAULT_SIZE, 37, Short.MAX_VALUE)
+                        .addComponent(tglPause, javax.swing.GroupLayout.PREFERRED_SIZE, 37, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(tglVideo, javax.swing.GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(tglAudio, javax.swing.GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(tglPreview, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
+                        .addComponent(tglPreview, javax.swing.GroupLayout.PREFERRED_SIZE, 40, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(tglLoop, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
                         .addContainerGap())))
@@ -1173,13 +1138,7 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener {
                         .addComponent(labelAD)
                         .addComponent(spinADelay, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jSlSpinAD, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(spinSeek, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(labelSeek, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jSlSpinSeek, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(19, Short.MAX_VALUE))
+                .addContainerGap(49, Short.MAX_VALUE))
         );
 
         jSlSpinVD.getAccessibleContext().setAccessibleDescription("");
@@ -1204,8 +1163,8 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener {
                 jSlSpinVD.setEnabled(false);
                 spinADelay.setEnabled(false);
                 jSlSpinAD.setEnabled(false);
-                spinSeek.setEnabled(false);
-                jSlSpinSeek.setEnabled(false);
+//                spinSeek.setEnabled(false);
+//                jSlSpinSeek.setEnabled(false);
                 tglAudio.setEnabled(false);
                 tglPreview.setEnabled(false);
                 tglPause.setEnabled(true);
@@ -1222,8 +1181,8 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener {
             jSlSpinVD.setEnabled(stream.hasVideo());
             spinADelay.setEnabled(stream.hasAudio());
             jSlSpinAD.setEnabled(stream.hasAudio());
-            spinSeek.setEnabled(stream.needSeekCTRL());
-            jSlSpinSeek.setEnabled(stream.needSeekCTRL());
+//            spinSeek.setEnabled(stream.needSeekCTRL());
+//            jSlSpinSeek.setEnabled(stream.needSeekCTRL());
             tglPreview.setEnabled(true);
             if (tglAudio.isSelected()) {
                 tglAudio.setEnabled(true);
@@ -1299,7 +1258,7 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener {
     private void spinVolumeStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spinVolumeStateChanged
         String jSVol = spinVolume.getValue().toString();
         String volPar = jSVol.replace(".0", "");
-        System.out.println("String Volume="+jSVol);
+//        System.out.println("String Volume="+jSVol);
         
         int jVol = Integer.parseInt(volPar);
         if (jVol == 1500001) {
@@ -1307,7 +1266,7 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener {
         }
         jSlSpinV.setValue(jVol);
         
-        System.out.println("Number Volume="+jVol);
+//        System.out.println("Number Volume="+jVol);
         
         Object value = spinVolume.getValue();
         float v = 0;
@@ -1317,7 +1276,7 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener {
             v = ((Number) value).floatValue();
         }
         
-        System.out.println("Float Volume="+v/100f);
+//        System.out.println("Float Volume="+v/100f);
         
         if (stream.getisPaused()) {
             if (v / 100f != 0) {
@@ -1338,12 +1297,7 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener {
         stream.setADelay((Integer) spinADelay.getValue());
         jSlSpinAD.setValue((Integer) spinADelay.getValue());
     }//GEN-LAST:event_spinADelayStateChanged
-
-    private void spinSeekStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spinSeekStateChanged
-        stream.setSeek((Integer) spinSeek.getValue());
-        jSlSpinSeek.setValue((Integer) spinSeek.getValue());
-    }//GEN-LAST:event_spinSeekStateChanged
-
+    
     private void jSlSpinXStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSlSpinXStateChanged
         spinX.setValue(jSlSpinX.getValue());
     }//GEN-LAST:event_jSlSpinXStateChanged
@@ -1377,11 +1331,7 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener {
     private void jSlSpinADStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSlSpinADStateChanged
         spinADelay.setValue(jSlSpinAD.getValue());
     }//GEN-LAST:event_jSlSpinADStateChanged
-
-    private void jSlSpinSeekStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSlSpinSeekStateChanged
-        spinSeek.setValue(jSlSpinSeek.getValue());
-    }//GEN-LAST:event_jSlSpinSeekStateChanged
-
+    
     private void jSlSpinZOrderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSlSpinZOrderStateChanged
         spinZOrder.setValue(jSlSpinZOrder.getValue());
     }//GEN-LAST:event_jSlSpinZOrderStateChanged
@@ -1544,81 +1494,81 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener {
     }//GEN-LAST:event_jSlSpinVFocusLost
 
     private void tglFFmpegActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tglFFmpegActionPerformed
-        if (tglFFmpeg.isSelected()) {
-            stream.setComm("FF");
-            stream.setNeedSeek(false);
-            stream.setBackFF(true);
-            tglAVconv.setSelected(false);
-            tglGst.setSelected(false);
-            if (listenerTS != null) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        listenerTS.selectedSource(stream);
-                    }
-                }).start();
-            }
-        } else {
-            stream.setComm("AV");
-            stream.setBackFF(false);
-            tglAVconv.setSelected(true);
-            tglGst.setSelected(false);
-        }
-        stream.updateStatus();
+//        if (tglFFmpeg.isSelected()) {
+//            stream.setComm("FF");
+//            stream.setNeedSeek(false);
+//            stream.setBackFF(true);
+//            tglAVconv.setSelected(false);
+//            tglGst.setSelected(false);
+//            if (listenerTS != null) {
+//                new Thread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        listenerTS.selectedSource(stream);
+//                    }
+//                }).start();
+//            }
+//        } else {
+//            stream.setComm("AV");
+//            stream.setBackFF(false);
+//            tglAVconv.setSelected(true);
+//            tglGst.setSelected(false);
+//        }
+//        stream.updateStatus();
     }//GEN-LAST:event_tglFFmpegActionPerformed
 
     private void tglAVconvActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tglAVconvActionPerformed
-        if (tglAVconv.isSelected()) {
-            stream.setComm("AV");
-            stream.setNeedSeek(false);
-            stream.setBackFF(false);
-            tglGst.setSelected(false);
-            tglFFmpeg.setSelected(false);
-            if (listenerTS != null) {
-                new Thread(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        listenerTS.selectedSource(stream);
-                    }
-                }).start();
-
-            }
-        } else {
-            tglGst.setSelected(true);
-            tglAVconv.setSelected(false);
-            tglFFmpeg.setSelected(false);
-            stream.setComm("GS");
-            stream.setBackFF(false);
-        }
-        stream.updateStatus();
+//        if (tglAVconv.isSelected()) {
+//            stream.setComm("AV");
+//            stream.setNeedSeek(false);
+//            stream.setBackFF(false);
+//            tglGst.setSelected(false);
+//            tglFFmpeg.setSelected(false);
+//            if (listenerTS != null) {
+//                new Thread(new Runnable() {
+//
+//                    @Override
+//                    public void run() {
+//                        listenerTS.selectedSource(stream);
+//                    }
+//                }).start();
+//
+//            }
+//        } else {
+//            tglGst.setSelected(true);
+//            tglAVconv.setSelected(false);
+//            tglFFmpeg.setSelected(false);
+//            stream.setComm("GS");
+//            stream.setBackFF(false);
+//        }
+//        stream.updateStatus();
     }//GEN-LAST:event_tglAVconvActionPerformed
 
     private void tglGstActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tglGstActionPerformed
-        if (tglGst.isSelected()) {
-            stream.setComm("GS");
-            stream.setNeedSeek(true);
-            stream.setBackFF(false);
-            tglAVconv.setSelected(false);
-            tglFFmpeg.setSelected(false);
-            if (listenerTS != null) {
-                new Thread(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        listenerTS.selectedSource(stream);
-                    }
-                }).start();
-
-            }
-        } else {
-            tglAVconv.setSelected(true);
-            tglGst.setSelected(false);
-            tglFFmpeg.setSelected(false);
-            stream.setBackFF(false);
-            stream.setComm("AV");
-        }
-        stream.updateStatus();
+//        if (tglGst.isSelected()) {
+//            stream.setComm("GS");
+//            stream.setNeedSeek(true);
+//            stream.setBackFF(false);
+//            tglAVconv.setSelected(false);
+//            tglFFmpeg.setSelected(false);
+//            if (listenerTS != null) {
+//                new Thread(new Runnable() {
+//
+//                    @Override
+//                    public void run() {
+//                        listenerTS.selectedSource(stream);
+//                    }
+//                }).start();
+//
+//            }
+//        } else {
+//            tglAVconv.setSelected(true);
+//            tglGst.setSelected(false);
+//            tglFFmpeg.setSelected(false);
+//            stream.setBackFF(false);
+//            stream.setComm("AV");
+//        }
+//        stream.updateStatus();
     }//GEN-LAST:event_tglGstActionPerformed
 
     private void tglLoopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tglLoopActionPerformed
@@ -1646,7 +1596,6 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener {
     private javax.swing.JSlider jSlSpinAD;
     private javax.swing.JSlider jSlSpinH;
     private javax.swing.JSlider jSlSpinO;
-    private javax.swing.JSlider jSlSpinSeek;
     private javax.swing.JSlider jSlSpinV;
     private javax.swing.JSlider jSlSpinVD;
     private javax.swing.JSlider jSlSpinW;
@@ -1658,7 +1607,6 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener {
     private javax.swing.JLabel labelAD;
     private javax.swing.JLabel labelH;
     private javax.swing.JLabel labelO;
-    private javax.swing.JLabel labelSeek;
     private javax.swing.JLabel labelVD;
     private javax.swing.JLabel labelVol;
     private javax.swing.JLabel labelW;
@@ -1669,7 +1617,6 @@ public class StreamPanel extends javax.swing.JPanel implements Stream.Listener {
     private javax.swing.JSpinner spinADelay;
     private javax.swing.JSpinner spinH;
     private javax.swing.JSpinner spinOpacity;
-    private javax.swing.JSpinner spinSeek;
     private javax.swing.JSpinner spinVDelay;
     private javax.swing.JSpinner spinVolume;
     private javax.swing.JSpinner spinW;

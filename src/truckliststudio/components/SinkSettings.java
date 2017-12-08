@@ -6,14 +6,12 @@
 
 package truckliststudio.components;
 
-import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import truckliststudio.TrucklistStudio;
-import truckliststudio.streams.SinkFile;
 import truckliststudio.streams.SinkHLS;
 import truckliststudio.streams.SinkUDP;
 import truckliststudio.streams.Stream;
@@ -23,7 +21,6 @@ import truckliststudio.streams.Stream;
  * @author karl
  */
 public class SinkSettings extends javax.swing.JFrame implements Stream.Listener {
-    SinkFile thisSinkFile = null;
     SinkUDP thisSinkUDP = null;
     SinkHLS thisSinkHLS = null;
     /**
@@ -31,50 +28,15 @@ public class SinkSettings extends javax.swing.JFrame implements Stream.Listener 
      * @param sFile
      * @param udp
      */
-    public SinkSettings(SinkFile sFile, SinkUDP udp, SinkHLS hls) {
+    public SinkSettings(SinkUDP udp, SinkHLS hls) {
         initComponents();
         // for now we keep this not visible
         lblOW.setVisible(false);
         lblOH.setVisible(false);
         spinOutW.setVisible(false);
         spinOutH.setVisible(false);
-        
-        if (sFile != null) {
-            chkHQMode.setEnabled(false);
-            lblrtmpURL.setEnabled(false);
-            chkHQMode.setForeground(Color.gray);
-            thisSinkFile = sFile;
-            thisSinkUDP = null;
-            thisSinkHLS = null;
-            lblName.setText(thisSinkFile.getName());
-            this.setTitle(thisSinkFile.getName() + " Settings");
-            if (thisSinkFile.getVbitrate().equals("")) {
-                spinVideoRate.setValue(0);
-                spinVideoRate.setEnabled(false);
-            } else {
-                spinVideoRate.setValue(Integer.parseInt(thisSinkFile.getVbitrate()));
-            }
-            if (thisSinkFile.getWidth() == 0) {
-                spinOutW.setValue(0);
-                spinOutW.setEnabled(false);
-            } else {
-                spinOutW.setValue(thisSinkFile.getWidth());
-            }
-            if (thisSinkFile.getHeight() == 0) {
-                spinOutH.setValue(0);
-                spinOutH.setEnabled(false);
-            } else {
-                spinOutH.setValue(thisSinkFile.getHeight());
-            }
-            if (thisSinkFile.getAbitrate().equals("")) {
-                spinAudioRate.setValue(0);
-                spinAudioRate.setEnabled(false);
-            } else {
-                spinAudioRate.setValue(Integer.parseInt(thisSinkFile.getAbitrate()));
-            }
-        } else if (udp != null) {
+        if (udp != null) {
             thisSinkUDP = udp;
-            thisSinkFile = null;
             thisSinkHLS = null;
             lblrtmpURL.setEnabled(false);
             lblName.setText(thisSinkUDP.getName());
@@ -106,7 +68,6 @@ public class SinkSettings extends javax.swing.JFrame implements Stream.Listener 
             chkHQMode.setSelected(thisSinkUDP.getStandard().equals("HQ"));
         } else {
             thisSinkUDP = null;
-            thisSinkFile = null;
             thisSinkHLS = hls;
             lblrtmpURL.setEnabled(true);
             lblName.setText(thisSinkHLS.getName());
@@ -388,20 +349,7 @@ public class SinkSettings extends javax.swing.JFrame implements Stream.Listener 
     }// </editor-fold>//GEN-END:initComponents
     @SuppressWarnings("deprecation")
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOKActionPerformed
-        if (thisSinkFile != null) {
-            if (thisSinkFile.getVbitrate().equals("")) {
-
-            } else {
-                thisSinkFile.setVbitrate(Integer.toString(spinVideoRate.getValue().hashCode()));
-            }
-            
-            if (thisSinkFile.getAbitrate().equals("")) {
-
-            } else {
-                thisSinkFile.setAbitrate(Integer.toString(spinAudioRate.getValue().hashCode()));
-            }
-
-        } else if (thisSinkUDP != null) {
+        if (thisSinkUDP != null) {
             if (thisSinkUDP.getVbitrate().equals("")) {
 
             } else {
@@ -426,19 +374,7 @@ public class SinkSettings extends javax.swing.JFrame implements Stream.Listener 
             thisSinkHLS.setMount(textMount.getText());
             thisSinkHLS.setURL(textURL.getText());
         }
-        if (thisSinkFile != null) {
-            Preferences filePrefs = TrucklistStudio.prefs.node("filerec");
-            try {
-                filePrefs.removeNode();
-                filePrefs.flush();
-                filePrefs = TrucklistStudio.prefs.node("filerec");
-            } catch (BackingStoreException ex) {
-                Logger.getLogger(OutputPanel.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            Preferences serviceF = filePrefs.node("frecordset");
-            serviceF.put("abitrate", thisSinkFile.getAbitrate());
-            serviceF.put("vbitrate", thisSinkFile.getVbitrate());
-        } else if (thisSinkUDP != null) {
+        if (thisSinkUDP != null) {
             Preferences udpPrefs = TrucklistStudio.prefs.node("udp");
             try {
                 udpPrefs.removeNode();

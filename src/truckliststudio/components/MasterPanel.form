@@ -427,7 +427,7 @@
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
               <Image iconType="3" name="/truckliststudio/resources/curtain.png"/>
             </Property>
-            <Property name="toolTipText" type="java.lang.String" value="Click on the curtain to Unhide"/>
+            <Property name="toolTipText" type="java.lang.String" value="Click on the pattern to Unhide"/>
             <Property name="name" type="java.lang.String" value="lblCurtainPre" noResource="true"/>
           </Properties>
           <Events>

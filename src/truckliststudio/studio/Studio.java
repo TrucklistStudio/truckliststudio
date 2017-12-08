@@ -72,7 +72,6 @@ import static truckliststudio.streams.SourceText.Shape.OVAL;
 import static truckliststudio.streams.SourceText.Shape.RECTANGLE;
 import static truckliststudio.streams.SourceText.Shape.ROUNDRECT;
 import truckliststudio.streams.Stream;
-//import truckliststudio.util.Tools;
 
 /**
  *
@@ -465,9 +464,6 @@ public class Studio {
     private static void readStreams(Document xml) throws IllegalArgumentException, IllegalAccessException, XPathExpressionException {
         XPath path = XPathFactory.newInstance().newXPath();
         NodeList sources = (NodeList) path.evaluate("/" + ELEMENT_ROOT + "/" + ELEMENT_SOURCES + "/" + ELEMENT_SOURCE, xml.getDocumentElement(), XPathConstants.NODESET);
-//        String videoDev;
-//        ArrayList<String> videoDevs = new ArrayList<>();
-//        ArrayList<Stream> extstreamBis = new ArrayList<>();
         if (sources != null) {
             for (int i = 0; i < sources.getLength(); i++) {
                 Node source = sources.item(i);
@@ -590,9 +586,7 @@ public class Studio {
                     File fileL = new File(file);
                     stream = Stream.getInstance(fileL);
                     extstream.add(stream);
-//                    extstreamBis.add(stream);
                     readObject(stream, source);
-                    stream.setComm(comm);
                     for (Effect fx : fXL) {
                         if (fx.getName().endsWith("Shapes")) {
                             fx.setDoOne(true);
@@ -658,7 +652,6 @@ public class Studio {
                                 URL url = TrucklistStudio.class.getResource("/truckliststudio/resources/animations/" + res);
                                 stream = new SourceImageGif(aKey, url);
                                 extstream.add(stream);
-//                                extstreamBis.add(stream);
                                 ImgMovMus.add("ImageGif");
                                 readObject(stream, source);
                                 loadTrack(SCL, stream, SubChNames, null, null);
@@ -670,23 +663,6 @@ public class Studio {
                     System.err.println("Cannot handle " + clazz);
                 }
             }
-//            for (Stream dST : extstreamBis) {
-//                int multi = 0;
-//                String streamName = dST.getName();
-////                System.out.println("Found Stream Name: "+streamName);
-//                for (String vDev : videoDevs) {
-//                    if (vDev.contains(streamName)) {
-//                        multi += 1;
-//                    }
-//                }
-//                if (multi > 1) {
-//                    extstream.remove(dST);
-//                    ImgMovMus.remove("/dev/" + streamName);
-////                    System.out.println(dST+" Removed ...");
-////                    System.out.println(streamName+" Removed ...");
-//                    multi = 0;
-//                }
-//            }
         }
     }
 

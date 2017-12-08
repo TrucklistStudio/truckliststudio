@@ -115,11 +115,6 @@ public class SourceImageGif extends Stream {
     }
 
     @Override
-    public boolean needSeek() {
-        return needSeekCTRL = false;
-    }
-
-    @Override
     public Frame getFrame() {
         return nextFrame;
     }
@@ -165,8 +160,4 @@ public class SourceImageGif extends Stream {
         // nothing Here.
     }
 
-    @Override
-    public void setNeedSeek(boolean seek) {
-        // Nothing here
-    }
 }

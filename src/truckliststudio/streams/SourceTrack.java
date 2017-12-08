@@ -138,8 +138,6 @@ public class SourceTrack {
         clone.isPaused = original.isPaused;
         clone.capHeight = original.capHeight;
         clone.capWidth = original.capWidth;
-//        if (stream instanceof SourceText) {
-//            SourceText st = (SourceText) stream;
         clone.capHeight = original.capHeight;
         clone.capWidth = original.capWidth;
         clone.isATimer = original.isATimer;
@@ -150,7 +148,6 @@ public class SourceTrack {
         clone.text = original.text;
         clone.font = original.font;
         clone.color = original.color;
-//        }
         return clone;
     }
 

@@ -39,14 +39,10 @@ import java.util.prefs.Preferences;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
-import javax.swing.JFileChooser;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JToggleButton;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import org.apache.commons.io.FileUtils;
 import truckliststudio.TrucklistStudio;
 import static truckliststudio.TrucklistStudio.theme;
 import static truckliststudio.TrucklistStudio.wsDistroWatch;
@@ -57,7 +53,6 @@ import truckliststudio.media.renderer.Exporter;
 import truckliststudio.mixers.MasterMixer;
 import truckliststudio.streams.SinkAudio;
 import truckliststudio.streams.SinkBroadcast;
-import truckliststudio.streams.SinkFile;
 import truckliststudio.streams.SinkHLS;
 import truckliststudio.streams.SinkUDP;
 import truckliststudio.streams.Stream;
@@ -69,7 +64,6 @@ import truckliststudio.util.Tools;
  */
 public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, TrucklistStudio.Listener, TrackPanel.Listener, Exporter.Listener {
 
-    TreeMap<String, SinkFile> files = new TreeMap<>();
     TreeMap<String, SinkBroadcast> broadcasts = new TreeMap<>();
     ArrayList<String> broadcastsOut = new ArrayList<>();
     TreeMap<String, SinkUDP> udpOut = new TreeMap<>();
@@ -85,8 +79,6 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
     JPopupMenu sinkFilePopup = new JPopupMenu();
     JPopupMenu sinkUDPPopup = new JPopupMenu();
     JPopupMenu sinkHLSPopup = new JPopupMenu();
-    File f;
-    SinkFile fileStream;
     SinkUDP udpStream;
     SinkAudio audioStream;
     SinkHLS hlsStream;
@@ -103,32 +95,11 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
      * @param aPanel */
     public OutputPanel(JPanel aPanel) {
         initComponents();
-        f = new File(userHomeDir + "/.truckliststudio/Record To File");
         udpStream = new SinkUDP();
-        fileStream = new SinkFile(f);
         audioStream = new SinkAudio();
         hlsStream = new SinkHLS();
         
 //        System.out.println("SinkAudio"+audioStream);
-        
-        tglRecordToFile.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                JToggleButton button = ((JToggleButton) evt.getSource());
-                if (!button.isSelected()) {
-                    sinkFileRightMousePressed(evt);
-                }
-            }
-            
-            @Override
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                JToggleButton button = ((JToggleButton) evt.getSource());
-                if (!button.isSelected()) {
-                    sinkFileRightMousePressed(evt);
-                }
-            }
-        });
-        
         tglUDP.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mousePressed(java.awt.event.MouseEvent evt) {
@@ -167,18 +138,13 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
         
         wDPanel = aPanel;
         fmeInitPopUp();
-        sinkFileInitPopUp();
         sinkUDPInitPopUp();
         sinkHLSInitPopUp();
         final OutputPanel instanceSinkOP = this;
         TrucklistStudio.setListenerOP(instanceSinkOP);
         TrackPanel.setListenerCPOPanel(instanceSinkOP);
         Exporter.setListenerEx(instanceSinkOP);
-        
-        fileStream.setWidth(MasterMixer.getInstance().getWidth());
-        fileStream.setHeight(MasterMixer.getInstance().getHeight());
-        fileStream.setRate(MasterMixer.getInstance().getRate());
-        
+
         udpStream.setWidth(MasterMixer.getInstance().getWidth());
         udpStream.setHeight(MasterMixer.getInstance().getHeight());
         udpStream.setRate(MasterMixer.getInstance().getRate());
@@ -256,20 +222,12 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
 
     public void loadPrefs(Preferences prefs) {
         Preferences fmePrefs = prefs.node("fme");
-        Preferences filePrefs = prefs.node("filerec");
         Preferences udpPrefs = prefs.node("udp");
         Preferences hlsPrefs = prefs.node("hls");
         try {
             String[] services = fmePrefs.childrenNames();          
-            String[] servicesF = filePrefs.childrenNames();           
             String[] servicesU = udpPrefs.childrenNames();
             String[] servicesH = hlsPrefs.childrenNames();
-            
-            for (String s : servicesF){
-                Preferences serviceF = filePrefs.node(s);
-                fileStream.setVbitrate(serviceF.get("vbitrate", "1200"));
-                fileStream.setAbitrate(serviceF.get("abitrate", "128"));
-            }
             
             for (String s : servicesU){
                 Preferences serviceU = udpPrefs.node(s);
@@ -324,16 +282,12 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
 
     public void savePrefs(Preferences prefs) {
         Preferences fmePrefs = prefs.node("fme");
-        Preferences filePrefs = prefs.node("filerec");
         Preferences udpPrefs = prefs.node("udp");
         Preferences hlsPrefs = prefs.node("hls");
         try {
             fmePrefs.removeNode();
             fmePrefs.flush();
             fmePrefs = prefs.node("fme");
-            filePrefs.removeNode();
-            filePrefs.flush();
-            filePrefs = prefs.node("filerec");
             udpPrefs.removeNode();
             udpPrefs.flush();
             udpPrefs = prefs.node("udp");
@@ -360,9 +314,6 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
             service.put("keyint", fme.getKeyInt());
             service.put("standard", fme.getStandard());
         }
-        Preferences serviceF = filePrefs.node("frecordset");
-        serviceF.put("abitrate", fileStream.getAbitrate());
-        serviceF.put("vbitrate", fileStream.getVbitrate());
         Preferences serviceU = udpPrefs.node("uoutset");
         serviceU.put("abitrate", udpStream.getAbitrate());
         serviceU.put("vbitrate", udpStream.getVbitrate());
@@ -393,8 +344,8 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
         button.setPreferredSize(d);
         button.setText(fme.getName());
         button.setActionCommand(fme.getUrl()+"/"+fme.getStream());
-        button.setIcon(tglRecordToFile.getIcon());
-        button.setSelectedIcon(tglRecordToFile.getSelectedIcon());
+        button.setIcon(tglUDP.getIcon());
+        button.setSelectedIcon(tglUDP.getSelectedIcon());
         button.setRolloverEnabled(false);
         button.setToolTipText("Drag to the right to Remove... - Right Click for Settings");
         button.addActionListener(new java.awt.event.ActionListener() {
@@ -508,12 +459,6 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
         }
     }
     
-    private void sinkFileRightMousePressed(java.awt.event.MouseEvent evt) { // , SinkFile sinkfile
-        if (evt.isPopupTrigger()) {
-            sinkFilePopup.show(evt.getComponent(), evt.getX(), evt.getY());
-        }
-    }
-    
     private void sinkUDPRightMousePressed(java.awt.event.MouseEvent evt) {
         if (evt.isPopupTrigger()) {
             sinkUDPPopup.show(evt.getComponent(), evt.getX(), evt.getY());
@@ -540,25 +485,11 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
         fmePopup.add(fmeSettings);
     }
     
-    private void sinkFileInitPopUp(){
-        JMenuItem sinkSettings = new JMenuItem (new AbstractAction("Record Settings") {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                SinkSettings sinkSet = new SinkSettings(fileStream, null, null);
-                sinkSet.setLocationRelativeTo(TrucklistStudio.cboAnimations);
-                sinkSet.setAlwaysOnTop(true);
-                sinkSet.setVisible(true);
-            }
-        });
-        sinkSettings.setIcon(new ImageIcon(getClass().getResource("/truckliststudio/resources/tango/working-6.png"))); // NOI18N
-        sinkFilePopup.add(sinkSettings);
-    }
-    
     private void sinkUDPInitPopUp(){
         JMenuItem sinkSettings = new JMenuItem (new AbstractAction("UDP Settings") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                SinkSettings sinkSet = new SinkSettings(null, udpStream, null);
+                SinkSettings sinkSet = new SinkSettings(udpStream, null);
                 sinkSet.setLocationRelativeTo(TrucklistStudio.cboAnimations);
                 sinkSet.setAlwaysOnTop(true);
                 sinkSet.setVisible(true);
@@ -572,7 +503,7 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
         JMenuItem sinkSettings = new JMenuItem (new AbstractAction("HLS Settings") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                SinkSettings sinkSet = new SinkSettings(null, null, hlsStream);
+                SinkSettings sinkSet = new SinkSettings(null, hlsStream);
                 sinkSet.setLocationRelativeTo(TrucklistStudio.cboAnimations);
                 sinkSet.setAlwaysOnTop(true);
                 sinkSet.setVisible(true);
@@ -593,7 +524,6 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
 
         jLabel1 = new javax.swing.JLabel();
         tglAudioOut = new javax.swing.JToggleButton();
-        tglRecordToFile = new javax.swing.JToggleButton();
         tglUDP = new javax.swing.JToggleButton();
         tglHLS = new javax.swing.JToggleButton();
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 3), new java.awt.Dimension(0, 3), new java.awt.Dimension(32767, 3));
@@ -627,28 +557,12 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
         });
         add(tglAudioOut);
 
-        tglRecordToFile.setIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/media-record.png"))); // NOI18N
-        tglRecordToFile.setText(bundle.getString("RECORD")); // NOI18N
-        tglRecordToFile.setToolTipText("Save to FIle - Right Click for Settings");
-        tglRecordToFile.setMinimumSize(new java.awt.Dimension(87, 21));
-        tglRecordToFile.setName("tglRecordToFile"); // NOI18N
-        tglRecordToFile.setPreferredSize(new java.awt.Dimension(87, 22));
-        tglRecordToFile.setRolloverEnabled(false);
-        tglRecordToFile.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/media-playback-stop.png"))); // NOI18N
-        tglRecordToFile.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                tglRecordToFileActionPerformed(evt);
-            }
-        });
-        add(tglRecordToFile);
-
         tglUDP.setIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/media-record.png"))); // NOI18N
         tglUDP.setText(bundle.getString("UDP_MPEG_OUT")); // NOI18N
         tglUDP.setToolTipText("(Min 25fps) Stream to udp://@127.0.0.1:7000 - Right Click for Settings");
         tglUDP.setMinimumSize(new java.awt.Dimension(237, 21));
         tglUDP.setName("tglUDP"); // NOI18N
         tglUDP.setPreferredSize(new java.awt.Dimension(237, 22));
-        tglUDP.setRolloverEnabled(false);
         tglUDP.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/media-playback-stop.png"))); // NOI18N
         tglUDP.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -663,7 +577,6 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
         tglHLS.setMinimumSize(new java.awt.Dimension(237, 21));
         tglHLS.setName("tglHLS"); // NOI18N
         tglHLS.setPreferredSize(new java.awt.Dimension(237, 22));
-        tglHLS.setRolloverEnabled(false);
         tglHLS.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/media-playback-stop.png"))); // NOI18N
         tglHLS.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -700,87 +613,6 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
         });
         add(btnAddFME);
     }// </editor-fold>//GEN-END:initComponents
-
-    private void tglRecordToFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tglRecordToFileActionPerformed
-        if (tglRecordToFile.isSelected()) {
-            boolean overWrite = true;
-            JFileChooser chooser = new JFileChooser();
-            FileNameExtensionFilter aviFilter = new FileNameExtensionFilter("AVI files (*.avi)", "avi");
-            FileNameExtensionFilter mp4Filter = new FileNameExtensionFilter("MP4 files (*.mp4)", "mp4");
-            FileNameExtensionFilter flvFilter = new FileNameExtensionFilter("FLV files (*.flv)", "flv");
-            
-            chooser.setFileFilter(aviFilter);
-            chooser.setFileFilter(mp4Filter);
-            chooser.setFileFilter(flvFilter);
-            chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-            chooser.setDialogTitle("Choose Destination File ...");
-            int retval = chooser.showSaveDialog(this);
-            f = chooser.getSelectedFile();
-            if (retval == JFileChooser.APPROVE_OPTION && f != null) {
-                if (chooser.getFileFilter().equals(aviFilter)) {
-                    if(!chooser.getSelectedFile().getAbsolutePath().endsWith(".avi")){
-                        f =  new File(chooser.getSelectedFile() + ".avi");
-                    }
-                } else if (chooser.getFileFilter().equals(mp4Filter) && !chooser.getSelectedFile().getAbsolutePath().endsWith(".mp4")) {
-                    f =  new File(chooser.getSelectedFile() + ".mp4");
-                } else if (chooser.getFileFilter().equals(flvFilter) && !chooser.getSelectedFile().getAbsolutePath().endsWith(".flv")) {
-                    f =  new File(chooser.getSelectedFile() + ".flv");
-                }
-                if(f.exists()){
-                    int result = JOptionPane.showConfirmDialog(this,"File exists, overwrite?","Attention",JOptionPane.YES_NO_CANCEL_OPTION);
-                    switch(result){
-                        case JOptionPane.YES_OPTION:
-                            overWrite = true;
-                            break;
-                        case JOptionPane.NO_OPTION:
-                            overWrite = false;
-                            break;
-                        case JOptionPane.CANCEL_OPTION:
-                            overWrite = false;
-                            break;
-                        case JOptionPane.CLOSED_OPTION:
-                            overWrite = false;
-                            break;
-                    }
-                }
-            }
-            if (retval == JFileChooser.APPROVE_OPTION && overWrite) {
-                fileStream.setFile(f);
-                fileStream.setListener(instanceSink);
-                // Fix lost prefs
-                if ("".equals(fileStream.getVbitrate())) {
-                    fileStream.setVbitrate("1200");
-                }
-                if ("".equals(fileStream.getAbitrate())) {
-                    fileStream.setAbitrate("128");
-                }
-                
-                fileStream.read();
-//                System.out.println("VBitRate: "+fileStream.getVbitrate());
-                files.put("RECORD", fileStream);
-                ResourceMonitorLabel label = new ResourceMonitorLabel(System.currentTimeMillis()+10000, "Recording to " + f.getName());
-                labels.put("RECORD", label);
-                ResourceMonitor.getInstance().addMessage(label);
-            } else {
-                tglRecordToFile.setSelected(false);
-                ResourceMonitorLabel label3 = new ResourceMonitorLabel(System.currentTimeMillis()+10000, "Record Cancelled!");
-                ResourceMonitor.getInstance().addMessage(label3);
-            }
-        } else {
-            SinkFile fileStream = files.get("RECORD");
-            if (fileStream != null) {
-                fileStream.stop();
-                fileStream = null;
-                files.remove("RECORD");
-                ResourceMonitorLabel label = labels.get("RECORD");
-                ResourceMonitor.getInstance().removeMessage(label);
-
-                ResourceMonitorLabel label2 = new ResourceMonitorLabel(System.currentTimeMillis()+10000, "File is saved!");
-                ResourceMonitor.getInstance().addMessage(label2);
-            }
-        }
-        
-    }//GEN-LAST:event_tglRecordToFileActionPerformed
 
     private void tglUDPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tglUDPActionPerformed
         if (tglUDP.isSelected()) {
@@ -831,27 +663,16 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
 
     @Override
     public void resetSinks(ActionEvent evt) {
-        fileStream.destroy();
         udpStream.destroy();
         audioStream.destroy();
-        f = new File(userHomeDir + "/.truckliststudio/Record To File");
-        fileStream = new SinkFile(f);
         udpStream = new SinkUDP();
         hlsStream = new SinkHLS();
         audioStream = new SinkAudio();
-        Preferences filePrefs = TrucklistStudio.prefs.node("filerec");
         Preferences udpPrefs = TrucklistStudio.prefs.node("udp");
         Preferences hlsPrefs = TrucklistStudio.prefs.node("hls");
         try {
-            String[] servicesF = filePrefs.childrenNames();           
             String[] servicesU = udpPrefs.childrenNames();
             String[] servicesH = hlsPrefs.childrenNames();
-            
-            for (String s : servicesF){
-                Preferences serviceF = filePrefs.node(s);
-                fileStream.setVbitrate(serviceF.get("vbitrate", ""));
-                fileStream.setAbitrate(serviceF.get("abitrate", ""));
-            }
             
             for (String s : servicesU){
                 Preferences serviceU = udpPrefs.node(s);
@@ -1052,17 +873,14 @@ public class OutputPanel extends javax.swing.JPanel implements Stream.Listener, 
     private javax.swing.JSeparator sepFME;
     private javax.swing.JToggleButton tglAudioOut;
     private javax.swing.JToggleButton tglHLS;
-    private javax.swing.JToggleButton tglRecordToFile;
-    final OutputPanel instanceSink = this;
     private javax.swing.JToggleButton tglUDP;
+    final OutputPanel instanceSink = this;
     // End of variables declaration//GEN-END:variables
 
     
     @Override
     public void sourceUpdated(Stream stream) {
-        if (stream instanceof SinkFile) {
-            tglRecordToFile.setSelected(stream.isPlaying());
-        } else if (stream instanceof SinkUDP) {
+        if (stream instanceof SinkUDP) {
             tglUDP.setSelected(stream.isPlaying());
         } else if (stream instanceof SinkHLS) {
             tglHLS.setSelected(stream.isPlaying());

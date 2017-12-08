@@ -70,7 +70,7 @@ public class ProcessExecutor {
     public static void killUnixProcess(Process process) throws Exception //Modified from Martijn Courteaux Code
     {
         int pid = getPID(process);
-//    System.out.println("Process_Pid: "+pid);
+        System.out.println("Process_Pid: "+pid);
         String commandPids = "ps -ef | awk '{if ($3 == " + pid + ") print $2;}'";
         File fileP = new File(userHomeDir + "/.truckliststudio/" + "WSBust.sh");
         FileOutputStream fosV;
@@ -111,13 +111,11 @@ public class ProcessExecutor {
         childPids = null;
     }
 
-    public static void killWin32Process(Process process) throws Exception //Modified from Martijn Courteaux Code
-    {
+    public static void killWin32Process(Process process) throws Exception {//Modified from Martijn Courteaux Code
         int pid = getPID(process);
-//        System.out.println("Process_Pid: "+pid);
-        String batchPidCommand = "taskkill /F /pid " + pid;
-        rt.exec(batchPidCommand);
-        Tools.sleep(10);
+        System.out.println("Process_Pid: " + pid);
+        String batchPidCommand = "taskkill /pid " + pid + " /t /f";
+        rt.exec(batchPidCommand).waitFor();
     }
 
     private Process process;
@@ -143,12 +141,7 @@ public class ProcessExecutor {
                         if (count > 0) {
                             System.out.println("Process Err: " + new String(buffer, 0, count));
                         }
-//                        count = in2.read(buffer);
-//                        if (count > 0){
-//                            System.out.println("FFMPEG Out: " + new String(buffer,0,count));
-//                        }
                         Tools.sleep(100);
-
                     } catch (IOException ex) {
                         Logger.getLogger(ProcessExecutor.class.getName()).log(Level.SEVERE, null, ex);
                         break;
@@ -164,23 +157,18 @@ public class ProcessExecutor {
     public void execute(String[] params) throws IOException, InterruptedException {
         process = rt.exec(params);
         processRunning = true;
-//        readOutput(process);      
     }
 
-    // Testing console capture
     public Process executeC(String[] params) throws IOException, InterruptedException {
         process = rt.exec(params);
         processRunning = true;
         return process;
-//        readOutput(process);      
     }
 
     public void executeString(String params) throws IOException, InterruptedException {
-
         process = rt.exec(params);
 //        System.out.println("Process: "+process);
         processRunning = true;
-//        readOutput(process);
     }
 
     public void destroy() {

@@ -341,7 +341,7 @@ public class MasterPanel extends javax.swing.JPanel implements MasterMixer.SinkL
         panelPreviewer.setLayout(new java.awt.BorderLayout());
 
         lblCurtainPre.setIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/curtain.png"))); // NOI18N
-        lblCurtainPre.setToolTipText("Click on the curtain to Unhide");
+        lblCurtainPre.setToolTipText("Click on the pattern to Unhide");
         lblCurtainPre.setName("lblCurtainPre"); // NOI18N
         lblCurtainPre.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {

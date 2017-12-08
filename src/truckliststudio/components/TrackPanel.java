@@ -243,7 +243,6 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
     @SuppressWarnings("unchecked")
     public TrackPanel() {
         initComponents();
-//        btnRename.setVisible(false);
         remoteInitPopUp();
         final TrackPanel instanceChPnl = this;
         lblPlayingTrack.setVisible(false);
@@ -256,7 +255,6 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
         if (theme.equals("Dark")) {
             lblPlayingTrack.setForeground(Color.YELLOW);
         }
-        btnAdd.setVisible(false);
         listTracks.revalidate();
 
         loadPrefs();
@@ -346,7 +344,6 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
 
         lstTracksScroll = new javax.swing.JScrollPane();
         listTracks = new javax.swing.JList();
-        btnAdd = new javax.swing.JButton();
         btnRemove = new javax.swing.JButton();
         btnUpdate = new javax.swing.JButton();
         trkDuration = new javax.swing.JSpinner();
@@ -404,17 +401,6 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
         });
         lstTracksScroll.setViewportView(listTracks);
 
-        btnAdd.setIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/list-add.png"))); // NOI18N
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("truckliststudio/Languages"); // NOI18N
-        btnAdd.setToolTipText(bundle.getString("ADD_CHANNEL")); // NOI18N
-        btnAdd.setEnabled(false);
-        btnAdd.setName("btnAdd"); // NOI18N
-        btnAdd.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnAddActionPerformed(evt);
-            }
-        });
-
         btnRemove.setIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/process-stop.png"))); // NOI18N
         btnRemove.setText("Delete");
         btnRemove.setToolTipText("Remove selected Track");
@@ -447,6 +433,7 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
         });
 
         lblTrackDuration.setFont(new java.awt.Font("Noto Sans", 0, 18)); // NOI18N
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("truckliststudio/Languages"); // NOI18N
         lblTrackDuration.setText(bundle.getString("DURATION")); // NOI18N
         lblTrackDuration.setName("lblTrackDuration"); // NOI18N
         lblTrackDuration.setPreferredSize(null);
@@ -657,9 +644,7 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
                                 .addComponent(btnJump)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(spinJumpPos, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 116, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 150, Short.MAX_VALUE)
                                 .addComponent(btnDuplicateTrk)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btnRemove, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -706,7 +691,6 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(btnAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(btnUp, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(tglRemote, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -774,33 +758,8 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
             tglRemote.setEnabled(false);
         }
     }//GEN-LAST:event_listTracksValueChanged
-    @SuppressWarnings("unchecked")
-    private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
-//        String name = txtName.getText();
-//        boolean noDuplicateCh = true;
-//        for (String chName : arrayListTracks){
-//            if (name.equals(chName)){
-//                noDuplicateCh = false;
-//                break;
-//            }
-//        }
-//        
-//        if (name.length() > 0 && noDuplicateCh) {
-//            master.addTrack(name);
-//            master.addTrkTransitions(name);
-//            model.addElement(name);
-//            CHTimers.add(CHTimer);
-//            arrayListTracks.add(name);
-//            listTracks.revalidate();
-//            listTracks.setSelectedValue(name, true);
-//        } else {
-//            if (!noDuplicateCh){
-//                ResourceMonitorLabel label = new ResourceMonitorLabel(System.currentTimeMillis()+10000, "Track "+name+" Duplicated !!!");
-//                ResourceMonitor.getInstance().addMessage(label);
-//            }
-//        }
-    }//GEN-LAST:event_btnAddActionPerformed
-    @SuppressWarnings("unchecked")
+
+   @SuppressWarnings("unchecked")
     private void btnRemoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveActionPerformed
         if (listTracks.getSelectedIndex() != -1) {
             String name = listTracks.getSelectedValue().toString();
@@ -914,9 +873,7 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
 
     @Override
     public void resetBtnStates(ActionEvent evt) {
-//        txtName.setText("");
         btnRemove.setEnabled(true);
-//        btnRename.setEnabled(true);
         lblPlayingTrack.setText("");
         if (theme.equals("Dark")) {
             lblOnAir.setForeground(Color.WHITE);
@@ -1034,11 +991,6 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
         trkProgressTime.setValue(0);
         trkProgressTime.setString("0");
         tglStartTrack.setSelected(false);
-//        if (theme.equals("Dark")) {
-//            lblOnAir.setForeground(Color.WHITE);
-//        } else {
-//            lblOnAir.setForeground(Color.BLACK);
-//        }
     }
 
     public void RemoteStopCHTimerOnlyActionPerformed() {
@@ -1077,39 +1029,7 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
         ResourceMonitorLabel label = new ResourceMonitorLabel(System.currentTimeMillis() + 10000, "All Stopped.");
         ResourceMonitor.getInstance().addMessage(label);
         listTracks.repaint();
-//        System.gc();
     }//GEN-LAST:event_btnStopAllStreamActionPerformed
-
-    @SuppressWarnings("unchecked")
-    private void btnRenameActionPerformed(java.awt.event.ActionEvent evt) {
-//        if (listTracks.getSelectedIndex() != -1) {
-//            if (listTracks != null && txtName.getText().length() > 0) {
-//                String rnName = txtName.getText();
-//                String chName = listTracks.getSelectedValue().toString();
-//                int selectCHIndex = listTracks.getSelectedIndex();
-//                for (Stream stream : streamS){
-//                    if (stream.getTrkName().equals(chName)) {
-//                        stream.setTrkName(rnName);
-//                    }
-//                    for (SourceTrack sc : stream.getTracks()) {
-//                        if (sc.getName().equals(chName)){
-//                            sc.setName(rnName);
-//                        }
-//                    }
-//                }
-//                master.addTrackAt(rnName, selectCHIndex);
-//                master.removeTrackAt(chName);
-//                model.removeElement(chName);
-//                CHTimers.remove(selectCHIndex);
-//                arrayListTracks.remove(chName);
-//                listTracks.revalidate();
-//                model.insertElementAt(rnName, selectCHIndex);
-//                CHTimers.add(selectCHIndex, CHTimer);
-//                arrayListTracks.add(selectCHIndex, rnName);
-//                listTracks.revalidate();
-//            }
-//        }
-    }
 
     @SuppressWarnings("unchecked")
     public static void makeATrack(Stream stream) {
@@ -1150,11 +1070,7 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
                 listTracks.revalidate();
                 stream.setIsPlaying(false);
             }
-//            ResourceMonitorLabel label = new ResourceMonitorLabel(System.currentTimeMillis()+5000, sourceName + " Track made.");
-//            ResourceMonitor.getInstance().addMessage(label);
         } else {
-//            System.out.println("stream Destroy !!!");
-//            stream.destroy();
             if (sourceName.length() > 25) {
                 sourceName = sourceName.substring(0, 25) + " ...";
             }
@@ -1434,7 +1350,6 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
         Tools.sleep(30);
         lblPlayingTrack.setText("");
         btnRemove.setEnabled(true);
-//        btnRename.setEnabled(true);
         if (inTimer) {
             RemoteStopCHTimerActionPerformed();
         } else {
@@ -1446,7 +1361,6 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
         ResourceMonitorLabel label = new ResourceMonitorLabel(System.currentTimeMillis() + 10000, "Streams Stopped.");
         ResourceMonitor.getInstance().addMessage(label);
         listTracks.repaint();
-//        System.gc();
     }//GEN-LAST:event_btnStopOnlyStreamActionPerformed
 
     private void listTracksMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_listTracksMouseClicked
@@ -1651,7 +1565,6 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
             String name = listTracks.getSelectedValue().toString();
             System.out.println("Playing: " + name);
             lblPlayingTrack.setText(name);
-//            listTracks.repaint();
             if (trkNextTime != 0) {
                 trkT = new Timer();
                 trkT.schedule(new TSelectActionPerformed(), trkNextTime);
@@ -1989,7 +1902,6 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JPanel PanelResource;
-    private javax.swing.JButton btnAdd;
     private javax.swing.JButton btnAddGAP;
     private javax.swing.JButton btnClearAllTrk;
     private javax.swing.JButton btnDown;

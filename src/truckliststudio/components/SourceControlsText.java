@@ -225,7 +225,6 @@ public class SourceControlsText extends javax.swing.JPanel {
     }//GEN-LAST:event_txtHexColorFocusLost
 
     private void btnSelectColorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectColorActionPerformed
-
         ColorChooser c = new ColorChooser(null, true);
         c.setLocationRelativeTo(this);
         c.setVisible(true);

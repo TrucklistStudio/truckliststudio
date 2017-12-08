@@ -38,28 +38,28 @@ public final class AreaPainter extends AbstractRegionPainter {
     static final int BACKGROUND_ENABLED_PRESSED = 4;
 
 
-    private int state; //refers to one of the static final ints above
-    private PaintContext ctx;
+    private final int state; //refers to one of the static final ints above
+    private final PaintContext ctx;
 
     //the following 4 variables are reused during the painting code of the layers
-    private Path2D path = new Path2D.Float();
+    private final Path2D path = new Path2D.Float();
     private Rectangle2D rect = new Rectangle2D.Float(0, 0, 0, 0);
-    private RoundRectangle2D roundRect = new RoundRectangle2D.Float(0, 0, 0, 0, 0, 0);
-    private Ellipse2D ellipse = new Ellipse2D.Float(0, 0, 0, 0);
+    private final RoundRectangle2D roundRect = new RoundRectangle2D.Float(0, 0, 0, 0, 0, 0);
+    private final Ellipse2D ellipse = new Ellipse2D.Float(0, 0, 0, 0);
 
     //All Colors used for painting are stored here. Ideally, only those colors being used
     //by a particular instance of TabbedPaneTabbedPaneTabAreaPainter would be created. For the moment at least,
     //however, all are created for each instance.
-    private Color color1 = new Color(255, 200, 0, 255);
-    private Color color2 = decodeColor("nimbusOrange", 0.08801502f, 0.3642857f, -0.4784314f, 0);
-    private Color color3 = decodeColor("nimbusOrange", 5.1498413E-4f, -0.45471883f, 0.31764704f, 0);
-    private Color color4 = decodeColor("nimbusOrange", 5.1498413E-4f, -0.4633005f, 0.3607843f, 0);
-    private Color color5 = decodeColor("nimbusOrange", 0.05468172f, -0.58308274f, 0.19607842f, 0);
-    private Color color6 = decodeColor("nimbusOrange", -0.57865167f, -0.6357143f, -0.54901963f, 0);
-    private Color color7 = decodeColor("nimbusOrange", 5.1498413E-4f, -0.4690476f, 0.39215684f, 0);
-    private Color color8 = decodeColor("nimbusOrange", 5.1498413E-4f, -0.47635174f, 0.4352941f, 0);
-    private Color color9 = decodeColor("nimbusOrange", 0.0f, -0.05401492f, 0.05098039f, 0);
-    private Color color10 = decodeColor("nimbusOrange", 0.0f, -0.09303135f, 0.09411764f, 0);
+    private final Color color1 = new Color(255, 200, 0, 255);
+    private final Color color2 = decodeColor("nimbusOrange", 0.08801502f, 0.3642857f, -0.4784314f, 0);
+    private final Color color3 = decodeColor("nimbusOrange", 5.1498413E-4f, -0.45471883f, 0.31764704f, 0);
+    private final Color color4 = decodeColor("nimbusOrange", 5.1498413E-4f, -0.4633005f, 0.3607843f, 0);
+    private final Color color5 = decodeColor("nimbusOrange", 0.05468172f, -0.58308274f, 0.19607842f, 0);
+    private final Color color6 = decodeColor("nimbusOrange", -0.57865167f, -0.6357143f, -0.54901963f, 0);
+    private final Color color7 = decodeColor("nimbusOrange", 5.1498413E-4f, -0.4690476f, 0.39215684f, 0);
+    private final Color color8 = decodeColor("nimbusOrange", 5.1498413E-4f, -0.47635174f, 0.4352941f, 0);
+    private final Color color9 = decodeColor("nimbusOrange", 0.0f, -0.05401492f, 0.05098039f, 0);
+    private final Color color10 = decodeColor("nimbusOrange", 0.0f, -0.09303135f, 0.09411764f, 0);
 
 
     //Array of current component colors, updated in each paint call

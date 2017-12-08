@@ -6,7 +6,6 @@ package truckliststudio.streams;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-//import static truckliststudio.TrucklistStudio.gsNLE;
 import static truckliststudio.TrucklistStudio.selColLbl2;
 import truckliststudio.components.ResourceMonitor;
 import truckliststudio.components.ResourceMonitorLabel;
@@ -51,7 +50,7 @@ public class SourceMovie extends Stream {
         } else {
             MasterFrameBuilder.register(this);
         }
-        capture = new ProcessRenderer(this, ProcessRenderer.ACTION.CAPTURE, "movie", comm);
+        capture = new ProcessRenderer(this, ProcessRenderer.ACTION.CAPTURE, "movie");
         capture.read();
     }
 
@@ -67,9 +66,6 @@ public class SourceMovie extends Stream {
             if (capture != null) {
                 capture.stop();
                 capture = null;
-            }
-            if (this.getBackFF()) {
-                this.setComm("FF");
             }
             this.read();
         } else {
@@ -91,20 +87,7 @@ public class SourceMovie extends Stream {
                 capture.stop();
                 capture = null;
             }
-            if (this.getBackFF()) {
-                this.setComm("FF");
-            }
         }
-    }
-
-    @Override
-    public boolean needSeek() {
-        if (this.getComm().equals("GS")) {
-            needSeekCTRL = true;
-        } else {
-            needSeekCTRL = false;
-        }
-        return needSeekCTRL;
     }
 
     @Override
@@ -158,11 +141,6 @@ public class SourceMovie extends Stream {
     public void play() {
         isPaused = false;
         capture.play();
-    }
-
-    @Override
-    public void setNeedSeek(boolean seek) {
-        needSeekCTRL = seek;
     }
 
 }

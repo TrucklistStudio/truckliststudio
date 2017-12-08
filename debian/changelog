@@ -1,3 +1,12 @@
+truckliststudio (1.0.0) stable; urgency=low
+
+  * Fixes: In windows Output broadcast's ffmpeg task wasn't killed after it is stopped.
+  * Fixes: Small Fixes and Tweaks.
+  * Removes: Completely removed GStreamer and AVConv backends. Now TS relay only on FFMpeg.
+  * New upstream version
+
+ -- Karl Ellis <soylent.tv@gmail.com>  Sat, 04 Nov 2017 17:56:34 +0100
+
 truckliststudio (0.9.9) stable; urgency=low
 
   * Fixes: In some cases setting volume to some values and updating the stream have no effect.

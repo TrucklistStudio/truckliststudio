@@ -20,7 +20,6 @@ import java.util.Collections;
 import java.util.NoSuchElementException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-//import static truckliststudio.TrucklistStudio.lblText;
 import static truckliststudio.TrucklistStudio.textN;
 import truckliststudio.mixers.Frame;
 import truckliststudio.mixers.MasterFrameBuilder;
@@ -50,7 +49,6 @@ public class SourceText extends Stream {
     public SourceText(String content) {
         super();
         this.content = content;
-//        name = "Text";
         name = "Text(" + textN + ")";
         updateContent(content);
         color = 0xFFFFFF;
@@ -468,11 +466,6 @@ public class SourceText extends Stream {
     }
 
     @Override
-    public boolean needSeek() {
-        return needSeekCTRL = false;
-    }
-
-    @Override
     public Frame getFrame() {
 
         return nextFrame;
@@ -496,11 +489,6 @@ public class SourceText extends Stream {
     @Override
     public boolean hasVideo() {
         return true;
-    }
-
-    @Override
-    public void setNeedSeek(boolean seek) {
-        // Nothing here.
     }
 
     public enum Shape {

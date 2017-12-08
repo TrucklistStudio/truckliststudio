@@ -86,7 +86,9 @@ public class Exporter implements MasterMixer.SinkListener {
                                 Tools.sleep(20);
                             } else {
                                 videoOutput.write(videoData);
-                                videoOutput.flush();
+                                if (audioOutput != null) {
+                                    videoOutput.flush();
+                                }
                                 vCounter++;
                             }
                         }

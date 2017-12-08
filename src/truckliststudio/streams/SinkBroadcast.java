@@ -5,13 +5,9 @@
 package truckliststudio.streams;
 
 import java.awt.image.BufferedImage;
-import static truckliststudio.TrucklistStudio.os;
-import static truckliststudio.TrucklistStudio.outFMEbe;
-import static truckliststudio.TrucklistStudio.x64;
 import truckliststudio.externals.FME;
 import truckliststudio.externals.ProcessRenderer;
 import truckliststudio.mixers.MasterMixer;
-import truckliststudio.util.Tools;
 
 /**
  *
@@ -27,13 +23,6 @@ public class SinkBroadcast extends Stream {
         this.fme=fme;
         name=fme.getName();
         url = fme.getUrl()+"/"+fme.getStream();
-        if (outFMEbe == 0){
-            this.setComm("FF");
-        } else if (outFMEbe == 1) {
-            this.setComm("AV");
-        } else if (outFMEbe == 2) {
-            this.setComm("GS");
-        }
     }
     @Override
     public String getName(){
@@ -48,12 +37,7 @@ public class SinkBroadcast extends Stream {
         if (!"".equals(this.fme.getMount())) {
             String plugin = "iceCast";
             String pluginHD = "iceCastHQ";
-            if (os == Tools.OS.WINDOWS){
-                if  (!x64){
-                    plugin = "iceCast86";
-                    pluginHD = "iceCastHQ86";
-                }
-            }
+
             if (standard.equals("STD")) {
                 capture = new ProcessRenderer(this, fme, plugin);
             } else {
@@ -62,12 +46,6 @@ public class SinkBroadcast extends Stream {
         } else {
             String plugin = "broadcast";
             String pluginHD = "broadcastHQ";
-            if (os == Tools.OS.WINDOWS){
-                if  (!x64){
-                    plugin = "broadcast86";
-                    pluginHD = "broadcastHQ86";
-                }
-            }
             if (standard.equals("STD")) {
                 capture = new ProcessRenderer(this, fme, plugin);
             } else {
@@ -89,13 +67,6 @@ public class SinkBroadcast extends Stream {
             capture.stop();
             capture=null;
         }
-        if (this.getBackFF()){
-            this.setComm("FF");
-        }
-    }
-    @Override
-    public boolean needSeek() {
-            return needSeekCTRL=false;
     }
 
     @Override
@@ -133,10 +104,5 @@ public class SinkBroadcast extends Stream {
     @Override
     public void play() {
         // nothing here.
-    }
-
-    @Override
-    public void setNeedSeek(boolean seek) {
-        // Nothing here
     }
 }

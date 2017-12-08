@@ -99,11 +99,7 @@ public class SourceImage extends Stream{
             MasterFrameBuilder.unregister(this);
         }
     }
-    
-    @Override
-    public boolean needSeek() {
-            return needSeekCTRL=false;
-    }
+
     @Override
     public Frame getFrame(){
         return nextFrame;
@@ -137,12 +133,9 @@ public class SourceImage extends Stream{
     @Override
     public void readNext() {
         frame.setImage(image);
-//        if (frame != null) {
         if (isPlaying) {
             BufferedImage img = frame.getImage(); 
             applyEffects(img);
-//        }
-//        if (frame != null) {
             frame.setOutputFormat(x, y, width, height, opacity, volume);
             frame.setZOrder(zorder);
         }
@@ -155,18 +148,8 @@ public class SourceImage extends Stream{
         captureWidth = width;
         captureHeight = height;
         image = Scalr.resize(bkImage, Scalr.Method.ULTRA_QUALITY, Scalr.Mode.FIT_EXACT, width, height);
-//        image = bkImage;
-//        try{
-//            loadImage(file);
-            frame = new Frame(captureWidth,captureHeight,rate);
-            frame.setImage(image);
-//            frame.setAudio(null);
-//            frame.setID(uuid);
-//            frame.setOutputFormat(x, y, width, height, opacity, volume);
-//            frame.setZOrder(zorder);
-//        } catch(IOException e){
-//            e.printStackTrace();
-//        }
+        frame = new Frame(captureWidth,captureHeight,rate);
+        frame.setImage(image);
     }
     
     public void setImgCW (int tCW) {
@@ -211,11 +194,6 @@ public class SourceImage extends Stream{
     @Override
     public void play() {
         // nothing here.
-    }
-
-    @Override
-    public void setNeedSeek(boolean seek) {
-        // Nothing here
     }
 
 }

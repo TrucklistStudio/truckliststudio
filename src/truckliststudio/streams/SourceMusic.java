@@ -6,7 +6,6 @@ package truckliststudio.streams;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-//import static truckliststudio.TrucklistStudio.gsNLE;
 import static truckliststudio.TrucklistStudio.selColLbl2;
 import truckliststudio.components.ResourceMonitor;
 import truckliststudio.components.ResourceMonitorLabel;
@@ -52,7 +51,7 @@ public class SourceMusic extends Stream {
             MasterFrameBuilder.register(this);
         }
         lastPreview = new BufferedImage(captureWidth, captureHeight, BufferedImage.TYPE_INT_ARGB);
-        capture = new ProcessRenderer(this, ProcessRenderer.ACTION.CAPTURE, "music", comm);
+        capture = new ProcessRenderer(this, ProcessRenderer.ACTION.CAPTURE, "music");
         capture.read();
     }
 
@@ -68,9 +67,6 @@ public class SourceMusic extends Stream {
             if (capture != null) {
                 capture.stop();
                 capture = null;
-            }
-            if (this.getBackFF()) {
-                this.setComm("FF");
             }
             this.read();
         } else {
@@ -92,21 +88,8 @@ public class SourceMusic extends Stream {
                 capture.stop();
                 capture = null;
             }
-            if (this.getBackFF()) {
-                this.setComm("FF");
-            }
         }
 
-    }
-
-    @Override
-    public boolean needSeek() {
-        if (this.getComm().equals("GS")) {
-         needSeekCTRL = true;
-        } else {
-         needSeekCTRL = false;
-        }
-        return needSeekCTRL;
     }
 
     @Override
@@ -173,8 +156,4 @@ public class SourceMusic extends Stream {
         capture.play();
     }
 
-    @Override
-    public void setNeedSeek(boolean seek) {
-        needSeekCTRL = seek;
-    }
 }
