@@ -83,6 +83,12 @@ public class MasterPanel extends javax.swing.JPanel implements MasterMixer.SinkL
         TrackPanel.setListenerCPMPanel(instanceSinkMP);
         panPreview.setLayout(null);
         panPreview.validate();
+        panelPreviewer.remove(preViewer);
+        lblCurtainPre.setOpaque(true);
+        lblCurtainPre.setVisible(true);
+        panelPreviewer.add(lblCurtainPre);
+        this.repaint();
+        this.revalidate();
     }
 
     /**
