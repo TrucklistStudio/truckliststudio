@@ -77,7 +77,7 @@ public class Exporter implements MasterMixer.SinkListener {
                 public void run() {
                     try {
                         vConnection = videoServer.accept();
-                        System.out.println("Video output accepted");
+//                        System.out.println("Video output accepted");
                         videoOutput = new DataOutputStream(new BufferedOutputStream(vConnection.getOutputStream(), 4096));
                         imageBuffer.clear();
                         while (!cancel) {
@@ -102,7 +102,7 @@ public class Exporter implements MasterMixer.SinkListener {
                         listenerEx.resetFMECount();
                         Logger.getLogger(Exporter.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                    System.out.println("Video output stopped");
+//                    System.out.println("Video output stopped");
                 }
             });
             vExCapture.setPriority(Thread.MIN_PRIORITY);
@@ -115,7 +115,7 @@ public class Exporter implements MasterMixer.SinkListener {
                 public void run() {
                     try {
                         aConnection = audioServer.accept();
-                        System.out.println("Audio output accepted");
+//                        System.out.println("Audio output accepted");
                         audioOutput = new DataOutputStream(new BufferedOutputStream(aConnection.getOutputStream(), 4096));
                         audioBuffer.clear();
                         while (!cancel) {
@@ -140,7 +140,7 @@ public class Exporter implements MasterMixer.SinkListener {
                         stream.updateStatus();
 //                        Logger.getLogger(Exporter.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                    System.out.println("Audio output stopped");
+//                    System.out.println("Audio output stopped");
                 }
             });
             aExCapture.setPriority(Thread.MIN_PRIORITY);
@@ -166,8 +166,8 @@ public class Exporter implements MasterMixer.SinkListener {
             audioBuffer = null;
 //            System.out.println("audioBuffer Aborted!");
         }
-        System.out.println("V: " + vCounter);
-        System.out.println("A: " + aCounter);
+//        System.out.println("V: " + vCounter);
+//        System.out.println("A: " + aCounter);
         if (videoServer != null && stream.hasVideo()) {
             try {
                 videoServer.close();

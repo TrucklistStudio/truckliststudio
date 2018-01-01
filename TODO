@@ -1,7 +1,3 @@
-[NOTES]:
-- Still have to check ApolloFM GUI modifications (partially Implemented).
-- Have to check for the command line.
-
 [TODO]:
-- Windows compatibility with ffmpeg static binary. (Test in progress)
+- Change rendering engine.
 

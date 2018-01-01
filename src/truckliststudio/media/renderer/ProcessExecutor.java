@@ -70,7 +70,7 @@ public class ProcessExecutor {
     public static void killUnixProcess(Process process) throws Exception //Modified from Martijn Courteaux Code
     {
         int pid = getPID(process);
-        System.out.println("Process_Pid: "+pid);
+//        System.out.println("Process_Pid: "+pid);
         String commandPids = "ps -ef | awk '{if ($3 == " + pid + ") print $2;}'";
         File fileP = new File(userHomeDir + "/.truckliststudio/" + "WSBust.sh");
         FileOutputStream fosV;
@@ -113,7 +113,7 @@ public class ProcessExecutor {
 
     public static void killWin32Process(Process process) throws Exception {//Modified from Martijn Courteaux Code
         int pid = getPID(process);
-        System.out.println("Process_Pid: " + pid);
+//        System.out.println("Process_Pid: " + pid);
         String batchPidCommand = "taskkill /pid " + pid + " /t /f";
         rt.exec(batchPidCommand).waitFor();
     }

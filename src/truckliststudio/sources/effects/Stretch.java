@@ -86,7 +86,7 @@ public class Stretch extends Effect {
 
     @Override
     public void resetFX() {
-        System.out.println("reset FX !!");
+//        System.out.println("reset FX !!");
         width = MasterMixer.getInstance().getWidth();
         height = MasterMixer.getInstance().getHeight();
     }

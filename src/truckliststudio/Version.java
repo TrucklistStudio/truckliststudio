@@ -14,7 +14,7 @@ import java.util.logging.Logger;
  * @author pballeux
  */
 public class Version {
-    public final static String version = "1.0";
+    public final static String version = "1.1";
     private String build = "";
     public Version(){
         java.io.DataInput di = new java.io.DataInputStream(getClass().getResourceAsStream("build.txt"));

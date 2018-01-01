@@ -327,7 +327,7 @@ public class ProcessRenderer {
                         for (String p : parmsVideo) {
                             cmdVideo = cmdVideo + p + " ";
                         }
-                        System.out.print("CommandVideo: " + cmdVideo + "\n");
+//                        System.out.print("CommandVideo: " + cmdVideo + "\n");
                         pV = processVideo.executeC(parmsVideo);
                     } catch (IOException | InterruptedException e) {
                         Logger.getLogger(ProcessRenderer.class.getName()).log(Level.SEVERE, null, e);
@@ -343,7 +343,7 @@ public class ProcessRenderer {
                         for (String p : parmsAudio) {
                             cmdAudio = cmdAudio + p + " ";
                         }
-                        System.out.print("CommandAudio: " + cmdAudio + "\n");
+//                        System.out.print("CommandAudio: " + cmdAudio + "\n");
                         pA = processAudio.executeC(parmsAudio);
                     } catch (IOException | InterruptedException e) {
                         Logger.getLogger(ProcessRenderer.class.getName()).log(Level.SEVERE, null, e);
@@ -374,10 +374,10 @@ public class ProcessRenderer {
                 stopMe = false;
                 videoPort = exporter.getVideoPort();
                 audioPort = exporter.getAudioPort();
-                System.out.println("plugin="+plugin);
+//                System.out.println("plugin="+plugin);
                 String command = plugins.getProperty(plugin).replaceAll("  ", " "); //Making sure there is no double spaces
                 command = setParameters(command);
-                System.out.println("Command Out: " + command);
+//                System.out.println("Command Out: " + command);
                 if (distro.toLowerCase().equals("windows")) {
                     file = new File(userHomeDir + "/.truckliststudio/" + "WSBro.bat");
                     FileOutputStream fos;

@@ -1,3 +1,14 @@
+truckliststudio (1.1.0) stable; urgency=low
+
+  * Fixes: MasterMixer FPS. (Now the only selectable values are 5, 15, 25 and 30 FPS)
+  * Fixes: Small Fixes and Tweaks.
+  * Adds: Viewer FPS control.(To save CPU power)
+  * Changes: CHANGELOG, TODO.
+  * Removes: ToCompatibleImage seems to have no effect on performance.
+  * New upstream version
+
+ -- Karl Ellis <soylent.tv@gmail.com>  Mon, 01 Jan 2018 11:56:26 +0100
+
 truckliststudio (1.0.0) stable; urgency=low
 
   * Fixes: In windows Output broadcast's ffmpeg task wasn't killed after it is stopped.

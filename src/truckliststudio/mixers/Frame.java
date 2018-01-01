@@ -6,9 +6,10 @@ package truckliststudio.mixers;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.GraphicsConfiguration;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
+//import java.awt.image.BufferStrategy;
+//import java.awt.GraphicsConfiguration;
+//import java.awt.GraphicsDevice;
+//import java.awt.GraphicsEnvironment;
 import java.awt.image.BufferedImage;
 import static truckliststudio.TrucklistStudio.audioFreq;
 
@@ -28,10 +29,10 @@ public class Frame {
     private String uuid = null;
     private long frameNb = 0;
     private int aFreq = audioFreq;
-    GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
-    GraphicsDevice device = env.getDefaultScreenDevice();
-    GraphicsConfiguration config = device.getDefaultConfiguration();
-    private BufferedImage image = config.createCompatibleImage(320, 240, BufferedImage.TYPE_INT_ARGB);
+//    GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
+//    GraphicsDevice device = env.getDefaultScreenDevice();
+//    GraphicsConfiguration config = device.getDefaultConfiguration();
+    private BufferedImage image; //= config.createCompatibleImage(320, 240, BufferedImage.TYPE_INT_ARGB)
 
     public Frame(String id, BufferedImage img, byte[] audio) {
         image = img;
@@ -55,7 +56,6 @@ public class Frame {
     }
 
     public void copyFrame(Frame frame) {
-
         BufferedImage imageSrc = frame.getImage();
         byte[] audioSrc = frame.getAudioData();
         if (imageSrc != null) {

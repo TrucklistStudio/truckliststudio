@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sound.sampled.LineUnavailableException;
+import javax.swing.SpinnerListModel;
 import javax.swing.SpinnerNumberModel;
 import truckliststudio.TSPreview;
 import truckliststudio.TrucklistStudio;
@@ -57,6 +58,7 @@ public class MasterPanel extends javax.swing.JPanel implements MasterMixer.SinkL
     private BufferedImage liveImg = null;
     int opacity = 0;
     int rate = mixer.getRate();
+    int viewRate = PreviewMixer.getInstance().getRate();
     int i = rate;
     public static float masterVolume = 0f;
     boolean transition = false;
@@ -68,7 +70,11 @@ public class MasterPanel extends javax.swing.JPanel implements MasterMixer.SinkL
         initComponents();
         jslOpacity.setValue(0);
         lblCurtainPre.setVisible(false);
-        spinFPS.setModel(new SpinnerNumberModel(5, 5, 30, 5));
+        String[] rates = new String[] {"5","15","25","30"};
+        SpinnerListModel model = new SpinnerListModel(rates);
+        spinFPS.setModel(model);
+//        spinFPS.setModel(new SpinnerNumberModel(5, 5, 30, 5));
+        spinViewFPS.setModel(new SpinnerNumberModel(5, 1, 30, 1));
         spinWidth.setValue(mixer.getWidth());
         spinHeight.setValue(mixer.getHeight());
         this.setVisible(true);
@@ -77,7 +83,8 @@ public class MasterPanel extends javax.swing.JPanel implements MasterMixer.SinkL
         prePlayer = PrePlayer.getPreInstance(preViewer);
         mixer.register(this);
         preMixer.register(this);
-        spinFPS.setValue(MasterMixer.getInstance().getRate());
+        spinFPS.setValue(Integer.toString(MasterMixer.getInstance().getRate()));
+        spinViewFPS.setValue(viewRate);
         final MasterPanel instanceSinkMP = this;
         TSPreview.setListenerPW(instanceSinkMP);
         TrackPanel.setListenerCPMPanel(instanceSinkMP);
@@ -121,6 +128,8 @@ public class MasterPanel extends javax.swing.JPanel implements MasterMixer.SinkL
         jLabel1 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jslOpacity = new javax.swing.JSlider();
+        spinViewFPS = new javax.swing.JSpinner();
+        lblViewerFPS = new javax.swing.JLabel();
         panelPreviewer = new javax.swing.JPanel();
         lblCurtainPre = new javax.swing.JLabel();
 
@@ -288,13 +297,13 @@ public class MasterPanel extends javax.swing.JPanel implements MasterMixer.SinkL
             }
         });
         panPreview.add(btnPreview);
-        btnPreview.setBounds(10, 80, 110, 28);
+        btnPreview.setBounds(10, 100, 110, 28);
 
         lblHeight2.setFont(new java.awt.Font("Ubuntu", 0, 10)); // NOI18N
         lblHeight2.setText(bundle.getString("FAST PREVIEW")); // NOI18N
         lblHeight2.setName("lblHeight2"); // NOI18N
         panPreview.add(lblHeight2);
-        lblHeight2.setBounds(90, 46, 90, 13);
+        lblHeight2.setBounds(90, 46, 90, 12);
 
         tglSound.setIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/audio-card.png"))); // NOI18N
         tglSound.setToolTipText("Java Sound AudioSystem Out (Unstable)");
@@ -305,19 +314,19 @@ public class MasterPanel extends javax.swing.JPanel implements MasterMixer.SinkL
             }
         });
         panPreview.add(tglSound);
-        tglSound.setBounds(120, 80, 110, 28);
+        tglSound.setBounds(120, 100, 110, 28);
 
-        jLabel1.setFont(new java.awt.Font("Noto Sans", 1, 12)); // NOI18N
-        jLabel1.setText("LiVEView");
+        jLabel1.setFont(new java.awt.Font("Noto Sans", 0, 12)); // NOI18N
+        jLabel1.setText("LiveView");
         jLabel1.setName("jLabel1"); // NOI18N
         panPreview.add(jLabel1);
-        jLabel1.setBounds(10, 10, 60, 17);
+        jLabel1.setBounds(10, 10, 48, 17);
 
-        jLabel4.setFont(new java.awt.Font("Noto Sans", 1, 12)); // NOI18N
+        jLabel4.setFont(new java.awt.Font("Noto Sans", 0, 12)); // NOI18N
         jLabel4.setText("PreView");
         jLabel4.setName("jLabel4"); // NOI18N
         panPreview.add(jLabel4);
-        jLabel4.setBounds(183, 10, 50, 17);
+        jLabel4.setBounds(186, 10, 45, 17);
 
         jslOpacity.setName("jslOpacity"); // NOI18N
         jslOpacity.addChangeListener(new javax.swing.event.ChangeListener() {
@@ -327,6 +336,22 @@ public class MasterPanel extends javax.swing.JPanel implements MasterMixer.SinkL
         });
         panPreview.add(jslOpacity);
         jslOpacity.setBounds(8, 22, 225, 30);
+
+        spinViewFPS.setToolTipText("Lower to save CPU power. Once set press [Apply] on Mixer Tab.");
+        spinViewFPS.setName("spinViewFPS"); // NOI18N
+        spinViewFPS.setPreferredSize(new java.awt.Dimension(28, 25));
+        spinViewFPS.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                spinViewFPSStateChanged(evt);
+            }
+        });
+        panPreview.add(spinViewFPS);
+        spinViewFPS.setBounds(90, 68, 140, 25);
+
+        lblViewerFPS.setText("Viewer FPS");
+        lblViewerFPS.setName("lblViewerFPS"); // NOI18N
+        panPreview.add(lblViewerFPS);
+        lblViewerFPS.setBounds(15, 73, 79, 15);
 
         tabMixers.addTab("Viewer Controls", panPreview);
 
@@ -361,14 +386,14 @@ public class MasterPanel extends javax.swing.JPanel implements MasterMixer.SinkL
 
     public void releaseTglButton() {
     }
-
+    
     public void applyLoadedMixer() {
         int w = (Integer) spinWidth.getValue();
         int h = (Integer) spinHeight.getValue();
         mixer.stop();
         mixer.setWidth(w);
         mixer.setHeight(h);
-        mixer.setRate((Integer) spinFPS.getValue());
+        mixer.setRate((Integer) Integer.parseInt((String)spinFPS.getValue()));
         MasterMixer.getInstance().start();
         preMixer.stop();
         preMixer.setWidth(w);
@@ -394,7 +419,7 @@ public class MasterPanel extends javax.swing.JPanel implements MasterMixer.SinkL
         preMixer.setWidth(w);
         mixer.setHeight(h);
         preMixer.setHeight(h);
-        mixer.setRate((Integer) spinFPS.getValue());
+        mixer.setRate((Integer) Integer.parseInt((String)spinFPS.getValue()));
         mixer.start();
         preMixer.start();
         for (Stream s : streamM) {
@@ -610,6 +635,11 @@ public class MasterPanel extends javax.swing.JPanel implements MasterMixer.SinkL
         masterVolume = v / 100f;
     }//GEN-LAST:event_sldMasterVolumeStateChanged
 
+    private void spinViewFPSStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spinViewFPSStateChanged
+        PreviewMixer.getInstance().setRate((Integer) spinViewFPS.getValue());
+//        System.out.println("PreviewRate = " + PreviewMixer.getInstance().getRate());
+    }//GEN-LAST:event_spinViewFPSStateChanged
+
     /**
      *
      * @param evt
@@ -638,6 +668,7 @@ public class MasterPanel extends javax.swing.JPanel implements MasterMixer.SinkL
     private javax.swing.JLabel lblHeight;
     private javax.swing.JLabel lblHeight1;
     private javax.swing.JLabel lblHeight2;
+    private javax.swing.JLabel lblViewerFPS;
     private javax.swing.JLabel lblWidth;
     private javax.swing.JPanel panMixer;
     private javax.swing.JPanel panPreview;
@@ -645,6 +676,7 @@ public class MasterPanel extends javax.swing.JPanel implements MasterMixer.SinkL
     private javax.swing.JSlider sldMasterVolume;
     public static javax.swing.JSpinner spinFPS;
     public static javax.swing.JSpinner spinHeight;
+    private javax.swing.JSpinner spinViewFPS;
     public static javax.swing.JSpinner spinWidth;
     private javax.swing.JTabbedPane tabMixers;
     private javax.swing.JToggleButton tglLockRatio;
@@ -676,8 +708,8 @@ public class MasterPanel extends javax.swing.JPanel implements MasterMixer.SinkL
         if (liveImg != null) {
             lImg = cloneImage(liveImg);
         }
-        int w = img.getWidth();
-        int h = img.getHeight();
+//        int w = img.getWidth();
+//        int h = img.getHeight();
         if (lImg != null) {
             Graphics2D buffer = lImg.createGraphics();
             buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, opacity / 100F));

@@ -1,3 +1,80 @@
+truckliststudio (1.1.0) 01 Jan 2018
+
+  * Fixes: MasterMixer FPS. (Now the only selectable values are 5, 15, 25 and 30 FPS)
+  * Fixes: Small Fixes and Tweaks.
+  * Adds: Viewer FPS control.(To save CPU power)
+  * Changes: CHANGELOG, TODO.
+  * Removes: ToCompatibleImage seems to have no effect on performance.
+  * New upstream version
+
+truckliststudio (1.0.0)    04 Nov 2017
+
+  * Fixes: In windows Output broadcast's ffmpeg task wasn't killed after it is stopped.
+  * Fixes: Small Fixes and Tweaks.
+  * Removes: Completely removed GStreamer and AVConv backends. Now TS relay only on FFMpeg.
+  * New upstream version
+
+truckliststudio (0.9.9)    02 Jul 2017
+
+  * Fixes: In some cases setting volume to some values and updating the stream have no effect.
+  * Fixes: In windows loading a studio streams show GStreamer Backend.
+  * Adds: "Save Studio" operation don't need to stop the streaming anymore.
+  * New upstream version
+
+truckliststudio (0.9.8)    14 May 2017
+
+  * Fixes: If only user name is given TS Remote hangs.
+  * Adds: "Skip Track" in TrucklistStudio Remote Control.
+  * New upstream version
+
+truckliststudio (0.9.7)    02 Apr 2017
+
+  * Fixes: Importing a source folder in a Studio can lead to loose custom source settings.
+  * New upstream version
+
+truckliststudio (0.9.6)    22 Jan 2017
+
+  * Fixes: Small Fixes and Tweaks.
+  * Adds: HLS Default Output.
+  * New upstream version
+
+truckliststudio (0.9.5)    21 Oct 2016
+
+  * Removes: Removed Transitions feature.
+  * Fixes: Small Fixes and Tweaks.
+  * New upstream version
+
+truckliststudio (0.9.4)    18 Oct 2016
+
+  * Changes: Improved Status Bar messages.
+  * Changes: New flat TrucklistStudio logo.
+  * New upstream version
+
+truckliststudio (0.9.3)    19 Sep 2016
+
+  * Fixes: If "AutoTitle" is selected invoking "Make A Track" doesn't create the overlay text.
+  * New upstream version
+
+truckliststudio (0.9.2)    30 Jul 2016
+
+  * Changes: Going Flat.
+  * New upstream version
+
+truckliststudio (0.9.1)    02 May 2016
+
+  * Adds: Tracks Automatic titling based on file-name.
+  * New upstream version
+
+truckliststudio (0.9)    02 May 2016
+
+  * Changes: New Sources User Interface.
+  * New upstream version
+
+truckliststudio (0.8)    15 Apr 2016
+
+  * Changes: Updated code to TrucklistStudioFX changes.
+  * New upstream version
+
 truckliststudio (0.7)    04 Jun 2015
 
   * Changes: More GUI Modifications.

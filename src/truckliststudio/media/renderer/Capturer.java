@@ -17,7 +17,7 @@ import truckliststudio.streams.SourceMovie;
 import truckliststudio.streams.SourceMusic;
 import truckliststudio.streams.Stream;
 import truckliststudio.util.Tools;
-import static truckliststudio.util.Tools.toCompatibleImage;
+//import static truckliststudio.util.Tools.toCompatibleImage;
 
 /**
  *
@@ -185,10 +185,11 @@ public class Capturer {
     private TSImage getNextImage() throws IOException {
         if (videoIn != null && !vPauseFlag) {
             if (stream instanceof SourceMovie || stream instanceof SourceMusic) {
-                if (vPauseFlag) {
-                    image.readFully(videoIn);
-                    return image;
-                } else if ((int) System.currentTimeMillis() < streamTotalEnd) {
+//                if (vPauseFlag) {
+//                    image.readFully(videoIn);
+//                    return image;
+//                } else
+                if ((int) System.currentTimeMillis() < streamTotalEnd) {
                     image.readFully(videoIn);
                     return image;
                 } else {
@@ -213,14 +214,15 @@ public class Capturer {
     }
 
     public Frame getFrame() {
-        BufferedImage nextImage = null;
+//        BufferedImage nextImage = null;
+        BufferedImage quantumImage = null;
         byte[] nextAudio = null;
         try {
             if (stream.hasVideo()) {
 //                System.out.println("getFrame");
-                BufferedImage quantumImage = getNextImage();
+                quantumImage = getNextImage();
                 if (quantumImage != null) {
-                    nextImage = toCompatibleImage(quantumImage);
+//                    nextImage = toCompatibleImage(quantumImage);
                 } else if (stream instanceof SourceMovie || stream instanceof SourceMusic) {
                     if (vPauseFlag) {
                         pauseTime = (int) System.currentTimeMillis() - currTime;
@@ -233,7 +235,7 @@ public class Capturer {
                 nextAudio = getNextAudio();
             }
             frame.setAudio(nextAudio);
-            frame.setImage(nextImage);
+            frame.setImage(quantumImage);
             frame.setOutputFormat(stream.getX(), stream.getY(), stream.getWidth(), stream.getHeight(), stream.getOpacity(), stream.getVolume());
             frame.setZOrder(stream.getZOrder());
         } catch (IOException ioe) {

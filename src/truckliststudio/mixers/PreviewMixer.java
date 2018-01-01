@@ -21,7 +21,7 @@ public class PreviewMixer {
         return instance;
     }
 
-    protected int frameRate = 25;
+    protected int frameRate = 15;
     protected int width = 320;
     protected int height = 240;
     protected ArrayList<SinkListener> listeners = null;

@@ -21,6 +21,7 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDropEvent;
+import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
@@ -247,8 +248,8 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
      */
     public TrucklistStudio() throws IOException {
 
-        initComponents();
-
+        initComponents();        
+        
         setTitle("TrucklistStudio " + Version.version);
         ImageIcon icon = new ImageIcon(this.getClass().getResource("/truckliststudio/resources/icon.png"));
         this.setIconImage(icon.getImage());
@@ -558,6 +559,7 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
         tglAutoTrack.setSelected(autoTrack);
         tglAutoTitle.setSelected(autoTitle);
         listenerOP.resetSinks(null);
+        this.createBufferStrategy(2);
         if (cmdFile != null) {
             loadAtStart(cmdFile, null);
             while (!loadingFinish) {
@@ -630,7 +632,7 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
         MasterMixer.getInstance().setRate(prefs.getInt("mastermixer-r", MasterMixer.getInstance().getRate()));
         PreviewMixer.getInstance().setWidth(prefs.getInt("mastermixer-w", MasterMixer.getInstance().getWidth()));
         PreviewMixer.getInstance().setHeight(prefs.getInt("mastermixer-h", MasterMixer.getInstance().getHeight()));
-        PreviewMixer.getInstance().setRate(15);
+        PreviewMixer.getInstance().setRate(prefs.getInt("previewmixer-fps", PreviewMixer.getInstance().getRate()));
         mainSplit.setDividerLocation(prefs.getInt("split-x", mainSplit.getDividerLocation()));
         mainSplit.setDividerLocation(prefs.getInt("split-last-x", mainSplit.getLastDividerLocation()));
         mainVerticalSplit.setDividerLocation(prefs.getInt("split-y", mainVerticalSplit.getDividerLocation()));
@@ -656,6 +658,7 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
         prefs.putInt("mastermixer-w", MasterMixer.getInstance().getWidth());
         prefs.putInt("mastermixer-h", MasterMixer.getInstance().getHeight());
         prefs.putInt("mastermixer-r", MasterMixer.getInstance().getRate());
+        prefs.putInt("previewmixer-fps", PreviewMixer.getInstance().getRate());
         prefs.putInt("split-x", mainSplit.getDividerLocation());
         prefs.putInt("split-last-x", mainSplit.getLastDividerLocation());
         prefs.putInt("split-y", mainVerticalSplit.getDividerLocation());
@@ -2036,7 +2039,7 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                         int seconds = Integer.parseInt(temp[2]);
                         int totalTime = hours * 3600 + minutes * 60 + seconds;
                         String strDuration = Integer.toString(totalTime);
-                        System.out.println(strDuration + "s");
+//                        System.out.println(strDuration + "s");
                         stream.setStreamTime(strDuration + "s");
                     }
 
@@ -2063,11 +2066,11 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                                     w = Integer.parseInt(videoNativeSize[0]);
                                     h = Integer.parseInt(videoNativeSize[1]);
                                 } catch (NumberFormatException e) {
-                                    System.out.println("Number Format Exception! ...trying MS Way...");
+//                                    System.out.println("Number Format Exception! ...trying MS Way...");
                                     lineRParts = lineR.split(",");
                                     tempNativeSize = lineRParts[3].split(" ");
                                     if (tempNativeSize[1].contains("x")) {
-                                        System.out.println(tempNativeSize[1]);
+//                                        System.out.println(tempNativeSize[1]);
                                         videoNativeSize = tempNativeSize[1].split("x");
                                     } else {
                                         tempNativeSize = lineRParts[4].split(" ");
@@ -2218,13 +2221,13 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                             Studio.main();
                             spinWidth.setValue(MasterMixer.getInstance().getWidth());
                             spinHeight.setValue(MasterMixer.getInstance().getHeight());
-                            spinFPS.setValue(MasterMixer.getInstance().getRate());
+                            spinFPS.setValue(Integer.toString(MasterMixer.getInstance().getRate()));
                             int mW = (Integer) spinWidth.getValue();
                             int mH = (Integer) spinHeight.getValue();
                             MasterMixer.getInstance().stop();
                             MasterMixer.getInstance().setWidth(mW);
                             MasterMixer.getInstance().setHeight(mH);
-                            MasterMixer.getInstance().setRate((Integer) spinFPS.getValue());
+                            MasterMixer.getInstance().setRate((Integer) Integer.parseInt((String)spinFPS.getValue()));
                             MasterMixer.getInstance().start();
                             PreviewMixer.getInstance().stop();
                             PreviewMixer.getInstance().setWidth(mW);
@@ -3346,6 +3349,13 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
         if (!dir.exists()) {
             dir.mkdir();
         }
+        
+        System.setProperty("sun.java2d.transaccel", "True");
+        System.setProperty("sun.java2d.trace", "timestamp,log,count");
+        System.setProperty("sun.java2d.opengl", "True");
+        System.setProperty("sun.java2d.d3d", "True");
+        System.setProperty("sun.java2d.ddforcevram", "True");
+        
         System.out.println("Welcome to TrucklistStudio " + Version.version + " build " + new Version().getBuild() + " ...");
 
         /*
