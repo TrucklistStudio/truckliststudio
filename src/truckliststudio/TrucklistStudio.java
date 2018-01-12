@@ -3550,13 +3550,13 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                         Studio.main();
                         spinWidth.setValue(MasterMixer.getInstance().getWidth());
                         spinHeight.setValue(MasterMixer.getInstance().getHeight());
-                        spinFPS.setValue(MasterMixer.getInstance().getRate());
+                        spinFPS.setValue(Integer.toString(MasterMixer.getInstance().getRate()));
                         int mW = (Integer) spinWidth.getValue();
                         int mH = (Integer) spinHeight.getValue();
                         MasterMixer.getInstance().stop();
                         MasterMixer.getInstance().setWidth(mW);
                         MasterMixer.getInstance().setHeight(mH);
-                        MasterMixer.getInstance().setRate((Integer) spinFPS.getValue());
+                        MasterMixer.getInstance().setRate((Integer) Integer.parseInt((String)spinFPS.getValue()));
                         MasterMixer.getInstance().start();
                         PreviewMixer.getInstance().stop();
                         PreviewMixer.getInstance().setWidth(mW);
