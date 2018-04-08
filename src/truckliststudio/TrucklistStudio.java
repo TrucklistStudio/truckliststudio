@@ -156,6 +156,7 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
     private int prevIndex = 0;
     private int selIndex = 0;
     boolean loadingFinish = false;
+    private boolean yesToAll = false;
 
     @Override
     public void closeSource(String name) {
@@ -1234,10 +1235,12 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
         });
 
         videoScroll.setName("videoScroll"); // NOI18N
+        videoScroll.setPreferredSize(new java.awt.Dimension(494, 300));
 
         videoDesktop.setTabLayoutPolicy(javax.swing.JTabbedPane.SCROLL_TAB_LAYOUT);
         videoDesktop.setTabPlacement(javax.swing.JTabbedPane.LEFT);
         videoDesktop.setName("videoDesktop"); // NOI18N
+        videoDesktop.setPreferredSize(new java.awt.Dimension(494, 300));
         videoDesktop.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 videoDesktopStateChanged(evt);
@@ -1253,10 +1256,14 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
         tabSources.addTab("Videos", videoScroll);
 
         musicScroll.setName("musicScroll"); // NOI18N
+        musicScroll.setPreferredSize(new java.awt.Dimension(494, 300));
 
         musicDesktop.setTabLayoutPolicy(javax.swing.JTabbedPane.SCROLL_TAB_LAYOUT);
         musicDesktop.setTabPlacement(javax.swing.JTabbedPane.LEFT);
+        musicDesktop.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        musicDesktop.setMinimumSize(new java.awt.Dimension(494, 300));
         musicDesktop.setName("musicDesktop"); // NOI18N
+        musicDesktop.setPreferredSize(new java.awt.Dimension(494, 300));
         musicDesktop.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 musicDesktopStateChanged(evt);
@@ -1272,10 +1279,12 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
         tabSources.addTab("Musics", musicScroll);
 
         pictureScroll.setName("pictureScroll"); // NOI18N
+        pictureScroll.setPreferredSize(new java.awt.Dimension(494, 300));
 
         pictureDesktop.setTabLayoutPolicy(javax.swing.JTabbedPane.SCROLL_TAB_LAYOUT);
         pictureDesktop.setTabPlacement(javax.swing.JTabbedPane.LEFT);
         pictureDesktop.setName("pictureDesktop"); // NOI18N
+        pictureDesktop.setPreferredSize(new java.awt.Dimension(494, 300));
         pictureDesktop.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 pictureDesktopStateChanged(evt);
@@ -1310,6 +1319,7 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
         tabSources.addTab("Texts", textScroll);
 
         searchScroll.setName("searchScroll"); // NOI18N
+        searchScroll.setPreferredSize(new java.awt.Dimension(494, 300));
 
         searchPanel.setName("searchPanel"); // NOI18N
         searchPanel.setPreferredSize(new java.awt.Dimension(494, 300));
@@ -1361,6 +1371,7 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
         });
 
         btnRemove.setText("Remove Selected");
+        btnRemove.setToolTipText("Select one or more streams to remove. ");
         btnRemove.setName("btnRemove"); // NOI18N
         btnRemove.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1375,10 +1386,6 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
             .addGroup(searchPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(searchPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(searchPanelLayout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(lblSearchTitle)
-                        .addGap(0, 0, Short.MAX_VALUE))
                     .addComponent(searchField)
                     .addComponent(lblSearchText, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(lblSearchRes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -1386,12 +1393,13 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, searchPanelLayout.createSequentialGroup()
                         .addComponent(btnStartSearch, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGap(18, 18, 18)
-                        .addComponent(btnClearRes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(btnClearRes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(searchPanelLayout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(lblSearchTitle)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(btnRemove, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
-            .addGroup(searchPanelLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(btnRemove)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         searchPanelLayout.setVerticalGroup(
             searchPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -3471,7 +3479,6 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
             }
         }
 //        System.out.println("Streams:" + allStreams);
-
         for (Object s : allStreams) {
             if (((String) s).toLowerCase().contains(searchField.getText().toLowerCase())) {
                 searchListModel.addElement((String) s);
@@ -3504,68 +3511,13 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                             break;
                         }
                     }
+
                     if (tabIndex != -1) {
                         currentDesktop.setSelectedIndex(tabIndex);
                         tabSources.setSelectedIndex(k);
                         break;
                     }
                 }
-
-//                int totalTabs = videoDesktop.getTabCount();
-//                for (int i = 0; i < totalTabs; i++) {
-//                    String titleAt = videoDesktop.getTitleAt(i).replace("<html><body><table width='20'>", "").replace("</table></body></html>", "").replace("<span></span>", "");
-//                    if (searchName.equals(titleAt)) {
-//                        tabIndex = i;
-//                        desktopIndex = 0;
-//                        break;
-//                    }
-//                }
-//                videoDesktop.setSelectedIndex(tabIndex);
-////                tabSources.setSelectedIndex(0);
-//
-//                if (tabIndex == -1) {
-//                    totalTabs = musicDesktop.getTabCount();
-//                    for (int i = 0; i < totalTabs; i++) {
-//                        String titleAt = musicDesktop.getTitleAt(i).replace("<html><body><table width='20'>", "").replace("</table></body></html>", "").replace("<span></span>", "");
-//                        if (searchName.equals(titleAt)) {
-//                            tabIndex = i;
-//                            desktopIndex = 1;
-//                            break;
-//                        }
-//                    }
-//                    musicDesktop.setSelectedIndex(tabIndex);
-////                    tabSources.setSelectedIndex(1);
-//                }
-//
-//                if (tabIndex == -1) {
-//                    totalTabs = pictureDesktop.getTabCount();
-//                    for (int i = 0; i < totalTabs; i++) {
-//                        String titleAt = pictureDesktop.getTitleAt(i).replace("<html><body><table width='20'>", "").replace("</table></body></html>", "").replace("<span></span>", "");
-//                        if (searchName.equals(titleAt)) {
-//                            tabIndex = i;
-//                            desktopIndex = 2;
-//                            break;
-//                        }
-//                    }
-//                    pictureDesktop.setSelectedIndex(tabIndex);
-////                    tabSources.setSelectedIndex(2);
-//                }
-//                if (tabIndex == -1) {
-//                    totalTabs = textDesktop.getTabCount();
-//                    for (int i = 0; i < totalTabs; i++) {
-//                        String titleAt = textDesktop.getTitleAt(i).replace("<html><body><table width='20'>", "").replace("</table></body></html>", "").replace("<span></span>", "");
-//                        if (searchName.equals(titleAt)) {
-//                            tabIndex = i;
-//                            desktopIndex = 3;
-//                            break;
-//                        }
-//                    }
-//                    textDesktop.setSelectedIndex(tabIndex);
-////                    tabSources.setSelectedIndex(3);
-//                }
-//                if (tabIndex != -1) {
-//                    tabSources.setSelectedIndex(desktopIndex);
-//                }
             }
         }
     }//GEN-LAST:event_searchResListMouseClicked
@@ -3574,11 +3526,11 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
 
         List resSelected = searchResList.getSelectedValuesList();
         int[] indexSelected = searchResList.getSelectedIndices();
-        System.out.println("Sel List: " + resSelected + "Size: " + resSelected.size());
+//        System.out.println("Sel List: " + resSelected + "Size: " + resSelected.size());
 
         for (int c = 0; c < resSelected.size(); c++) {
             String sName = (String) resSelected.get(c);
-            System.out.println("sName: " + sName);
+//            System.out.println("sName: " + sName);
 
             int sIndex = -1;
             JTabbedPane currentDesktop = null;
@@ -3595,36 +3547,20 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                         break;
                     }
                 }
-//                    if (tabIndex != -1) {
-//                        currentDesktop.setSelectedIndex(tabIndex);
-//                        tabSources.setSelectedIndex(k);
-//                        break;
-//                    }
             }
-
-//            int tabIndex = tabSources.getSelectedIndex();
-//            String tabTitle = tabSources.getTitleAt(tabIndex);
-//            
-//            JTabbedPane tabPaneSelected = null;
-//            int selectedNumber = 0;
-//
-//            if (tabTitle.contains("Videos")) {
-//                tabPaneSelected = videoDesktop;
-//            } else if (tabTitle.contains("Musics")) {
-//                tabPaneSelected = musicDesktop;
-//                selectedNumber = 1;
-//            } else if (tabTitle.contains("Pictures")) {
-//                tabPaneSelected = pictureDesktop;
-//                selectedNumber = 2;
-//            } else if (tabTitle.contains("Texts")) {
-//                tabPaneSelected = textDesktop;
-//                selectedNumber = 3;
-//            }
-//            int index = currentDesktop.getSelectedIndex();
-            int index = sIndex;
-            if (index != -1) {
-                int result = JOptionPane.showConfirmDialog(this, "Stream \"" + sName + "\" will be Removed !!!", "Attention", JOptionPane.YES_NO_CANCEL_OPTION);
-                if (result == JFileChooser.APPROVE_OPTION) {
+            if (sIndex != -1) {
+                int result = -1;
+                if (!yesToAll) {
+                    String[] buttons = {"Yes", "Yes to all", "No", "Cancel"};
+                    result = JOptionPane.showOptionDialog(this, "Stream \"" + sName + "\" will be Removed !!!", "Attention",
+                            JOptionPane.WARNING_MESSAGE, 0, null, buttons, buttons[0]);
+//                    System.out.println(result);
+                }
+                if (result == 1) {
+                    yesToAll = true;
+                }
+//                int result = JOptionPane.showConfirmDialog(this, "Stream \"" + sName + "\" will be Removed !!!", "Attention", JOptionPane.YES_NO_CANCEL_OPTION);
+                if (result == 0 || yesToAll) {
                     lblSourceSelected.setText("");
 
                     switch (selectedNumber) {
@@ -3638,11 +3574,9 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                                 lblVideo.setFont(font);
                                 lblVideo.setText("Videos(" + numVideos + ")");
                             }
-                            StreamPanel sPV = (StreamPanel) videoDesktop.getComponentAt(index);
+                            StreamPanel sPV = (StreamPanel) videoDesktop.getComponentAt(sIndex);
                             Stream sV = sPV.getStream();
-//                        System.out.println("sName=" + sName);
-                            currentDesktop.remove(sPV);
-//                        System.out.println("Closed");
+                            videoDesktop.remove(sPV);
                             if (sV.getisATrack() && sV.getName().equals(lblPlayingTrack.getText())) {
                                 listTracks.repaint();
                                 lblPlayingTrack.setText("");
@@ -3665,11 +3599,9 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                                 lblMusic.setFont(font);
                                 lblMusic.setText("Musics(" + numMusics + ")");
                             }
-                            StreamPanel sPA = (StreamPanel) musicDesktop.getComponentAt(index);
+                            StreamPanel sPA = (StreamPanel) musicDesktop.getComponentAt(sIndex);
                             Stream sA = sPA.getStream();
-//                        System.out.println("sName=" + sName);
-                            currentDesktop.remove(sPA);
-//                        System.out.println("Closed");
+                            musicDesktop.remove(sPA);
                             if (sA.getisATrack() && sA.getName().equals(lblPlayingTrack.getText())) {
                                 listTracks.repaint();
                                 lblPlayingTrack.setText("");
@@ -3692,11 +3624,9 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                                 lblPicture.setFont(font);
                                 lblPicture.setText("Pictures(" + numPictures + ")");
                             }
-                            StreamPanel sPP = (StreamPanel) pictureDesktop.getComponentAt(index);
+                            StreamPanel sPP = (StreamPanel) pictureDesktop.getComponentAt(sIndex);
                             Stream sP = sPP.getStream();
-                            sName = sP.getName();
-//                        System.out.println("sName=" + sName);
-                            currentDesktop.remove(sPP);
+                            pictureDesktop.remove(sPP);
                             sP.setLoop(false);
                             PreviewFrameBuilder.unregister(sP);
                             MasterFrameBuilder.unregister(sP);
@@ -3714,10 +3644,9 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                                 lblText.setFont(font);
                                 lblText.setText("Texts(" + numTexts + ")");
                             }
-                            StreamPanelText sPT = (StreamPanelText) textDesktop.getComponentAt(index);
+                            StreamPanelText sPT = (StreamPanelText) textDesktop.getComponentAt(sIndex);
                             Stream sT = sPT.getStream();
-//                        System.out.println("sName=" + sName);
-                            currentDesktop.remove(sPT);
+                            textDesktop.remove(sPT);
                             sT.setLoop(false);
                             PreviewFrameBuilder.unregister(sT);
                             MasterFrameBuilder.unregister(sT);
@@ -3734,15 +3663,16 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                     }
                     ResourceMonitorLabel label = new ResourceMonitorLabel(System.currentTimeMillis() + 10000, "<html>&nbsp;Stream <font color=" + selColLbl2 + ">\"" + sName + "\"</font> Removed.</html>");
                     ResourceMonitor.getInstance().addMessage(label);
+                    searchListModel.remove(indexSelected[0]);
+                    searchResList.revalidate();
+                    indexSelected = searchResList.getSelectedIndices();
                 } else {
                     ResourceMonitorLabel label = new ResourceMonitorLabel(System.currentTimeMillis() + 10000, "Remove Stream Cancelled.");
                     ResourceMonitor.getInstance().addMessage(label);
                 }
             }
-            searchListModel.remove(indexSelected[0]);
-            searchResList.revalidate();
-            indexSelected = searchResList.getSelectedIndices();
         }
+        yesToAll = false;
     }//GEN-LAST:event_btnRemoveActionPerformed
 
     /**
@@ -3810,8 +3740,10 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
             public void run() {
                 try {
                     new TrucklistStudio().setVisible(true);
+
                 } catch (IOException ex) {
-                    Logger.getLogger(TrucklistStudio.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(TrucklistStudio.class
+                            .getName()).log(Level.SEVERE, null, ex);
                 }
             }
         });
@@ -3996,8 +3928,10 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                         PreviewMixer.getInstance().setWidth(mW);
                         PreviewMixer.getInstance().setHeight(mH);
                         PreviewMixer.getInstance().start();
+
                     } catch (ParserConfigurationException | SAXException | IOException | XPathExpressionException ex) {
-                        Logger.getLogger(TrucklistStudio.class.getName()).log(Level.SEVERE, null, ex);
+                        Logger.getLogger(TrucklistStudio.class
+                                .getName()).log(Level.SEVERE, null, ex);
                     }
                     // loading studio streams
                     int cont = 0;
