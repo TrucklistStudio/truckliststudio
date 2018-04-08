@@ -21,7 +21,7 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDropEvent;
-import java.awt.image.BufferStrategy;
+//import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
@@ -51,12 +51,16 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.imageio.ImageIO;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIDefaults;
@@ -139,8 +143,10 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
     private JLabel lblMusic = new JLabel("Musics(0)");
     private JLabel lblPicture = new JLabel("Pictures(0)");
     public static JLabel lblText = new JLabel("Texts(0)");
+    private JLabel lblSearch = new JLabel("Stream search/remove (Beta)");
     public static int textN = 0;
     public static Color busyTab = Color.red;
+    public static Color searchTab = Color.red;
     private Color resetTab = Color.black;
     private String selColLbl = "black";
     public static String selColLbl2 = "green";
@@ -248,8 +254,8 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
      */
     public TrucklistStudio() throws IOException {
 
-        initComponents();        
-        
+        initComponents();
+
         setTitle("TrucklistStudio " + Version.version);
         ImageIcon icon = new ImageIcon(this.getClass().getResource("/truckliststudio/resources/icon.png"));
         this.setIconImage(icon.getImage());
@@ -519,7 +525,8 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
             textDesktop.putClientProperty("Nimbus.Overrides.InheritDefaults", Boolean.TRUE);
             textDesktop.putClientProperty("Nimbus.Overrides", dialogTheme);
             busyTab = Color.red.darker();
-            resetTab = Color.WHITE;
+            resetTab = Color.white;
+            searchTab = Color.yellow;
             selColLbl = "white";
             selColLbl2 = "#ADFF2F";
         }
@@ -527,15 +534,18 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
         lblText.setForeground(resetTab);
         Font font = new Font("Ubuntu", Font.PLAIN, 11);
         lblVideo.setFont(font);
-
         lblMusic.setFont(font);
         lblPicture.setFont(font);
         lblText.setFont(font);
+        Font fontSearch = new Font("Ubuntu", Font.BOLD, 11);
+        lblSearch.setFont(fontSearch);
+        lblSearch.setForeground(searchTab);
 
         tabSources.setTabComponentAt(0, lblVideo);
         tabSources.setTabComponentAt(1, lblMusic);
         tabSources.setTabComponentAt(2, lblPicture);
         tabSources.setTabComponentAt(3, lblText);
+        tabSources.setTabComponentAt(4, lblSearch);
 
         MasterMixer.getInstance().start();
         PreviewMixer.getInstance().start();
@@ -745,6 +755,17 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
         pictureDesktop = new javax.swing.JTabbedPane();
         textScroll = new javax.swing.JScrollPane();
         textDesktop = new javax.swing.JTabbedPane();
+        searchScroll = new javax.swing.JScrollPane();
+        searchPanel = new javax.swing.JPanel();
+        lblSearchTitle = new javax.swing.JLabel();
+        lblSearchText = new javax.swing.JLabel();
+        searchField = new javax.swing.JTextField();
+        lblSearchRes = new javax.swing.JLabel();
+        searchScrollPane = new javax.swing.JScrollPane();
+        searchResList = new javax.swing.JList<>(searchListModel);
+        btnStartSearch = new javax.swing.JButton();
+        btnClearRes = new javax.swing.JButton();
+        btnRemove = new javax.swing.JButton();
         panControls = new javax.swing.JPanel();
         tabControls = new javax.swing.JTabbedPane();
         lblSourceSelected = new javax.swing.JLabel();
@@ -1288,11 +1309,121 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
 
         tabSources.addTab("Texts", textScroll);
 
+        searchScroll.setName("searchScroll"); // NOI18N
+
+        searchPanel.setName("searchPanel"); // NOI18N
+        searchPanel.setPreferredSize(new java.awt.Dimension(494, 300));
+
+        lblSearchTitle.setFont(new java.awt.Font("Dialog", 1, 24)); // NOI18N
+        lblSearchTitle.setText("Stream search/remove");
+        lblSearchTitle.setName("lblSearchTitle"); // NOI18N
+
+        lblSearchText.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblSearchText.setText("Enter Text:");
+        lblSearchText.setName("lblSearchText"); // NOI18N
+
+        searchField.setName("searchField"); // NOI18N
+        searchField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                searchFieldActionPerformed(evt);
+            }
+        });
+
+        lblSearchRes.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblSearchRes.setText("Search Results:");
+        lblSearchRes.setName("lblSearchRes"); // NOI18N
+
+        searchScrollPane.setName("searchScrollPane"); // NOI18N
+
+        searchResList.setToolTipText("Double click to go to selected stream");
+        searchResList.setName("searchResList"); // NOI18N
+        searchResList.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                searchResListMouseClicked(evt);
+            }
+        });
+        searchScrollPane.setViewportView(searchResList);
+
+        btnStartSearch.setText("Start Search");
+        btnStartSearch.setName("btnStartSearch"); // NOI18N
+        btnStartSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnStartSearchActionPerformed(evt);
+            }
+        });
+
+        btnClearRes.setText("New Search");
+        btnClearRes.setName("btnClearRes"); // NOI18N
+        btnClearRes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnClearResActionPerformed(evt);
+            }
+        });
+
+        btnRemove.setText("Remove Selected");
+        btnRemove.setName("btnRemove"); // NOI18N
+        btnRemove.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRemoveActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout searchPanelLayout = new javax.swing.GroupLayout(searchPanel);
+        searchPanel.setLayout(searchPanelLayout);
+        searchPanelLayout.setHorizontalGroup(
+            searchPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(searchPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(searchPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(searchPanelLayout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(lblSearchTitle)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(searchField)
+                    .addComponent(lblSearchText, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblSearchRes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(searchScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 470, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, searchPanelLayout.createSequentialGroup()
+                        .addComponent(btnStartSearch, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnClearRes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addContainerGap())
+            .addGroup(searchPanelLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnRemove)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        searchPanelLayout.setVerticalGroup(
+            searchPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(searchPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lblSearchTitle)
+                .addGap(18, 18, 18)
+                .addComponent(lblSearchText)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(searchField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(searchPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnStartSearch)
+                    .addComponent(btnClearRes))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblSearchRes)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(searchScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 171, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnRemove)
+                .addContainerGap())
+        );
+
+        searchScroll.setViewportView(searchPanel);
+
+        tabSources.addTab("Stream search/remove", searchScroll);
+
         javax.swing.GroupLayout panSourcesLayout = new javax.swing.GroupLayout(panSources);
         panSources.setLayout(panSourcesLayout);
         panSourcesLayout.setHorizontalGroup(
             panSourcesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(toolbar, javax.swing.GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE)
+            .addComponent(toolbar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(tabSources)
         );
         panSourcesLayout.setVerticalGroup(
@@ -1300,7 +1431,7 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
             .addGroup(panSourcesLayout.createSequentialGroup()
                 .addComponent(toolbar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tabSources, javax.swing.GroupLayout.DEFAULT_SIZE, 418, Short.MAX_VALUE))
+                .addComponent(tabSources))
         );
 
         mainSplit.setLeftComponent(panSources);
@@ -2227,7 +2358,7 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                             MasterMixer.getInstance().stop();
                             MasterMixer.getInstance().setWidth(mW);
                             MasterMixer.getInstance().setHeight(mH);
-                            MasterMixer.getInstance().setRate((Integer) Integer.parseInt((String)spinFPS.getValue()));
+                            MasterMixer.getInstance().setRate((Integer) Integer.parseInt((String) spinFPS.getValue()));
                             MasterMixer.getInstance().start();
                             PreviewMixer.getInstance().stop();
                             PreviewMixer.getInstance().setWidth(mW);
@@ -3184,6 +3315,8 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
             String sName = "";
             JTabbedPane tabPaneSelected = null;
 
+            int selIndex = -1;
+
             if (tabTitle.contains("Videos")) {
                 tabPaneSelected = videoDesktop;
             } else if (tabTitle.contains("Musics")) {
@@ -3193,7 +3326,11 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
             } else if (tabTitle.contains("Texts")) {
                 tabPaneSelected = textDesktop;
             }
-            int selIndex = tabPaneSelected.getSelectedIndex();
+
+            if (tabPaneSelected != null) {
+                selIndex = tabPaneSelected.getSelectedIndex();
+            }
+//            System.out.println("selIndex: "+selIndex);
 
             if (selIndex != -1) {
                 String streamName = tabPaneSelected.getTitleAt(selIndex).replace("<html><body><table width='20'>", "").replace("</table></body></html>", "").replace("<span></span>", "");
@@ -3322,6 +3459,292 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
         formWindowClosing(null);
     }//GEN-LAST:event_btnExitActionPerformed
 
+    private void searchFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_searchFieldActionPerformed
+    @SuppressWarnings("unchecked")
+    private void btnStartSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStartSearchActionPerformed
+        final ArrayList<String> allStreams = new ArrayList<>();
+        for (Stream str : MasterTracks.getInstance().getStreams()) {
+            if (!str.toString().toLowerCase().contains("sink")) {
+                allStreams.add(str.getName());
+            }
+        }
+//        System.out.println("Streams:" + allStreams);
+
+        for (Object s : allStreams) {
+            if (((String) s).toLowerCase().contains(searchField.getText().toLowerCase())) {
+                searchListModel.addElement((String) s);
+            }
+        }
+    }//GEN-LAST:event_btnStartSearchActionPerformed
+
+    private void btnClearResActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearResActionPerformed
+        searchListModel.removeAllElements();
+        searchListModel.clear();
+        searchField.setText("");
+    }//GEN-LAST:event_btnClearResActionPerformed
+
+    private void searchResListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_searchResListMouseClicked
+        if (evt.getClickCount() == 2 && !evt.isConsumed()) {
+            evt.consume();
+            if (searchResList.getSelectedIndex() != -1) {
+                int tabIndex = -1;
+                String searchName = searchResList.getSelectedValue().toString();
+                System.out.println("Going To: " + searchName);
+
+                for (int k = 0; k <= 3; k++) {
+                    JViewport viewport = ((JScrollPane) tabSources.getComponentAt(k)).getViewport();
+                    JTabbedPane currentDesktop = (JTabbedPane) viewport.getView();
+                    int totalTabs = currentDesktop.getTabCount();
+                    for (int i = 0; i < totalTabs; i++) {
+                        String titleAt = currentDesktop.getTitleAt(i).replace("<html><body><table width='20'>", "").replace("</table></body></html>", "").replace("<span></span>", "");
+                        if (searchName.equals(titleAt)) {
+                            tabIndex = i;
+                            break;
+                        }
+                    }
+                    if (tabIndex != -1) {
+                        currentDesktop.setSelectedIndex(tabIndex);
+                        tabSources.setSelectedIndex(k);
+                        break;
+                    }
+                }
+
+//                int totalTabs = videoDesktop.getTabCount();
+//                for (int i = 0; i < totalTabs; i++) {
+//                    String titleAt = videoDesktop.getTitleAt(i).replace("<html><body><table width='20'>", "").replace("</table></body></html>", "").replace("<span></span>", "");
+//                    if (searchName.equals(titleAt)) {
+//                        tabIndex = i;
+//                        desktopIndex = 0;
+//                        break;
+//                    }
+//                }
+//                videoDesktop.setSelectedIndex(tabIndex);
+////                tabSources.setSelectedIndex(0);
+//
+//                if (tabIndex == -1) {
+//                    totalTabs = musicDesktop.getTabCount();
+//                    for (int i = 0; i < totalTabs; i++) {
+//                        String titleAt = musicDesktop.getTitleAt(i).replace("<html><body><table width='20'>", "").replace("</table></body></html>", "").replace("<span></span>", "");
+//                        if (searchName.equals(titleAt)) {
+//                            tabIndex = i;
+//                            desktopIndex = 1;
+//                            break;
+//                        }
+//                    }
+//                    musicDesktop.setSelectedIndex(tabIndex);
+////                    tabSources.setSelectedIndex(1);
+//                }
+//
+//                if (tabIndex == -1) {
+//                    totalTabs = pictureDesktop.getTabCount();
+//                    for (int i = 0; i < totalTabs; i++) {
+//                        String titleAt = pictureDesktop.getTitleAt(i).replace("<html><body><table width='20'>", "").replace("</table></body></html>", "").replace("<span></span>", "");
+//                        if (searchName.equals(titleAt)) {
+//                            tabIndex = i;
+//                            desktopIndex = 2;
+//                            break;
+//                        }
+//                    }
+//                    pictureDesktop.setSelectedIndex(tabIndex);
+////                    tabSources.setSelectedIndex(2);
+//                }
+//                if (tabIndex == -1) {
+//                    totalTabs = textDesktop.getTabCount();
+//                    for (int i = 0; i < totalTabs; i++) {
+//                        String titleAt = textDesktop.getTitleAt(i).replace("<html><body><table width='20'>", "").replace("</table></body></html>", "").replace("<span></span>", "");
+//                        if (searchName.equals(titleAt)) {
+//                            tabIndex = i;
+//                            desktopIndex = 3;
+//                            break;
+//                        }
+//                    }
+//                    textDesktop.setSelectedIndex(tabIndex);
+////                    tabSources.setSelectedIndex(3);
+//                }
+//                if (tabIndex != -1) {
+//                    tabSources.setSelectedIndex(desktopIndex);
+//                }
+            }
+        }
+    }//GEN-LAST:event_searchResListMouseClicked
+
+    private void btnRemoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveActionPerformed
+
+        List resSelected = searchResList.getSelectedValuesList();
+        int[] indexSelected = searchResList.getSelectedIndices();
+        System.out.println("Sel List: " + resSelected + "Size: " + resSelected.size());
+
+        for (int c = 0; c < resSelected.size(); c++) {
+            String sName = (String) resSelected.get(c);
+            System.out.println("sName: " + sName);
+
+            int sIndex = -1;
+            JTabbedPane currentDesktop = null;
+            int selectedNumber = 0;
+            for (int k = 0; k <= 3; k++) {
+                JViewport viewport = ((JScrollPane) tabSources.getComponentAt(k)).getViewport();
+                currentDesktop = (JTabbedPane) viewport.getView();
+                int totalTabs = currentDesktop.getTabCount();
+                for (int i = 0; i < totalTabs; i++) {
+                    String titleAt = currentDesktop.getTitleAt(i).replace("<html><body><table width='20'>", "").replace("</table></body></html>", "").replace("<span></span>", "");
+                    if (sName.equals(titleAt)) {
+                        sIndex = i;
+                        selectedNumber = k;
+                        break;
+                    }
+                }
+//                    if (tabIndex != -1) {
+//                        currentDesktop.setSelectedIndex(tabIndex);
+//                        tabSources.setSelectedIndex(k);
+//                        break;
+//                    }
+            }
+
+//            int tabIndex = tabSources.getSelectedIndex();
+//            String tabTitle = tabSources.getTitleAt(tabIndex);
+//            
+//            JTabbedPane tabPaneSelected = null;
+//            int selectedNumber = 0;
+//
+//            if (tabTitle.contains("Videos")) {
+//                tabPaneSelected = videoDesktop;
+//            } else if (tabTitle.contains("Musics")) {
+//                tabPaneSelected = musicDesktop;
+//                selectedNumber = 1;
+//            } else if (tabTitle.contains("Pictures")) {
+//                tabPaneSelected = pictureDesktop;
+//                selectedNumber = 2;
+//            } else if (tabTitle.contains("Texts")) {
+//                tabPaneSelected = textDesktop;
+//                selectedNumber = 3;
+//            }
+//            int index = currentDesktop.getSelectedIndex();
+            int index = sIndex;
+            if (index != -1) {
+                int result = JOptionPane.showConfirmDialog(this, "Stream \"" + sName + "\" will be Removed !!!", "Attention", JOptionPane.YES_NO_CANCEL_OPTION);
+                if (result == JFileChooser.APPROVE_OPTION) {
+                    lblSourceSelected.setText("");
+
+                    switch (selectedNumber) {
+                        case 0:
+                            numVideos -= 1;
+                            if (numVideos > 0) {
+                                lblVideo.setText("Videos(" + numVideos + ")");
+                            } else {
+                                lblVideo.setForeground(resetTab);
+                                Font font = new Font("Ubuntu", Font.PLAIN, 11);
+                                lblVideo.setFont(font);
+                                lblVideo.setText("Videos(" + numVideos + ")");
+                            }
+                            StreamPanel sPV = (StreamPanel) videoDesktop.getComponentAt(index);
+                            Stream sV = sPV.getStream();
+//                        System.out.println("sName=" + sName);
+                            currentDesktop.remove(sPV);
+//                        System.out.println("Closed");
+                            if (sV.getisATrack() && sV.getName().equals(lblPlayingTrack.getText())) {
+                                listTracks.repaint();
+                                lblPlayingTrack.setText("");
+                                listenerTSTP.stopChTime(evt);
+                            }
+                            sV.setLoop(false);
+                            PreviewFrameBuilder.unregister(sV);
+                            MasterFrameBuilder.unregister(sV);
+                            sV.destroy();
+                            sV = null;
+                            tabControls.removeAll();
+                            break;
+                        case 1:
+                            numMusics -= 1;
+                            if (numMusics > 0) {
+                                lblMusic.setText("Musics(" + numMusics + ")");
+                            } else {
+                                lblMusic.setForeground(resetTab);
+                                Font font = new Font("Ubuntu", Font.PLAIN, 11);
+                                lblMusic.setFont(font);
+                                lblMusic.setText("Musics(" + numMusics + ")");
+                            }
+                            StreamPanel sPA = (StreamPanel) musicDesktop.getComponentAt(index);
+                            Stream sA = sPA.getStream();
+//                        System.out.println("sName=" + sName);
+                            currentDesktop.remove(sPA);
+//                        System.out.println("Closed");
+                            if (sA.getisATrack() && sA.getName().equals(lblPlayingTrack.getText())) {
+                                listTracks.repaint();
+                                lblPlayingTrack.setText("");
+                                listenerTSTP.stopChTime(evt);
+                            }
+                            sA.setLoop(false);
+                            PreviewFrameBuilder.unregister(sA);
+                            MasterFrameBuilder.unregister(sA);
+                            sA.destroy();
+                            sA = null;
+                            tabControls.removeAll();
+                            break;
+                        case 2:
+                            numPictures -= 1;
+                            if (numPictures > 0) {
+                                lblPicture.setText("Pictures(" + numPictures + ")");
+                            } else {
+                                lblPicture.setForeground(resetTab);
+                                Font font = new Font("Ubuntu", Font.PLAIN, 11);
+                                lblPicture.setFont(font);
+                                lblPicture.setText("Pictures(" + numPictures + ")");
+                            }
+                            StreamPanel sPP = (StreamPanel) pictureDesktop.getComponentAt(index);
+                            Stream sP = sPP.getStream();
+                            sName = sP.getName();
+//                        System.out.println("sName=" + sName);
+                            currentDesktop.remove(sPP);
+                            sP.setLoop(false);
+                            PreviewFrameBuilder.unregister(sP);
+                            MasterFrameBuilder.unregister(sP);
+                            sP.destroy();
+                            sP = null;
+                            tabControls.removeAll();
+                            break;
+                        case 3:
+                            numTexts -= 1;
+                            if (numTexts > 0) {
+                                lblText.setText("Texts(" + numTexts + ")");
+                            } else {
+                                lblText.setForeground(resetTab);
+                                Font font = new Font("Ubuntu", Font.PLAIN, 11);
+                                lblText.setFont(font);
+                                lblText.setText("Texts(" + numTexts + ")");
+                            }
+                            StreamPanelText sPT = (StreamPanelText) textDesktop.getComponentAt(index);
+                            Stream sT = sPT.getStream();
+//                        System.out.println("sName=" + sName);
+                            currentDesktop.remove(sPT);
+                            sT.setLoop(false);
+                            PreviewFrameBuilder.unregister(sT);
+                            MasterFrameBuilder.unregister(sT);
+                            sT.destroy();
+                            sT = null;
+                            tabControls.removeAll();
+                            break;
+                        default:
+                            break;
+                    }
+                    listenerTSTP.closeItsTrack(sName);
+                    if (sName.length() > 25) {
+                        sName = sName.substring(0, 25) + " ...";
+                    }
+                    ResourceMonitorLabel label = new ResourceMonitorLabel(System.currentTimeMillis() + 10000, "<html>&nbsp;Stream <font color=" + selColLbl2 + ">\"" + sName + "\"</font> Removed.</html>");
+                    ResourceMonitor.getInstance().addMessage(label);
+                } else {
+                    ResourceMonitorLabel label = new ResourceMonitorLabel(System.currentTimeMillis() + 10000, "Remove Stream Cancelled.");
+                    ResourceMonitor.getInstance().addMessage(label);
+                }
+            }
+            searchListModel.remove(indexSelected[0]);
+            searchResList.revalidate();
+            indexSelected = searchResList.getSelectedIndices();
+        }
+    }//GEN-LAST:event_btnRemoveActionPerformed
+
     /**
      *
      */
@@ -3349,13 +3772,12 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
         if (!dir.exists()) {
             dir.mkdir();
         }
-        
-        System.setProperty("sun.java2d.transaccel", "True");
-        System.setProperty("sun.java2d.trace", "timestamp,log,count");
-        System.setProperty("sun.java2d.opengl", "True");
-        System.setProperty("sun.java2d.d3d", "True");
-        System.setProperty("sun.java2d.ddforcevram", "True");
-        
+
+//        System.setProperty("sun.java2d.transaccel", "True");
+//        System.setProperty("sun.java2d.trace", "timestamp,log,count");
+//        System.setProperty("sun.java2d.opengl", "True");
+//        System.setProperty("sun.java2d.d3d", "True");
+//        System.setProperty("sun.java2d.ddforcevram", "True");
         System.out.println("Welcome to TrucklistStudio " + Version.version + " build " + new Version().getBuild() + " ...");
 
         /*
@@ -3421,14 +3843,17 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
     private javax.swing.JButton btnAddFolder;
     private javax.swing.JButton btnAddText;
     private javax.swing.JButton btnApplyTitle;
+    private javax.swing.JButton btnClearRes;
     private javax.swing.JButton btnExit;
     private javax.swing.JButton btnHideVideo;
     private javax.swing.JButton btnImportStudio;
     private final javax.swing.JButton btnLoadStudio = new javax.swing.JButton();
     private javax.swing.JButton btnMinimizeAll;
     private javax.swing.JButton btnNewStudio;
+    private javax.swing.JButton btnRemove;
     private javax.swing.JButton btnRemoveSource;
     private javax.swing.JButton btnSaveStudio;
+    private javax.swing.JButton btnStartSearch;
     private javax.swing.JButton btnSysGC;
     public static javax.swing.JComboBox cboAnimations;
     private javax.swing.JComboBox cboAudioHz;
@@ -3450,6 +3875,9 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
     private javax.swing.JLabel lblAudioFreq;
     private javax.swing.JLabel lblFFmpeg;
     private javax.swing.JLabel lblFFmpeg3;
+    private javax.swing.JLabel lblSearchRes;
+    private javax.swing.JLabel lblSearchText;
+    private javax.swing.JLabel lblSearchTitle;
     private javax.swing.JLabel lblSourceSelected;
     private javax.swing.JLabel lblSysGC;
     private javax.swing.JLabel lblThemeSwitch;
@@ -3464,6 +3892,12 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
     private javax.swing.JPanel panSources;
     private javax.swing.JTabbedPane pictureDesktop;
     private javax.swing.JScrollPane pictureScroll;
+    private javax.swing.JTextField searchField;
+    private javax.swing.JPanel searchPanel;
+    private DefaultListModel<String> searchListModel = new DefaultListModel<>();
+    private javax.swing.JList<String> searchResList;
+    private javax.swing.JScrollPane searchScroll;
+    private javax.swing.JScrollPane searchScrollPane;
     public static javax.swing.JTabbedPane tabControls;
     private javax.swing.JTabbedPane tabSources;
     public static javax.swing.JTabbedPane textDesktop;
@@ -3556,7 +3990,7 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                         MasterMixer.getInstance().stop();
                         MasterMixer.getInstance().setWidth(mW);
                         MasterMixer.getInstance().setHeight(mH);
-                        MasterMixer.getInstance().setRate((Integer) Integer.parseInt((String)spinFPS.getValue()));
+                        MasterMixer.getInstance().setRate((Integer) Integer.parseInt((String) spinFPS.getValue()));
                         MasterMixer.getInstance().start();
                         PreviewMixer.getInstance().stop();
                         PreviewMixer.getInstance().setWidth(mW);

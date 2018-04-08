@@ -1,3 +1,9 @@
+truckliststudio (1.2.0) 08 Apr 2018
+
+  * Changes: About infos.
+  * Adds: Stream search/delete.
+  * New upstream version
+
 truckliststudio (1.1.0) 01 Jan 2018
 
   * Fixes: MasterMixer FPS. (Now the only selectable values are 5, 15, 25 and 30 FPS)

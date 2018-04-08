@@ -1,3 +1,11 @@
+truckliststudio (1.2.0) stable; urgency=low
+
+  * Changes: About infos.
+  * Adds: Stream search/delete.
+  * New upstream version
+
+ -- Karl Ellis <soylent.tv@gmail.com>  Sun, 08 Apr 2018 11:19:58 +0200
+
 truckliststudio (1.1.0) stable; urgency=low
 
   * Fixes: MasterMixer FPS. (Now the only selectable values are 5, 15, 25 and 30 FPS)
