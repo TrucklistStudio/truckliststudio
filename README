@@ -69,6 +69,7 @@ to avoid memory issues.
 https://www.java.com/en/download/manual.jsp
 
 Choose:
+
 Windows Offline (64-bit)
 
 - FFmpeg for Windows are already present in this archive. You can always download the latest version from here (Static Version): 
@@ -81,8 +82,7 @@ For Windows download the latest jars files from:
 
 https://sourceforge.net/projects/truckliststudio/
 
-- To run TrucklistStudio extract the content of the zip file to a folder, open the folder and doubleclick
-on TrucklistStudio.jar icon.
+- To run TrucklistStudio extract the content of the zip file to a folder, open the folder and doubleclick on TrucklistStudio.jar icon.
 
 TrucklistStudio commad line:
 ==============================
