@@ -11,8 +11,7 @@ $ sudo add-apt-repository ppa:soylent-tv/truckliststudio
 $ sudo apt-get update
 $ sudo apt-get install truckliststudio
 
-It is also included an Ubuntu 14.04 Trusty build, but before trying to install you have to add the Openjdk-8 PPA,
-because for 14.04 there isn't any Java 8 OpenJDK official release in the default repos.
+It is also included an Ubuntu 14.04 Trusty build, but before trying to install you have to add the Openjdk-8 PPA, because for 14.04 there isn't any Java 8 OpenJDK official release in the default repos.
 
 So if you want to use TrucklistStudio PPA for Trusty do the following:
 1) Add the Openjdk-8 PPA:
@@ -47,8 +46,7 @@ $ sudo update-alternatives --config java
 
 ... and select the java runtime you want from the list.
 
-To run TrucklistStudio extract the content of the zip file to a folder, open a terminal and navigate to it (TS folder)
-and then type:
+To run TrucklistStudio extract the content of the zip file to a folder, open a terminal and navigate to it (TS folder) and then type:
 $ java -jar TrucklistStudio.jar
 If you run into memory Issues try to set the initial Java Heap memory size to 1Gb:
 $ java -jar -Xms1000m TrucklistStudio.jar
