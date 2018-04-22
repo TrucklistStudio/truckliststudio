@@ -21,7 +21,6 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDropEvent;
-//import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
@@ -143,7 +142,7 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
     private JLabel lblMusic = new JLabel("Musics(0)");
     private JLabel lblPicture = new JLabel("Pictures(0)");
     public static JLabel lblText = new JLabel("Texts(0)");
-    private JLabel lblSearch = new JLabel("Stream search/remove (Beta)");
+    private JLabel lblSearch = new JLabel("Search/Remove");
     public static int textN = 0;
     public static Color busyTab = Color.red;
     public static Color searchTab = Color.red;
