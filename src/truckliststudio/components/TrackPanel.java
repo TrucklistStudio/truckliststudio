@@ -76,6 +76,7 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
     private static String remUser = "truckliststudio";
     private static String remPsw = "truckliststudio";
     private static int remPort = 8000;
+    private String lastTrack = "";
     Preferences preferences = Preferences.userNodeForPackage(this.getClass());
     int playingIndex = 0;
 
@@ -89,7 +90,7 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
         tglStartTrack.doClick();
         listenerCPOP.requestStart();
     }
-    
+
     @Override
     public void requestSkip() {
         btnSkipTrack.doClick();
@@ -115,7 +116,11 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
 
     @Override
     public void resetSinks(ActionEvent evt) { // used resetSinks to AutoPlay from command line.
-        tglStartTrack.doClick();
+        if (lastTrack != "") {
+            System.out.println("LastTrack: " + lastTrack);
+            listTracks.setSelectedValue(lastTrack, true);
+            tglStartTrack.doClick();
+        }
     }
 
     @Override
@@ -125,7 +130,7 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
         String userPsw = loginSplit[1].replace("j_username=", "");
         userPsw = userPsw.replace("j_password=", "");
         userPsw = userPsw.replace(" HTTP/1.1", "");
-        System.out.println("userPsw: "+userPsw);
+        System.out.println("userPsw: " + userPsw);
         if (!userPsw.equals("&")) {
             String[] userPswSplit = userPsw.split("&");
             if (!userPsw.equals("&") && userPswSplit.length > 1) {
@@ -219,7 +224,7 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
         public void requestReset();
 
         public void requestStop();
-        
+
         public void requestSkip();
 
         public void requestStart();
@@ -289,6 +294,7 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
     }
 
     private void loadPrefs() {
+        lastTrack = preferences.get("lasttrack", "");
         remUser = preferences.get("remoteuser", "truckliststudio");
         remPsw = preferences.get("remotepsw", "truckliststudio");
         remPort = preferences.getInt("remoteport", 8000);
@@ -296,6 +302,7 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
     }
 
     public void savePrefs() {
+        preferences.put("lasttrack", lastTrack);
         preferences.put("remoteuser", remUser);
         preferences.put("remotepsw", remPsw);
         preferences.putInt("remoteport", remPort);
@@ -759,7 +766,7 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
         }
     }//GEN-LAST:event_listTracksValueChanged
 
-   @SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked")
     private void btnRemoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveActionPerformed
         if (listTracks.getSelectedIndex() != -1) {
             String name = listTracks.getSelectedValue().toString();
@@ -941,7 +948,9 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
             listTracks.setSelectedValue(trkNxName, true);
             master.selectTrack(trkNxName);
             String name = listTracks.getSelectedValue().toString();
-            System.out.println("Playing: " + name);
+            lastTrack = name;
+            savePrefs();
+            System.out.println("Playing: " + lastTrack);
             lblPlayingTrack.setText(name);
             if (trkNextTime != 0) {
                 trkT = new Timer();
@@ -1367,7 +1376,7 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
         if (evt.getClickCount() == 2 && !evt.isConsumed()) {
             evt.consume();
             if (!tglStartTrack.isSelected()) {
-                
+
                 if (listTracks.getSelectedIndex() != -1) {
                     String name = listTracks.getSelectedValue().toString();
                     master.selectTrack(name);
@@ -1376,6 +1385,8 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
                     lblPlayingTrack.setText(name);
                     btnRemove.setEnabled(false);
                     tglRemote.setEnabled(true);
+                    lastTrack = name;
+                    savePrefs();
 
                     if (CHTimers.get(listTracks.getSelectedIndex()) != 0) {
                         inTimer = true;
@@ -1404,6 +1415,8 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
                         lblPlayingTrack.setText(name);
                         btnRemove.setEnabled(false);
                         tglRemote.setEnabled(true);
+                        lastTrack = name;
+                        savePrefs();
 
                         if (CHTimers.get(listTracks.getSelectedIndex()) != 0) {
                             inTimer = true;
@@ -1482,6 +1495,8 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
         lblPlayingTrack.setText(name);
         btnRemove.setEnabled(false);
         tglRemote.setEnabled(true);
+        lastTrack = name;
+        savePrefs();
         tglStartTrack.setSelected(true);
         if (CHTimers.get(trkOn) != 0) {
             inTimer = true;
@@ -1517,7 +1532,8 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
                 lblPlayingTrack.setText(name);
                 btnRemove.setEnabled(false);
                 tglRemote.setEnabled(true);
-
+                lastTrack = name;
+                savePrefs();
                 if (CHTimers.get(listTracks.getSelectedIndex()) != 0) {
                     inTimer = true;
                     trkT = new Timer();
@@ -1565,6 +1581,8 @@ public class TrackPanel extends javax.swing.JPanel implements TrucklistStudio.Li
             String name = listTracks.getSelectedValue().toString();
             System.out.println("Playing: " + name);
             lblPlayingTrack.setText(name);
+            lastTrack = name;
+            savePrefs();
             if (trkNextTime != 0) {
                 trkT = new Timer();
                 trkT.schedule(new TSelectActionPerformed(), trkNextTime);
