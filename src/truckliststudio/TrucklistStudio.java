@@ -574,8 +574,9 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
             loadAtStart(cmdFile, null);
             while (!loadingFinish) {
                 Tools.sleep(1000);
-                System.out.println("Load Finish: " + loadingFinish);
+//                System.out.println("Load Finish: " + loadingFinish);
             }
+            System.out.println("Loading completed!");
         }
         if (cmdOut != null) {
             listenerOP.addLoadingTrack(cmdOut); // used addLoadingTrack to activate Output from command line.
@@ -3912,6 +3913,7 @@ public final class TrucklistStudio extends JFrame implements StreamPanel.Listene
                         Studio.extstream = new ArrayList<>();
                         Studio.ImgMovMus = new ArrayList<>();
                         Studio.load(file, "load");
+                        System.out.println("Waiting for studio to be load...");
                         Studio.main();
                         spinWidth.setValue(MasterMixer.getInstance().getWidth());
                         spinHeight.setValue(MasterMixer.getInstance().getHeight());
