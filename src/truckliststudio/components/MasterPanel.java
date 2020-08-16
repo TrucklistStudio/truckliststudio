@@ -90,10 +90,10 @@ public class MasterPanel extends javax.swing.JPanel implements MasterMixer.SinkL
         TrackPanel.setListenerCPMPanel(instanceSinkMP);
         panPreview.setLayout(null);
         panPreview.validate();
-        panelPreviewer.remove(preViewer);
-        lblCurtainPre.setOpaque(true);
-        lblCurtainPre.setVisible(true);
-        panelPreviewer.add(lblCurtainPre);
+//        panelPreviewer.remove(preViewer);
+//        lblCurtainPre.setOpaque(true);
+//        lblCurtainPre.setVisible(true);
+//        panelPreviewer.add(lblCurtainPre);
         this.repaint();
         this.revalidate();
     }
@@ -303,7 +303,7 @@ public class MasterPanel extends javax.swing.JPanel implements MasterMixer.SinkL
         lblHeight2.setText(bundle.getString("FAST PREVIEW")); // NOI18N
         lblHeight2.setName("lblHeight2"); // NOI18N
         panPreview.add(lblHeight2);
-        lblHeight2.setBounds(90, 46, 90, 12);
+        lblHeight2.setBounds(90, 46, 90, 13);
 
         tglSound.setIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/tango/audio-card.png"))); // NOI18N
         tglSound.setToolTipText("Java Sound AudioSystem Out (Unstable)");
@@ -359,7 +359,6 @@ public class MasterPanel extends javax.swing.JPanel implements MasterMixer.SinkL
         tabMixers.getAccessibleContext().setAccessibleName(bundle.getString("MIXER")); // NOI18N
 
         panelPreviewer.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.RAISED));
-        panelPreviewer.setToolTipText("Click on the video to Hide");
         panelPreviewer.setMaximumSize(new java.awt.Dimension(180, 120));
         panelPreviewer.setMinimumSize(new java.awt.Dimension(180, 120));
         panelPreviewer.setName("panelPreviewer"); // NOI18N
@@ -372,7 +371,6 @@ public class MasterPanel extends javax.swing.JPanel implements MasterMixer.SinkL
         panelPreviewer.setLayout(new java.awt.BorderLayout());
 
         lblCurtainPre.setIcon(new javax.swing.ImageIcon(getClass().getResource("/truckliststudio/resources/curtain.png"))); // NOI18N
-        lblCurtainPre.setToolTipText("Click on the pattern to Unhide");
         lblCurtainPre.setName("lblCurtainPre"); // NOI18N
         lblCurtainPre.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -600,21 +598,21 @@ public class MasterPanel extends javax.swing.JPanel implements MasterMixer.SinkL
     }//GEN-LAST:event_btnPreviewActionPerformed
 
     private void lblCurtainPreMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblCurtainPreMouseClicked
-        lblCurtainPre.setVisible(false);
-        preViewer.setOpaque(true);
-        panelPreviewer.add(preViewer, BorderLayout.CENTER);
-        prePlayer = PrePlayer.getPreInstance(preViewer);
-        this.repaint();
-        this.revalidate();
+//        lblCurtainPre.setVisible(false);
+//        preViewer.setOpaque(true);
+//        panelPreviewer.add(preViewer, BorderLayout.CENTER);
+//        prePlayer = PrePlayer.getPreInstance(preViewer);
+//        this.repaint();
+//        this.revalidate();
     }//GEN-LAST:event_lblCurtainPreMouseClicked
 
     private void panelPreviewerMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_panelPreviewerMouseClicked
-        panelPreviewer.remove(preViewer);
-        lblCurtainPre.setOpaque(true);
-        lblCurtainPre.setVisible(true);
-        panelPreviewer.add(lblCurtainPre);
-        this.repaint();
-        this.revalidate();
+//        panelPreviewer.remove(preViewer);
+//        lblCurtainPre.setOpaque(true);
+//        lblCurtainPre.setVisible(true);
+//        panelPreviewer.add(lblCurtainPre);
+//        this.repaint();
+//        this.revalidate();
     }//GEN-LAST:event_panelPreviewerMouseClicked
 
     private void jslOpacityStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jslOpacityStateChanged
