@@ -35,17 +35,18 @@ public class ProcessExecutor {
 
     public static int getPID(Process process) throws Exception //Author Martijn Courteaux Code
     {
-//    System.out.println("Process_GetUnixPid: "+process.getClass().getName());
+        System.out.println("Process_GetUnixPid: "+process.getClass().getName());
         String pName = process.getClass().getName();
-//    System.out.println("ProcessType="+pName);
-        if (pName.equals("java.lang.UNIXProcess")) {
+//        System.out.println("ProcessType="+pName);
+//        if (pName.equals("java.lang.UNIXProcess")) {
+        if (pName.equals("java.lang.ProcessImpl") || pName.equals("java.lang.UNIXProcess")) {
             Class cl = process.getClass();
             Field field = cl.getDeclaredField("pid");
             field.setAccessible(true);
             Object pidObject = field.get(process);
             return (Integer) pidObject;
         } else if (os.equals(os.WINDOWS)) {
-//        System.out.println("Windows Process ...");
+//            System.out.println("Windows Process ...");
             int ret = 0;
             try {
                 Field f = process.getClass().getDeclaredField("handle");
@@ -56,7 +57,7 @@ public class ProcessExecutor {
                 WinNT.HANDLE handle = new WinNT.HANDLE();
                 handle.setPointer(Pointer.createConstant(handl));
                 ret = kernel.GetProcessId(handle);
-//            System.out.println("Detected Win32 pid: "+ ret);
+//                System.out.println("Detected Win32 pid: "+ ret);
 
             } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
                 e.printStackTrace();
@@ -107,7 +108,7 @@ public class ProcessExecutor {
         }
         rt.exec("kill " + pid).waitFor(); // andrew.silver0 mod from -9
         rt.exec("kill " + childPids).waitFor(); //andrew.silver0 mod from -9
-//    System.out.println("ChildPid: "+childPids);
+//        System.out.println("ChildPid: "+childPids);
         childPids = null;
     }
 

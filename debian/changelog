@@ -1,3 +1,12 @@
+truckliststudio (1.2.1) stable; urgency=low
+
+  * Fixes: ProcessExecutor getPid()
+  * Removed: ProcessExecutor destroy() because useless.
+  * Removed: Removed multicolor courtain from preview pane, beacause useless.
+  * New upstream version
+
+ -- Karl Ellis <soylent.tv@gmail.com>  Mon, 17 Aug 2020 16:53:21 +0200
+
 truckliststudio (1.2.0) stable; urgency=low
 
   * Changes: About infos.

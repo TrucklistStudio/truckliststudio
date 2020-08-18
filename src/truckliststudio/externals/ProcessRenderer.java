@@ -466,12 +466,12 @@ public class ProcessRenderer {
 //            System.out.println(stream.getName()+" Export Cleared ...");
         }
         if (processVideo != null) {
-            processVideo.destroy();
+//            processVideo.destroy();
             processVideo = null;
 //            System.out.println(stream.getName()+" Video Cleared ...");
         }
         if (processAudio != null) {
-            processAudio.destroy();
+//            processAudio.destroy();
             processAudio = null;
 //            System.out.println(stream.getName()+" Audio Cleared ...");
         }
