@@ -39,7 +39,7 @@
                               <Component id="btnJump" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="spinJumpPos" min="-2" pref="64" max="-2" attributes="0"/>
-                              <EmptySpace pref="150" max="32767" attributes="0"/>
+                              <EmptySpace pref="160" max="32767" attributes="0"/>
                               <Component id="btnDuplicateTrk" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="btnRemove" max="-2" attributes="0"/>
@@ -57,7 +57,7 @@
                               <EmptySpace min="-2" max="-2" attributes="0"/>
                               <Component id="btnSkipTrack" max="32767" attributes="0"/>
                               <EmptySpace min="-2" max="-2" attributes="0"/>
-                              <Component id="btnStopOnlyStream" min="-2" pref="112" max="-2" attributes="0"/>
+                              <Component id="btnStopOnlyStream" max="32767" attributes="0"/>
                               <EmptySpace min="-2" max="-2" attributes="0"/>
                               <Component id="btnStopAllStream" min="-2" pref="112" max="-2" attributes="0"/>
                           </Group>
@@ -460,7 +460,7 @@
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
           <Image iconType="3" name="/truckliststudio/resources/tango/media-playback-start.png"/>
         </Property>
-        <Property name="text" type="java.lang.String" value="Start/Stop Track"/>
+        <Property name="text" type="java.lang.String" value="Start/Stop"/>
         <Property name="toolTipText" type="java.lang.String" value="Start/Stop selected Track Playlist"/>
         <Property name="name" type="java.lang.String" value="tglStartTrack" noResource="true"/>
         <Property name="rolloverIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">

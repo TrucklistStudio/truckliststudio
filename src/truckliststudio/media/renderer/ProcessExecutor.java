@@ -35,7 +35,7 @@ public class ProcessExecutor {
 
     public static int getPID(Process process) throws Exception //Author Martijn Courteaux Code
     {
-        System.out.println("Process_GetUnixPid: "+process.getClass().getName());
+//        System.out.println("Process_GetUnixPid: "+process.getClass().getName());
         String pName = process.getClass().getName();
 //        System.out.println("ProcessType="+pName);
 //        if (pName.equals("java.lang.UNIXProcess")) {

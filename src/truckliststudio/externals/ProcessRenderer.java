@@ -17,6 +17,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import static truckliststudio.TrucklistStudio.audioFreq;
+import static truckliststudio.TrucklistStudio.os;
 import static truckliststudio.TrucklistStudio.wsDistroWatch;
 import static truckliststudio.externals.ProcessRenderer.ACTION.OUTPUT;
 import truckliststudio.media.renderer.Exporter;
@@ -28,6 +29,8 @@ import truckliststudio.streams.Stream;
 import truckliststudio.util.Tools;
 import truckliststudio.util.Tools.OS;
 import truckliststudio.media.renderer.Capturer;
+import static truckliststudio.media.renderer.ProcessExecutor.killUnixProcess;
+import static truckliststudio.media.renderer.ProcessExecutor.killWin32Process;
 import truckliststudio.streams.SinkHLS;
 
 /**
@@ -471,7 +474,9 @@ public class ProcessRenderer {
 //            System.out.println(stream.getName()+" Video Cleared ...");
         }
         if (processAudio != null) {
-//            processAudio.destroy();
+            if (!os.equals(os.WINDOWS)) {
+                processAudio.destroy();
+            }
             processAudio = null;
 //            System.out.println(stream.getName()+" Audio Cleared ...");
         }
