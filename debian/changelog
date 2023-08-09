@@ -1,3 +1,10 @@
+truckliststudio (1.2.2) stable; urgency=low
+
+  * Fixes: Changed libavformat dependency for Lunar and Mantic PPA builds.
+  * New upstream version
+
+ -- Karl Ellis <soylent.tv@gmail.com>  Wed, 09 Aug 2023 11:30:02 +0200
+
 truckliststudio (1.2.1) stable; urgency=low
 
   * Fixes: ProcessExecutor getPid()
